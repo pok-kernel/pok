@@ -1,0 +1,221 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package pingpong
+
+public
+
+with Data_Model;
+with ARINC653;
+with POK;
+
+
+data integer
+properties
+  Data_Model::Data_Representation => integer;
+end integer;
+
+virtual processor partition
+features
+   ErrorRecovered    : in event port;
+   ErrorRaised       : in event port;
+   InitDone          : in event port;
+   SwitchDone        : in event port;
+properties
+   POK::Additional_Features => (console);
+end partition;
+
+virtual processor implementation partition.secure
+modes
+   PartitionInit     : initial mode;
+   PartitionError    : mode;
+   ProcessExecution  : mode;
+   PartitionInit     -[ InitDone ]-> ProcessExecution;
+   ProcessExecution  -[ ErrorRaised ]-> PartitionError;
+   PartitionError    -[ ErrorRecovered ]-> ProcessExecution;
+properties
+   ARINC653::HM_Errors => (Partition_Config) in modes (PartitionInit);
+   ARINC653::HM_Partition_Recovery_Actions => (Ignore) in modes (PartitionInit);
+   POK::Criticality => 1;
+end partition.secure;
+
+virtual processor implementation partition.common
+modes
+   PartitionInit : initial mode;
+   PartitionError : mode;
+   ProcessExecution : mode;
+properties
+   ARINC653::HM_Errors => (Partition_Config) in modes (PartitionInit);
+   ARINC653::HM_Partition_Recovery_Actions => (Ignore) in modes (PartitionInit);
+   POK::Criticality => 10;
+end partition.common;
+
+subprogram hello_part1
+features
+   output : out parameter integer;
+properties
+   source_name => "user_send";
+   source_language => C;
+   Source_Text => ("../../../send.o");
+end hello_part1;
+
+subprogram hello_part2
+features
+   input : in parameter integer;
+properties
+   Source_Text => ("../../../receive.o");
+   source_language => C;
+   source_name => "user_receive";
+end hello_part2;
+
+
+processor ppc
+features
+   InitDone       : in event port;
+   NeedSwitch     : in event port;
+   SwitchDone     : in event port;
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   partition_secure : virtual processor partition.secure;
+   partition_common : virtual processor partition.common;
+modes
+   ModuleInit              : initial mode;
+   SystemFunctionExecution : mode;
+   PartitionSwitching      : mode;
+   ModuleInit -[ InitDone ]-> SystemFunctionExecution;
+   SystemFunctionExecution -[ NeedSwitch ]-> PartitionSwitching;
+   PartitionSwitching -[ SwitchDone ]-> SystemFunctionExecution;
+properties
+   ARINC653::Module_Major_Frame => 1000 ms;
+   ARINC653::Partition_Slots => (500 ms, 500 ms);
+   ARINC653::Slots_Allocation => ( reference (partition_secure), reference (partition_common));
+   ARINC653::HM_Errors => (Module_Init) in modes (ModuleInit, SystemFunctionExecution);
+   ARINC653::HM_Module_Recovery_Actions => (Reset) in modes (ModuleInit, SystemFunctionExecution);
+end ppc.impl;
+
+thread receive_ping
+features
+   datain : in data port integer {ARINC653::Sampling_Refresh_Period => 10 ms;};
+properties
+   Priority => 1;
+   Dispatch_Protocol => Periodic;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+   Compute_Execution_Time => 1 ms .. 2 ms;
+   Period => 200 Ms;
+   ARINC653::HM_Errors => (Stack_Overflow);
+   ARINC653::HM_Process_Recovery_Actions => (Ignore);
+end receive_ping;
+
+thread send_ping
+features
+   dataout : out data port integer {ARINC653::Sampling_Refresh_Period => 20 ms;};
+properties
+   Priority => 1;
+   Dispatch_Protocol => Periodic;
+   Period => 1000 Ms;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+   ARINC653::HM_Errors => (Stack_Overflow);
+   ARINC653::HM_Process_Recovery_Actions => (Ignore);
+end send_ping;
+
+thread implementation send_ping.impl
+calls 
+   call1 : { pspg : subprogram hello_part1;};
+connections
+   parameter pspg.output -> dataout;
+end send_ping.impl;
+
+thread implementation receive_ping.impl
+calls 
+   call1 : { pspg : subprogram hello_part2;};
+connections
+   parameter datain -> pspg.input;
+end receive_ping.impl;
+
+process receive_ping_process
+features
+   pdatain : in data port integer {ARINC653::Sampling_Refresh_Period => 25 ms;};
+end receive_ping_process;
+
+process send_ping_process
+features
+   pdataout : out data port integer
+      {ARINC653::Sampling_Refresh_Period => 15 ms;};
+end send_ping_process;
+
+process implementation receive_ping_process.impl
+subcomponents
+   thr : thread receive_ping.impl;
+connections
+   port pdatain -> thr.datain; 
+end receive_ping_process.impl;
+
+process implementation send_ping_process.impl
+subcomponents
+   thr : thread send_ping.impl;
+connections
+   port thr.dataout -> pdataout;
+end send_ping_process.impl;
+
+memory partitionmemory
+properties
+   Byte_Count => 80000;
+   ARINC653::Memory_Type => (code_memory);
+   ARINC653::Access_Type => read;
+end partitionmemory;
+
+memory mainmemory
+end mainmemory;
+
+memory implementation mainmemory.impl
+subcomponents
+   part1: memory partitionmemory 
+               {ARINC653::Memory_Type => (code_memory);
+                ARINC653::Access_Type => read;};
+   part2: memory partitionmemory
+               {ARINC653::Memory_Type => (data_memory);
+               ARINC653::Access_Type => write;};
+end mainmemory.impl;
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu : processor ppc.impl;
+   pr1 : process send_ping_process.impl;
+   pr2 : process receive_ping_process.impl;
+   mem : memory mainmemory.impl;
+connections
+   port pr1.pdataout -> pr2.pdatain;
+properties
+   actual_processor_binding => 
+      (reference (cpu.partition_secure)) applies to pr2;
+   actual_processor_binding => 
+      (reference (cpu.partition_common)) applies to pr1;
+   actual_memory_binding =>
+      (reference (mem.part1)) applies to pr1;
+   actual_memory_binding =>
+      (reference (mem.part2)) applies to pr2;
+end node.impl;
+
+end pingpong;

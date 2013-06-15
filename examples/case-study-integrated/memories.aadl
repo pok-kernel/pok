@@ -1,0 +1,61 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Dec  3 10:21:25 2009 
+--
+package memories
+
+public
+
+with ARINC653;
+
+memory segment
+end segment;
+
+memory implementation segment.data_segment
+properties
+   ARINC653::Memory_Type => (data_memory);
+   ARINC653::Access_Type => read_write;
+   Byte_Count => 120000;
+end segment.data_segment;
+
+memory implementation segment.code_segment
+properties
+   ARINC653::Memory_Type => (code_memory);
+   ARINC653::Access_Type => read;
+   Byte_Count => 5000;
+end segment.code_segment;
+
+
+memory ram
+end ram;
+
+memory implementation ram.i
+subcomponents
+   segment1_data : memory segment.data_segment;
+   segment1_code : memory segment.code_segment;
+   segment2_data : memory segment.data_segment;
+   segment2_code : memory segment.code_segment;
+   segment3_data : memory segment.data_segment;
+   segment3_code : memory segment.code_segment;
+   segment4_data : memory segment.data_segment;
+   segment4_code : memory segment.code_segment;
+   segment5_data : memory segment.data_segment;
+   segment5_code : memory segment.code_segment;
+   segment6_data : memory segment.data_segment;
+   segment6_code : memory segment.code_segment;
+end ram.i;
+
+
+
+end memories;

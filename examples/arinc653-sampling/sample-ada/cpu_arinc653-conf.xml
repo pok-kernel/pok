@@ -1,0 +1,36 @@
+<ARINC_653_Module xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=".\A653_Part1_rev1.xsd" ModuleName="ppc_impl">
+ <System_HM_Table/>
+ <Module_HM_Table/>
+ <Partition PartitionName="pr2" PartitionIdentifier="1" EntryPoint="main" SystemPartition="true">
+   <Sampling_Port Direction="DESTINATION" Name="pdatain" RefreshRateSeconds=" 0.0250" MaxMessageSize="1"/>
+ </Partition>
+ <Partition PartitionName="pr1" PartitionIdentifier="2" EntryPoint="main" SystemPartition="true">
+   <Sampling_Port Direction="SOURCE" Name="pdataout" RefreshRateSeconds=" 0.0150" MaxMessageSize="1"/>
+ </Partition>
+ <Partition_Memory PartitionName="pr2" PartitionIdentifier="1">
+   <Memory_Requirements SizeBytes="80000" Type="DATA" Access="WRITE"/>
+ </Partition_Memory>
+ <Partition_Memory PartitionName="pr1" PartitionIdentifier="2">
+   <Memory_Requirements SizeBytes="80000" Type="CODE" Access="READ"/>
+ </Partition_Memory>
+ <Module_Schedule MajorFrameSeconds=" 1.0000">
+   <Partition_Schedule PartitionName="pr2" PartitionIdentifier="1" PeriodSeconds=" 1.0000" PeriodDurationSeconds=" 0.5000">
+     <Window_Schedule WindowStartSeconds=" 0.0000" WindowIdentifier="0" WindowDurationSeconds=" 0.5000"/>
+   </Partition_Schedule>
+   <Partition_Schedule PartitionName="pr1" PartitionIdentifier="2" PeriodSeconds=" 1.0000" PeriodDurationSeconds=" 0.5000">
+     <Window_Schedule WindowStartSeconds=" 0.5000" WindowIdentifier="1" WindowDurationSeconds=" 0.5000"/>
+   </Partition_Schedule>
+ </Module_Schedule>
+ <Connection_Table>
+   <Channel ChannelIdentifier="1">
+     <Source>
+       <Standard_Partition PortName="pdataout" PartitionName="pr1" PartitionIdentifier="2"/>
+     </Source>
+     <Destination>
+       <Standard_Partition PortName="pdatain" PartitionName="pr2" PartitionIdentifier="1"/>
+     </Destination>
+   </Channel>
+ </Connection_Table>
+ <Partition_HM_Table/>
+ <Partition_HM_Table/>
+</ARINC_653_Module>

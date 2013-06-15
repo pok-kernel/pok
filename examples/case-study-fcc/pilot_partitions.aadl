@@ -1,0 +1,87 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package pilot_partitions
+
+
+public
+
+with types;
+
+process inceptor_simulation
+features
+   volts       : in data port types::integer;
+   force       : out data port types::integer;
+   position    : out data port types::integer;
+end inceptor_simulation;
+
+process implementation inceptor_simulation.i
+end inceptor_simulation.i;
+
+
+process af_partition
+features
+   backdrive   : out data port types::position;
+   error       : out event data port types::boolean;
+end af_partition;
+
+process implementation af_partition.i
+end af_partition.i;
+
+process aislc_partition
+features
+   positionask       : in data port types::position;
+   voltsask          : out data port types::integer;
+   measuredforce     : in data port types::integer;
+   measuredposition  : in data port types::position;
+   stickposition     : out data port types::position;
+   error             : out event data port types::boolean;
+end aislc_partition;
+
+process implementation aislc_partition.i
+end aislc_partition.i;
+
+process pfc_partition
+features
+   stickposition           : in data port types::position;
+   error                   : out event data port types::boolean;
+   surfacepositionask      : out data port types::position;
+   surfacepositionfeedback : in data port types::position;
+end pfc_partition;
+
+process implementation pfc_partition.i
+end pfc_partition.i;
+
+process reu_errornotification
+features
+   pfcerror       : in event data port types::boolean;
+   aislcerror     : in event data port types::boolean;
+   aferror        : in event data port types::boolean;
+   error          : out event data port types::boolean;
+   externalerror  : in event data port types::boolean;
+end reu_errornotification;
+
+process implementation reu_errornotification.i
+end reu_errornotification.i;
+
+process warning_display
+features
+   error : in event data port types::boolean;
+end warning_display;
+
+process implementation warning_display.i
+end warning_display.i;
+
+end pilot_partitions;

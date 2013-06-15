@@ -1,0 +1,183 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package pingpong
+
+public
+
+with Data_Model;
+with POK;
+
+
+data integer
+properties
+  Data_Model::Data_Representation => integer;
+end integer;
+
+virtual bus secure_bus
+properties
+   POK::security_level => 10;
+   Required_Connection_Quality_Of_Service => (SecureDelivery);
+end secure_bus;
+
+virtual bus medium_bus
+properties
+   POK::security_level => 8;
+   Required_Connection_Quality_Of_Service => (SecureDelivery);
+end medium_bus;
+
+
+virtual bus common_bus
+properties
+   POK::security_level => 1;
+   Required_Connection_Quality_Of_Service => (SecureDelivery);
+end common_bus;
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libc_stdio);
+end partition;
+
+virtual processor implementation partition.secure
+properties
+   Provided_Virtual_Bus_Class => 
+               (classifier (pingpong::secure_bus));
+end partition.secure;
+
+subprogram hello_part1
+features
+   output : out parameter integer;
+properties
+   source_name => "user_send";
+   source_language => C;
+   POK::Source_Location => "../../../send.o";
+end hello_part1;
+
+subprogram hello_part2
+features
+   input : in parameter integer;
+properties
+   POK::Source_Location => "../../../receive.o";
+   source_language => C;
+   source_name => "user_receive";
+end hello_part2;
+
+virtual processor implementation partition.common
+properties
+   Provided_Virtual_Bus_Class => 
+               (classifier (pingpong::common_bus));
+end partition.common;
+
+processor ppc
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   partition_secure : virtual processor partition.secure;
+   partition_common : virtual processor partition.common;
+properties
+   POK::Major_Frame => 1000 ms;
+   POK::Scheduler => static;
+   POK::Slots => (500 ms, 500 ms);
+   POK::Slots_Allocation => ( reference (partition_secure), reference (partition_common));
+end ppc.impl;
+
+thread receive_ping
+features
+   datain : in data port integer {POK::Refresh_Time => 10 ms;};
+properties
+   Dispatch_Protocol => Periodic;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+   Period => 200 Ms;
+end receive_ping;
+
+thread send_ping
+features
+   dataout : out data port integer {POK::Refresh_Time => 20 ms;};
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 1000 Ms;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+end send_ping;
+
+thread implementation send_ping.impl
+calls 
+   call1 : { pspg : subprogram hello_part1;};
+connections
+   parameter pspg.output -> dataout;
+end send_ping.impl;
+
+thread implementation receive_ping.impl
+calls 
+   call1 : { pspg : subprogram hello_part2;};
+connections
+   parameter datain -> pspg.input;
+end receive_ping.impl;
+
+process receive_ping_process
+features
+   pdatain : in data port integer {POK::Refresh_Time => 25 ms;};
+properties
+   Time_Slot => ( 2 );
+   POK::Needed_Memory_Size =>  120 Kbyte;
+end receive_ping_process;
+
+process send_ping_process
+features
+   pdataout : out data port integer
+       {POK::Refresh_Time => 15 ms;};
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end send_ping_process;
+
+process implementation receive_ping_process.impl
+subcomponents
+   thr : thread receive_ping.impl;
+connections
+   port pdatain -> thr.datain; 
+-- Specify the middleware 
+end receive_ping_process.impl;
+
+process implementation send_ping_process.impl
+subcomponents
+   thr : thread send_ping.impl;
+connections
+   port thr.dataout -> pdataout;
+end send_ping_process.impl;
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu : processor ppc.impl;
+   pr1 : process send_ping_process.impl;
+   pr2 : process receive_ping_process.impl;
+connections
+   port pr1.pdataout -> pr2.pdatain;
+properties
+   actual_processor_binding => 
+      (reference (cpu.partition_secure)) applies to pr2;
+   actual_processor_binding => 
+      (reference (cpu.partition_common)) applies to pr1;
+end node.impl;
+
+end pingpong;

@@ -1,0 +1,320 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Dec  3 10:21:25 2009 
+--
+package threads
+public
+
+with types;
+with ARINC653;
+
+----------------------------------------
+--  WARNING ANNUNCIATION MANAGER
+----------------------------------------
+
+thread thread_warningannunciationmanager
+properties
+   Dispatch_Protocol       => Periodic;
+   Period                  => 50 Ms;
+   Compute_Execution_Time  => 5 Ms .. 15 Ms;
+   Source_Data_Size        => 10 Kbyte;
+   Source_Code_Size        => 10 Kbyte;
+end thread_warningannunciationmanager;
+
+thread implementation thread_warningannunciationmanager.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_warningannunciationmanager;};
+end thread_warningannunciationmanager.impl;
+
+
+
+----------------------------------------
+--  DISPLAY MANAGER
+----------------------------------------
+
+thread thread_displaymanager
+features
+-- Previous declaration from Integrated1 example
+-- DMToDisplay: feature group types::PageReturn;
+-- DMToPCM: feature group types::PageRequest;
+   DMToDisplay_Request  : in data port types::PageRequestCmd;
+   DMToDisplay_Page     : out data port types::PageContent;
+   DMToPCM_Page         : in data port types::PageContent;
+   DMToPCM_Request      : out data port types::PageRequestCmd;
+properties
+   Dispatch_Protocol       => Periodic;
+   Period                  => 50 Ms;
+   Compute_Execution_Time  => 5 Ms .. 15 Ms;
+   Source_Data_Size        => 10 Kbyte;
+   Source_Code_Size        => 10 Kbyte;
+end thread_displaymanager;
+
+thread implementation thread_displaymanager.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_displaymanager;};
+connections
+   parameter pspg.request -> DMToPCM_Request;
+   parameter DmToPCM_Page -> pspg.page;
+end thread_displaymanager.impl;
+
+
+----------------------------------------
+--  PAGE CONTENT MANAGER
+----------------------------------------
+
+thread thread_pagecontentmanager
+features
+-- Previous declaration from Integrated1 example
+--   PCMToDM: feature group types::PageReturn;
+--   PCMToFM: feature group types::PageRequest;
+   PCMToFM_Request      : out data port types::PageRequestCmd;
+   PCMToFM_Page         : in data port types::PageContent;
+   PCMToDM_Request      : in data port types::PageRequestCmd;
+   PCMToDM_Page         : out data port types::PageContent;
+properties
+   Dispatch_Protocol          => Periodic;
+   Period                     => 50 Ms;
+   Compute_Execution_Time     => 5 Ms .. 15 Ms;
+   Source_Data_Size           => 10 Kbyte;
+   Source_Code_Size           => 10 Kbyte;
+end thread_pagecontentmanager;
+
+thread implementation thread_pagecontentmanager.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_pagecontentmanager;};
+end thread_pagecontentmanager.impl;
+
+
+----------------------------------------
+--  FLIGHT MANAGER
+----------------------------------------
+
+thread NavigationSensorProcessing
+features
+   navSignalDataFromSensor    : in data port types::NavSignalData;
+   navSensorDataToIN          : out data port types::NavSensorData;
+properties
+   Dispatch_Protocol          => Periodic;
+   Period                     => 50 Ms;
+   Compute_Execution_Time     => 5 Ms .. 15 Ms;
+   Source_Data_Size           => 10 Kbyte;
+   Source_Code_Size           => 10 Kbyte;
+end NavigationSensorProcessing;
+
+thread implementation NavigationSensorProcessing.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_navigationsensorprocessing;};
+end NavigationSensorProcessing.impl;
+
+
+thread IntegratedNavigation
+features
+   navSensorDataFromNSP : in data port types::NavSensorData;
+   navDataToGPAPC       : out data port types::NavData;
+properties
+   Dispatch_Protocol          => Periodic;
+   Period                     => 100 Ms;
+   Compute_Execution_Time     => 10 Ms .. 40 Ms;
+   Source_Data_Size           => 10 Kbyte;
+   Source_Code_Size           => 10 Kbyte;
+end IntegratedNavigation;
+
+thread implementation IntegratedNavigation.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_integratednavigation;};
+end IntegratedNavigation.impl;
+
+
+thread GuidanceProcessing
+features
+   navDataFromIN  : in data port types::NavData;
+   fpDataFromFPP  : in data port types::FPData;
+   guidanceToFPP  : out data port types::GuidanceData;
+properties
+   Dispatch_Protocol       => Periodic;
+   Period                  => 50 Ms;
+   Compute_Execution_Time  => 8 Ms .. 30 Ms;
+   Source_Data_Size        => 10 Kbyte;
+   Source_Code_Size        => 10 Kbyte;
+end GuidanceProcessing;
+
+thread implementation GuidanceProcessing.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_guidanceprocessing;};
+end GuidanceProcessing.impl;
+
+thread FlightPlanProcessing
+features
+   guidanceFromGP    : in data port types::GuidanceData;
+   perfDataFromAPC   : in data port types::PerformanceData;
+   fpDataToGPAPC     : out data port types::FPData;
+properties
+   Dispatch_Protocol       => Periodic;
+   Period                  => 200 Ms;
+   Compute_Execution_Time  => 10 Ms .. 30 Ms;
+   Source_Data_Size        => 10 Kbyte;
+   Source_Code_Size        => 10 Kbyte;
+end FlightPlanProcessing;
+
+thread implementation FlightPlanProcessing.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_flightplanprocessing;};
+end FlightPlanProcessing.impl;
+
+
+thread AircraftPerformanceCalculation
+features
+   fpDataFromFPP     : in data port types::FPData;
+   navDataFromIN     : in data port types::NavData;
+   fuelFlow          : in data port types::FuelFlowData;
+   perfDataToFPP     : out data port types::PerformanceData;
+properties
+   Dispatch_Protocol       => Periodic;
+   Period                  => 500 Ms;
+   Compute_Execution_Time  => 1 Ms .. 100 Ms;
+   Source_Data_Size        => 10 Kbyte;
+   Source_Code_Size        => 10 Kbyte;
+end AircraftPerformanceCalculation;
+
+thread implementation AircraftPerformanceCalculation.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_aircraftperformancecalculation;};
+end AircraftPerformanceCalculation.impl;
+
+thread PeriodicIO
+features
+-- Previous declaration from Integrated1 example
+-- fromOutside: feature group types::FMInData;
+-- toOutside: feature group types::FMOutData;
+   toOutside_guidanceOut            : out data port types::GuidanceData;
+   toOutside_fpDataOut              : out data port types::FPData;
+   toOutside_navDataOut             : out data port types::NavData;
+   fromOutside_fuelFlow             : in data port types::FuelFlowData;
+   fromOutside_navSignal            : in data port types::navSignalData;
+   fuelFlow                         : out data port types::FuelFlowData;
+   navSignal                        : out data port types::NavSignalData;
+   guidanceOut                      : in data port types::GuidanceData;
+   fpDataOut                        : in data port types::FPData;
+   navDataOut                       : in data port types::NavData;
+   New_Page_Request_From_PCM        : in data port types::PageRequestCmd;
+   New_Page_Request_To_PageFeed     : out data port types::PageRequestCmd;
+   New_Page_Request_From_PageFeed   : in data port types::PageRequestCmd;
+   New_Page_Request_To_FD           : out data port types::PageRequestCmd;
+   New_Page_Content_from_FD         : in data port types::PageContent;
+   New_Page_Content_To_PageFeed     : out data port types::PageContent;
+   New_Page_Content_From_PageFeed   : in data port types::PageContent;
+   New_Page_Content_To_PCM          : out data port types::PageContent;
+properties
+   Dispatch_Protocol       => Periodic;
+   Period                  => 50 Ms;
+   Compute_Execution_Time  => 1 Ms .. 1 Ms;
+   Source_Data_Size        => 10 Kbyte;
+   Source_Code_Size        => 10 Kbyte;
+end PeriodicIO;
+
+thread implementation PeriodicIO.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_periodicio;};
+connections
+-- Previous declaration from Integrated1 example
+-- feature group pspg.toOutside -> toOutside;
+   port pspg.fuelFlow -> fuelFlow;
+   port pspg.navSignal -> navSignal;
+   port guidanceOut -> pspg.guidanceOut;
+   port navDataOut -> pspg.navDataOut;
+   port fpDataOut -> pspg.fpDataOut;
+   port fromOutside_fuelFlow              -> pspg.fromOutside_fuelFlow;
+   port fromOutside_navSignal             -> pspg.fromOutside_navSignal;
+   port pspg.toOutside_guidanceOut        -> toOutside_guidanceOut;
+   port pspg.toOutside_fpDataOut          -> toOutside_fpDataOut;
+   port pspg.toOutside_navDataOut         -> toOutside_navDataOut;
+   port New_Page_Request_From_PCM         -> pspg.New_Page_Request_From_PCM;
+   port pspg.New_Page_Request_To_PageFeed -> New_Page_Request_To_PageFeed;
+   port New_Page_Request_From_PageFeed    -> pspg.New_Page_Request_From_PageFeed;
+   port pspg.New_Page_Request_To_FD       -> New_Page_Request_To_FD;
+   port New_Page_Content_From_FD          -> pspg.New_Page_Content_From_FD;
+   port pspg.New_Page_Content_To_PageFeed -> New_Page_Content_To_PageFeed;
+   port New_Page_Content_From_PageFeed    -> pspg.New_Page_Content_From_PageFeed;
+   port pspg.New_Page_Content_To_PCM      -> New_Page_Content_To_PCM;
+end PeriodicIO.impl;
+
+thread HandlePageRequest
+features
+   New_Page_Request_From_PCM  : in data port types::PageRequestCmd;
+   New_Page_Content_To_PCM    : out data port types::PageContent;
+   New_Page_Request_To_FD     : out data port types::PageRequestCmd;
+   New_Page_Content_from_FD   : in data port types::PageContent;
+properties
+   Dispatch_Protocol       => Periodic;
+   Compute_Execution_Time  => 1 Ms .. 1 Ms;
+   Period                  => 50 Ms;
+   Source_Data_Size        => 10 Kbyte;
+   Source_Code_Size        => 10 Kbyte;
+end HandlePageRequest;
+
+thread implementation HandlePageRequest.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_handlepagerequest;};
+end HandlePageRequest.impl;
+
+----------------------------------------
+--  FLIGHT DIRECTOR
+----------------------------------------
+
+thread thread_flightdirector
+features
+-- Previous declaration from Integrated1 example
+-- FDToFM: feature group types::PageReturn;
+   FDToFM_Request       : in data port types::PageRequestCmd;
+   FDToFM_Page          : out data port types::PageContent;
+properties
+   Dispatch_Protocol          => Periodic;
+   Compute_Execution_Time     => 1 Ms .. 1 Ms;
+   Period                     => 50 Ms;
+   Source_Data_Size           => 10 Kbyte;
+   Source_Code_Size           => 10 Kbyte;
+	ARINC653::HM_Errors                          => (Numeric_Error);
+	ARINC653::HM_Process_Recovery_Actions        => (Warm_Restart);
+end thread_flightdirector;
+
+thread implementation thread_flightdirector.impl
+calls
+   call1: {pspg : subprogram subprograms::spg_flightdirector;};
+end thread_flightdirector.impl;
+
+------------------------------------------------
+--  MFD
+------------------------------------------------
+
+thread thread_mfd_driver
+features
+   DisplayToDM_Request  : out data port types::PageRequestCmd;
+   DisplayToDM_Page     : in data port types::PageContent;
+properties
+   Dispatch_Protocol          => Periodic;
+   Compute_Execution_Time     => 1 Ms .. 1 Ms;
+   Period                     => 50 Ms;
+   Source_Data_Size           => 10 Kbyte;
+   Source_Code_Size           => 10 Kbyte;
+end thread_mfd_driver;
+
+thread implementation thread_mfd_driver.i
+calls
+   call1: {pspg : subprogram subprograms::mfd_driver;};
+connections
+   port pspg.DisplayToDM_Request -> DisplayToDM_Request;
+   port DisplayToDM_Page -> pspg.DisplayToDM_Page;
+end thread_mfd_driver.i;
+
+end threads;

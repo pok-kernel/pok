@@ -1,0 +1,3 @@
+ - autobuild-pok.sh   - autobuild script
+ - checker            - OSATE/Topcased plugin to check security
+                        and safety on AADL models

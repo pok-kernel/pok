@@ -1,0 +1,48 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package memories
+
+public
+
+   memory memory_segment
+   end memory_segment;
+
+   memory implementation memory_segment.i
+   properties
+      Byte_Count => 80000;
+   end memory_segment.i;
+
+   memory ram
+   end ram;
+
+   memory implementation ram.position
+   subcomponents
+      calculator     : memory memory_segment.i;
+      negociation    : memory memory_segment.i;
+      netif          : memory memory_segment.i {Byte_Count => 95000;};
+   end ram.position;
+
+   memory implementation ram.pilot
+   subcomponents
+      af             : memory memory_segment.i;
+      aislc          : memory memory_segment.i;
+      pfc            : memory memory_segment.i;
+      reu            : memory memory_segment.i;
+      errordisplay   : memory memory_segment.i;
+      inceptor       : memory memory_segment.i;
+      netif          : memory memory_segment.i {Byte_Count => 95000;};
+   end ram.pilot;
+end memories;

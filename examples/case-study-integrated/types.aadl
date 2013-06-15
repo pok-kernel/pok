@@ -1,0 +1,112 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Dec  3 10:21:25 2009 
+--
+package types
+public
+
+   with Data_Model;
+
+  feature group PageRequest
+    features
+      request: out data port PageRequestCmd;
+      page: in data port PageContent;
+  end PageRequest;
+
+
+  feature group PageReturn
+    inverse of PageRequest
+  end PageReturn;
+  
+  data PageRequestCmd
+      properties
+         Data_Model::Data_Representation => integer;
+  end PageRequestCmd;
+  
+  data MenuCmd
+      properties
+         Data_Model::Data_Representation => integer;
+  end MenuCmd;
+  
+  data PageContent
+      properties
+         Data_Model::Data_Representation => integer;
+  end PageContent;
+  
+  data PageImage
+      properties
+         Data_Model::Data_Representation => integer;
+  end PageImage;
+  
+  data NavSignalData
+      properties
+         Data_Model::Data_Representation => integer;
+  end NavSignalData;
+  
+  data NavSensorData
+      properties
+         Data_Model::Data_Representation => integer;
+  end NavSensorData;
+  
+  data NavData
+      properties
+         Data_Model::Data_Representation => integer;
+  end NavData;
+  
+  data FuelFlowData
+      properties
+         Data_Model::Data_Representation => integer;
+  end FuelFlowData;
+  
+  data GuidanceData
+      properties
+         Data_Model::Data_Representation => integer;
+  end GuidanceData;
+  
+  data FPData
+      properties
+         Data_Model::Data_Representation => integer;
+  end FPData;
+  
+  data PerformanceData
+      properties
+         Data_Model::Data_Representation => integer;
+  end PerformanceData;
+  
+  feature group FMInData
+    features
+      fuelFlow: in data port FuelFlowData;
+      navSignal: in data port NavSignalData;
+  end FMInData;
+  
+  feature group FMInDataInv
+    inverse of FMInData
+  end FMInDataInv;
+  
+  feature group FMOutData
+    features
+      guidanceOut: out data port GuidanceData;
+      fpDataOut: out data port FPData;
+      navDataOut: out data port NavData;
+  end FMOutData;
+  
+  feature group FMOutDataInv
+    inverse of FMOutData
+  end FMOutDataInv;
+  
+   data SharedData
+      properties
+         Data_Model::Data_Representation => integer;
+   end SharedData;
+end types;

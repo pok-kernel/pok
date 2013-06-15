@@ -1,0 +1,121 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Thu Apr 30 14:07:20 2009 
+%
+
+
+\chapter{Introduction}
+
+   \section{What is \pok ?}
+   \pok is a kernel dedicated to real-time embedded systems. This kernel works on
+   various architectures. The configuration code, the deployment code as well as
+   the application (userland) code can be automatically generated, achieving
+   zero-coding approach.
+
+   One main goal of \pok is to be compliant with many industrial standards. In
+   the embedded domain, many API exist for different application domains
+   (avionics, railway, automotive). However, concepts remain the same. \pok 
+   proposes a canonical adaptive kernel compliant with several industrial
+   standards.
+
+   \section{Purpose of this document}
+   This document provides general information about \pok. It also present
+   available API, describes them and detail how to configure the kernel.
+
+   \section{Supported platforms}
+   At this time, \pok supports the following platforms:
+   \begin{itemize}
+      \item[$\bullet$]
+         x86, emulation with \qemu
+      \item[$\bullet$]
+         \powerpc
+      \item[$\bullet$]
+         \leon, a platform for aerospace applications
+   \end{itemize}
+
+      \subsection{x86}
+      The x86 support is included to rapidly develop applications and 
+      test them into an emulator like \qemu or bochs.
+
+      \subsection{PowerPC}
+      A \powerpc port is available. The port is available for the following BSP:
+      \begin{itemize}
+         \item[$\bullet$]
+            prep
+      \end{itemize}
+
+      \subsection{LEON3}
+      A port for the LEON3 architecture (a typical architecture in the aerospace
+      domain) is currrently in progress. Please contact the POK team if you are
+      interested by this port.
+
+
+   \section{Supported standards}
+   \pok is compliant with the following standards:
+   \begin{itemize}
+      \item[$\bullet$] ARINC653
+      \item[$\bullet$] MILS
+   \end{itemize}
+
+   To achieve standard compliance, \pok relies on a minimal API that provides few
+   canonical services. These services then interact with the kernel to interact
+   with other nodes/processes.
+
+      \subsection{ARINC653 support}
+      At this time, \pok is compliant with the ARINC653 standard, meaning that it
+      provides partitioning functionnalities. On the userland-side, it provides
+      all the C and Ada API of the first part of ARINC653.
+
+      However, \pok does not have an XML parser to automatically create the
+      configuration/deployment code from ARINC653 XML files. 
+     
+      \subsection{MILS}
+      MILS stands for Multiple Independent Level of Security. \pok, by defining
+      strong partitioning, can be MILS-compliant, depending on its
+      configuration. Most of the time, the MILS compliant can be reached with
+      a analysis of the system in terms of security. To encrypt data, \pok
+      relies on the OpenSSL library, released under a BSD-license (see
+      http://www.openssl.org for more information).
+
+   \section{About the \pok team}
+   \pok is a research project. It was made to experiment partitioned
+   architectures and build safe and secure embedded systems. It was initiated
+   during a PhD thesis at TELECOM
+   ParisTech\footnote{http://www.telecom-paristech.fr} and
+   LIP6\footnote{http://www.lip6.fr} laboratories. The developer leader is
+   \textsc{Julien Delange}, who did his PhD on partitioned architectures.
+
+   However, several students from the EPITA school\footnote{http://www.epita.fr}
+   joined the project and improve for several purposes (projects, exercises, fun,
+   \ldots). In addition, other people contributed to the project for several
+   reasons.
+
+   There is a list of the people involved in the project (alphabetical order):
+   \begin{itemize}
+      \item
+         Fabien Chouteau (LEON port)
+      \item
+         Tristan Gingold (PowerPC port)
+      \item
+         François Goudal (initial version known as the Gunther project)
+      \item
+         Laurent Lec (Realtek 8029 driver, kernel IPC and so on)
+      \item
+         Pierre-Olivier Haye (memory protection)
+      \item
+         Julian Pidancer (initial work on partition isolation)
+   \end{itemize}
+
+   Hope the team will grow up in a near future !
+

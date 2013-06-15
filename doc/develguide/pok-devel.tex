@@ -1,0 +1,426 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Thu Apr 30 14:07:20 2009 
+%
+
+
+\documentclass[oneside]{article}
+\usepackage{xspace}
+\usepackage{epsfig}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{pslatex}
+\usepackage{epsfig}
+\usepackage{url}
+\usepackage[english]{babel}
+
+\usepackage{rotating}
+
+\newcommand{\Concept}[1]{#1\xspace}
+\newcommand{\aadl}{\Concept{AADL}}
+\newcommand{\ada}{\Concept{Ada}}
+\newcommand{\arinc}{\Concept{ARINC653}}
+\newcommand{\scade}{\Concept{SCADE}}
+\newcommand{\simulink}{\Concept{Simulink}}
+\newcommand{\leon}{\Concept{Leon3}}
+\newcommand{\powerpc}{\Concept{PowerPC}}
+\newcommand{\qemu}{\Concept{QEMU}}
+\newcommand{\pok}{\Concept{POK}}
+\newcommand{\macosx}{\Concept{Mac OS X}}
+\newcommand{\windows}{\Concept{Windows}}
+\newcommand{\linux}{\Concept{Linux}}
+\newcommand{\intel}{\textsc{Intel}}
+\newcommand{\ocarina}{\textit{Ocarina}\xspace}
+\newcommand{\susp}{.\xspace}
+
+\lstdefinelanguage{aadl}
+{morekeywords={aadlboolean,aadlinteger,aadlreal,aadlstring,access,all,and,
+        annex,applies,binding,bus,calls,classifier,connections,constant,
+        data,delta,device,end,enumeration,event,extends,false,features,flow,
+        flows,group,implementation,in,inherit,initial,inverse,is,list,memory,
+        mode,modes,none,not,of,or,out,package,parameter,path,port,private,
+        process,processor,virtual,properties,property,provides,public,range,
+        reference,refined,refines,requires,server,set,sink,source,
+        subcomponents,subprogram,system,thread,to,true,type,units,value},
+morecomment=[l]{--}}
+
+% Layout for listings
+
+\lstset{language=aadl,
+        basicstyle=\scriptsize\sffamily,
+        aboveskip=.1cm, % \smallskipamount, % \bigskipamount,
+        belowskip=.1cm, % \smallskipamount, % \bigskipamount,
+        abovecaptionskip=.1cm, % \smallskipamount, % \medskipamount,
+        belowcaptionskip=.1cm, % \smallskipamount, % \bigskipamount,
+        xleftmargin=.0cm,
+        numbersep=-10pt,
+        captionpos=b,
+        numbers=right,
+        tabsize=3}
+
+
+
+\newcommand{\onehugefig}[3]{%
+  \begin{figure}[htbp]
+    \centerline{\epsfig{file=#1.pdf,width=.60\textwidth}}
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}
+
+\newcommand{\onefullfig}[3]{%
+  \begin{figure}[htbp]
+    \centerline{\epsfig{file=#1.pdf,width=.45\textwidth}}
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}
+
+
+
+\newcommand{\onemedfig}[3]{%
+  \begin{figure}[htbp]
+    \centerline{\epsfig{file=#1.pdf,width=.35\textwidth}}
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}
+
+
+\begin{document}
+
+\title{POK Developper Guide}
+
+\author{POK Team}
+
+\date{\today}
+
+
+\maketitle
+
+\tableofcontents
+
+%\listoffigures
+\section{About this manual}
+This manual provides information about the development of POK. It indicates
+coding rules and naming convention so that everybody could improve POK by
+modifying its source code.
+
+   \subsection{About POK}
+   POK is a free operating system compliant with the ARINC653 and MILS
+   standards. It provides time and space partitioning to isolate software in
+   partitions. POK is released under the BSD licence and thus, could be modified
+   and used for commercial as well as non-commercial use. To have more
+   information about the licence of the projet, see POK
+   website\footnote{http://pok.gunnm.org}.
+
+\section{Coding guidelines}
+There are our coding guidelines:
+\begin{enumerate}
+    \item
+      Prefix for types: \texttt{pok\_}
+   \item
+      Prefix for functions : \texttt{pok\_}
+   \item
+      Prefix for maccro: \texttt{POK\_} but not for conditional compiling:
+      \begin{enumerate}
+         \item
+            When the code needs a functionnality, we define a maccro with the prefix \texttt{POK\_NEEDS\_my-functionnality}
+         \item
+            When a maccro configures the kernel or user code, it has the prefix \\ \texttt{POK\_CONFIG\_my-config-directive}
+      \end{enumerate}
+   \item
+      Indentation for ANY loop/condition
+   \item
+      Commits must be as small as possible
+   \item
+      Reduce machine-dependent code as more as possible
+   \item
+      Each header-file must begin with \texttt{\#ifdef \_\_POK\_SUBCATEGORY\_FILENAME\_H\_\_}
+   \item
+      Loop and condition style is :
+      \begin{verbatim}
+      condition 
+      {
+      }
+      \end{verbatim}
+   \textbf{and NOT}
+      \begin{verbatim}
+         condition {
+         }
+      \end{verbatim}
+   \item
+      To commit, do \textbf{not} invoke \texttt{svn commit} but issue \texttt{make commit} at the root of the
+      sources directory. \textbf{To commit, lftp is required}.
+   \item
+      If you introduce a new function for the userland, you must add relevant
+      documentation in the \texttt{doc/userguide/} directory.
+\end{enumerate}
+
+
+\section{Source organization}
+At the root directory, two main directories are available: \texttt{kernel} and
+\texttt{libpok}. We detail the organization and the guidelines for each
+subdirectory of kernel and libpok.
+
+   \subsection{kernel}
+   In the kernel, sources files are supposed to contain few lines of code. In
+   consequence, there is one file for each service.
+   \begin{itemize}
+      \item
+         \texttt{arch}: contains arch-dependent code. There is one directory for
+         each architecture and one subdirectory for each BSP. For example, files
+         for the x86 architecture and the x86-qemu BSP are located in the
+         \texttt{arch/x86/x86-qemu} directory.
+      \item
+         \texttt{core}: contains the core functionnality of POK - threads,
+         partitions, health monitoring, \ldots.
+      \item
+         \texttt{include}: contains headers files. The organization of header
+         files is the same than source files. So, you will find \texttt{core},
+         \texttt{middleware} or \texttt{arch} directories in the
+         \texttt{include} directory.
+      \item
+         \texttt{libc}: provides some functionnalities for printing things.
+         Functions located in this directory are here mainly for debugging
+         purposes.
+      \item
+         \texttt{middleware}: contain the code for inter-partitions
+         communication (sampling and queueing ports). It also contains some
+         functionnalities about virtual ports routing.
+   \end{itemize}
+
+   \subsection{libpok}
+   In libpok, sources files are supposed to contain more code than in kernel.
+   So, there is one file for each functions. There is the organization and
+   purpose of each directory.
+
+   \begin{itemize}
+      \item
+         \texttt{arch}: contains architecture dependent files. Unlike the
+         kernel, there is no need to separate each BSP so there is no
+         subdirecties for each architecture.
+      \item
+         \texttt{arinc653}: contains the implementation of the ARINC653 layer.
+      \item
+         \texttt{core}: contains the main functionnality of POK. It contains the
+         thread service, lockobjects, semaphores, events.
+      \item
+         \texttt{drivers}: contains device drivers implemented in POK.
+      \item
+         \texttt{include}: contains header files. As in the kernel, the
+         structure of this directory follow the structure of the sources.
+      \item
+         \texttt{libc}: contains the C-library of POK (stdio, stdlib and so on).
+      \item
+         \texttt{libm}: contains the libmath backported from NetBSD.
+      \item
+         \texttt{middleware}: contains sources for sampling and queueing ports
+         (interfacing with the kernel - inter-partition communication) but also blackboard and buffers
+         (intra-partition communication)
+   \end{itemize}
+
+
+\section{Optimization (about the \texttt{POK\_CONFIG\_OPTIMIZE\_FOR\_GENERATED\_CODE})}
+Systems generated with POK must be lightweight and keep a small memory footprint
+to be compliant with embedded requirements and ensures a good code coverage.
+When a system is written by hand, the libpok layer contains all its
+functionnalities. It is more convenient for the developper, he does not have to
+specify which functions he needs.
+
+However, when a system is generated from AADL models, it defines the maccro 
+\texttt{POK\_CONFIG\_OPTIMIZE\_FOR\_GENERATED\_CODE} and sets its values to 1.
+Its means that the code specifies precisely which functions are used. Then, the
+generated code specifies which services it needs using \texttt{POK\_NEEDS*}
+maccros. For example, the \texttt{POK\_NEEDS\_LIBC\_STDIO} specifies that it
+needs all functions of \texttt{libc/stdio}.
+
+Then, each function of libpok is surrounded with a \texttt{POK\_CONFIG\_NEEDS\_FUNC*}
+or \texttt{POK\_CONFIG\_NEEDS\_*}. {\LARGE You have to introduce that in your code when
+you introduce new services in POK}.
+
+Then, the file in \texttt{include/core/dependencies.h} specifies which functions
+are needed for each service. When the
+\texttt{POK\_CONFIG\_OPTIMIZE\_FOR\_GENERATED\_CODE} is not set, all functions
+are enabled (default behavior). But is defined, functions are carefully
+activated, depending on their service.
+
+
+\section{Documentation}
+   \subsection{User Guide}
+   Each improvement and enhancement in kernel or libpok must be documented in the
+   userguide (see \texttt{doc/userguide} in the POK sources) to keep a consistency
+   between the documentation and the sources.
+
+   \subsection{Code documentation}
+   The code \textbf{must be} documented using doxygen. At each release, we issue
+   a documentation in HTML and PDF using code documentation. The following
+   paragraphs indicate at least what information should be included in the
+   sources \textbf{at least}. Keep in mind that the more the code is documented,
+   the best it is for users.
+
+      \paragraph{Beginning of a file\\}
+      Specify the file, the author, the data and a brief description. You can
+      have an example in \texttt{kernel/core/thread.c}. For example, the
+      following comments provide these informations. It should be located at the
+      beginning of the file.
+      \begin{verbatim}
+/**
+ * \file    core/thread.c
+ * \author  Julien Delange
+ * \date    2008-2009
+ * \brief   Thread management in kernel
+ */
+      \end{verbatim}
+
+      \paragraph{Functions\\}
+      You \textbf{MUST} document each function and details what the function do.
+      You specify that with a comment just before the function. The comment must
+      begin with \texttt{/**}. There is an exemple for the function
+      \texttt{pok\_thread\_init}:
+      \begin{verbatim}
+/**
+ * Initialize threads array, put their default values
+ * and so on
+ */
+void pok_thread_init(void)
+{
+...
+      \end{verbatim}
+
+      \paragraph{Global variables\\}
+      Each global variable \textbf{must be} documented. As functions, you put a
+      comment just before the global variable. This comment \textbf{must begin}
+      with \texttt{/**}. There is an example for the global variable
+      \texttt{pok\_threads}:
+      \begin{verbatim}
+/**
+ * We declare an array of threads. The amount of threads
+ * is fixed by the software developper and we add two theads
+ *    - one for the kernel thread (this code)
+ *    - one for the idle task
+ */
+pok_thread_t                     pok_threads[POK_CONFIG_NB_THREADS];
+      \end{verbatim}
+
+
+\section{Submit a patch}
+If you found a bug or just want to send us an improvement, you can reach us at
+the following address: \texttt{pok-devel at listes dot enst dot fr}. Please send
+an email with the patch. We will answer and potentially merge your patch in the
+current version of POK.
+
+\section{Algorithms guidelines}
+Before introducing new functions or modifying existing ones, please qualify your
+code in terms of complexity, memory overhead, computation overhead, determinism.
+POK targets safety-critical systems, and so, its functions must provide high
+confidence to the user and must address these problems in its functions.
+
+Moreover, we always follow the moto \textit{Keep It Simple, Stupid} for each
+function: code must be understandable and documentation to be spread over users
+or developpers.
+
+\section{GDB'ing POK with QEMU}
+POK allows you to attach a remote GDB to monitor the kernel \textit{or} its
+partitions.
+
+To do so, go to your example directory and run the system in debug mode.
+
+\begin{verbatim}
+$ cd $POK_PATH/examples/partition-threads
+$ make run-gdb
+\end{verbatim}
+
+QEMU should be paused. Now run GDB using the kernel image.
+
+\begin{verbatim}
+$ gdb generated-code/kernel/kernel.elf
+...
+(gdb) target remote :1234
+Remote debugging using :1234
+0x0000fff0 in ?? ()
+(gdb) continue
+\end{verbatim}
+
+You're all set if you want to debug the kernel, but what if you want to
+instrumentate a partition?
+
+In GDB, we first have to let the kernel know about the symbols of the
+partition. But we also need to know where they are loaded in kernel space.
+Let's say we want to debug partition \#1. One way to know where it was
+relocated would be:
+
+\begin{verbatim}
+(gdb) p pok_partitions[0].base_addr
+$1 = 1175552
+\end{verbatim}
+
+Please note that \texttt{pok\_partition\_init} \textit{must} have completed
+or the array won't be initialized yet.
+
+Now we can load the symbol table with the correct offset.
+
+{
+\normalsize
+
+\begin{verbatim}
+(gdb) add-symbol-file generated-code/cpu/part1/part1.elf 1175552
+add symbol table from file "generated-code/cpu/part1/part1.elf" at
+        .text_addr = 0x11f000
+(y or n) y
+Reading symbols from /home/laurent/pok/examples/partitions-threads/generated-code/cpu/part1/part1.elf...done.
+(gdb) b user_hello_part1
+Breakpoint 1 at 0x11f17a: file ../../../hello1.c, line 21.
+(gdb) continue
+Continuing.
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x0000017a in ?? ()
+\end{verbatim}
+}
+
+You will notice debug symbols are missing, although we loaded them above.
+This is because the memory mapping is not the same in kernel end userland.
+We have to load the symbol file again in place of the kernel.
+
+{
+\normalsize
+
+\begin{verbatim}
+(gdb) symbol-file generated-code/cpu/part1/part1.elf
+Load new symbol table from "/home/laurent/pok/examples/partitions-threads/generated-code/cpu/part1/part1.elf"? (y or n) y
+Reading symbols from /home/laurent/pok/examples/partitions-threads/generated-code/cpu/part1/part1.elf...done.
+(gdb) bt
+#0  user_hello_part1 () at ../../../hello1.c:21
+#1  0xc4830845 in ?? ()
+\end{verbatim}
+}
+
+\section{Commit on the SVN}
+You \textbf{MUST} commit by ussing \texttt{make commit} at the root of the
+sources. This make target will build all examples on all architectures/platforms
+supported by POK to verify that modified sources seem
+to be consistent and do not introduce a regression.
+
+For that, you have to install compilers for every platform supported by POK.
+
+\section{Join the POK developper network !}
+If you want to join the POK team, please send us an email (\texttt{pok-devel at
+listes dot enst dot fr}. We are always looking for developpers with strong
+skills in C, ASM and low-level programming.
+
+If you are interested and think you can improve the project, you're welcome!
+
+
+\end{document}

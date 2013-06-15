@@ -1,0 +1,3 @@
+<Mapping_Rules>
+ <thread pokname="task1" aadlprocessor="cpu" aadlprocess="part1" aadlvirtualprocessor="part1" cheddarname="part1.thr1"/>
+</Mapping_Rules>

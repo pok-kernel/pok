@@ -1,0 +1,69 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Dec  3 10:21:25 2009 
+--
+package systems
+public
+
+with platform;
+with partitions;
+with memories;
+
+system mysystem
+end mysystem;
+
+
+system implementation mysystem.impl
+subcomponents
+   cpu            : processor   platform::partitioned.x86;
+   mem            : memory      memories::ram.i; 
+   WAM            : process     partitions::process_warningannunciationmanager.impl;
+   DM             : process     partitions::process_displaymanager.impl;
+   PCM            : process     partitions::process_pagecontentmanager.impl;
+   FM             : process     partitions::process_flightmanager.pio;
+   FD             : process     partitions::process_flightdirector.impl;
+   PilotDisplay   : device      partitions::mfd.i;
+connections
+--   old declarations that came from the first integrated example.
+--   these previous declarations use feature group and now, we split
+--   them with traditional ports.
+--   DisplayDM:  port PilotDisplay.DisplayToDM -> DM.DMToDisplay;
+--   PCMFM:      port PCM.PCMToFM -> FM.FMToPCM;
+--   DMPCM:      port DM.DMToPCM -> PCM.PCMToDM;
+
+   port DM.DMToDisplay_Page -> PilotDisplay.DisplayToDM_Page;
+   port PilotDisplay.DisplayToDM_Request -> DM.DMToDisplay_Request; 
+   port PCM.PCMToFM_Request -> FM.FMToPCM_Request;
+   port FM.FMToPCM_Page -> PCM.PCMToFM_Page;
+   port PCM.PCMToDM_Page -> DM.DMToPCM_Page;
+   port DM.DMToPCM_Request -> PCM.PCMToDM_Request;
+   FMFD_Request:  port FM.FMToFD_Request -> FD.FDToFM_Request;
+   FMFD_Page_Page : port FD.FDToFM_Page -> FM.FMToFD_Page;
+properties
+   actual_processor_binding => (reference (cpu.part1))      applies to WAM;
+   actual_processor_binding => (reference (cpu.part2))      applies to DM;
+   actual_processor_binding => (reference (cpu.part3))      applies to PCM;
+   actual_processor_binding => (reference (cpu.part4))      applies to FM;
+   actual_processor_binding => (reference (cpu.part5))      applies to FD;
+   actual_processor_binding => (reference (cpu.part6))      applies to PilotDisplay;
+   actual_memory_binding    => (reference (mem.segment5_data), reference (mem.segment5_code))   applies to WAM;
+   actual_memory_binding    => (reference (mem.segment2_data), reference (mem.segment2_code))   applies to DM;
+   actual_memory_binding    => (reference (mem.segment6_data), reference (mem.segment6_code))   applies to PCM;
+   actual_memory_binding    => (reference (mem.segment4_data), reference (mem.segment1_code))   applies to FM;
+   actual_memory_binding    => (reference (mem.segment1_data), reference (mem.segment5_code))   applies to FD;
+   actual_memory_binding    => (reference (mem.segment3_data), reference (mem.segment4_code))   applies to PilotDisplay;
+end mysystem.impl;
+
+
+end systems;

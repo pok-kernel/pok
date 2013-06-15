@@ -1,0 +1,56 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package subprograms
+
+public
+with types;
+
+subprogram print_integer
+features
+   valuetoprint : in parameter types::integer;
+properties
+   source_name => "user_print_integer";
+   source_language => C;
+   Source_Text => ("../../../usercode.o");
+   Source_Code_Size  => 3 Kbyte;
+   Source_Data_Size  => 0 Kbyte;
+end print_integer;
+
+subprogram print_two_integer
+features
+   firstvaluetoprint    : in parameter types::integer;
+   secondvaluetoprint   : in parameter types::integer;
+properties
+   source_name => "user_print_two_integer";
+   source_language => C;
+   Source_Text => ("../../../usercode.o");
+   Source_Code_Size  => 3 Kbyte;
+   Source_Data_Size  => 0 Kbyte;
+end print_two_integer;
+
+subprogram produce_integer
+features
+   valueproduced : out parameter types::integer;
+properties
+   source_name => "user_produce_integer";
+   source_language => C;
+   Source_Text => ("../../../usercode.o");
+   Source_Code_Size  => 3 Kbyte;
+   Source_Data_Size  => 0 Kbyte;
+end produce_integer;
+
+
+end subprograms;

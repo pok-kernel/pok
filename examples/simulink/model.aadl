@@ -1,0 +1,208 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package simulink
+public
+with Data_Model;
+with POK;
+
+data integer
+properties
+  Data_Model::Data_Representation => integer;
+end integer;
+
+virtual bus secure_bus
+properties
+   POK::security_level => 10;
+   Required_Connection_Quality_Of_Service => (SecureDelivery);
+end secure_bus;
+
+virtual bus medium_bus
+properties
+   POK::security_level => 8;
+   Required_Connection_Quality_Of_Service => (SecureDelivery);
+end medium_bus;
+
+
+virtual bus common_bus
+properties
+   POK::security_level => 1;
+   Required_Connection_Quality_Of_Service => (SecureDelivery);
+end common_bus;
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+end partition;
+
+virtual processor implementation partition.secure
+properties
+   POK::Additional_Features => (libc_stdio);
+end partition.secure;
+
+subprogram spg_wave1
+features
+   output : out parameter integer;
+properties
+   source_name => "handle_wave1";
+   source_language => C;
+   POK::Source_Location => "../../../handle_wave1.o";
+end spg_wave1;
+
+subprogram spg_wave2
+features
+   output : out parameter integer;
+properties
+   source_name => "handle_wave2";
+   source_language => C;
+   POK::Source_Location => "../../../handle_wave2.o";
+end spg_wave2;
+
+subprogram spg_add_waves
+features
+   wave1 : in parameter integer;
+   wave2 : in parameter integer;
+properties
+   POK::Source_Location => "../../../add_waves.o";
+   source_language => C;
+   source_name => "add_waves";
+end spg_add_waves;
+
+virtual processor implementation partition.common
+properties
+   POK::Additional_Features => (libc_stdio);
+end partition.common;
+
+processor ppc
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   partition_secure : virtual processor partition.secure;
+   partition_common : virtual processor partition.common;
+properties
+   POK::Major_Frame => 40ms;
+   POK::Scheduler => static;
+   POK::Slots => (20ms, 20ms);
+   POK::Slots_Allocation => ( reference (partition_secure), reference (partition_common));
+end ppc.impl;
+
+thread thread_add_waves
+features
+   wave1 : in event data port integer;
+   wave2 : in event data port integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+   Period => 500 Ms;
+end thread_add_waves;
+
+thread thread_wave1
+features
+   dataout : out event data port integer {Compute_Deadline => 40 ms;};
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 1000 Ms;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+end thread_wave1;
+
+thread implementation thread_wave1.impl
+calls 
+   call1 : { pspg : subprogram spg_wave1;};
+connections
+   parameter pspg.output -> dataout;
+end thread_wave1.impl;
+
+thread thread_wave2
+features
+   dataout : out event data port integer {Compute_Deadline => 40 ms;};
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 1000 Ms;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+end thread_wave2;
+
+thread implementation thread_wave2.impl
+calls 
+   call1 : { pspg : subprogram spg_wave2;};
+connections
+   parameter pspg.output -> dataout;
+end thread_wave2.impl;
+
+thread implementation thread_add_waves.impl
+calls 
+   call1 : { pspg : subprogram spg_add_waves;};
+connections
+   parameter wave1 -> pspg.wave1;
+   parameter wave2 -> pspg.wave2;
+end thread_add_waves.impl;
+
+process process_add_waves
+features
+   wave1 : in event data port integer {Compute_Deadline => 30 ms;};
+   wave2 : in event data port integer {Compute_Deadline => 30 ms;};
+properties
+   POK::Needed_Memory_Size => 185 Kbyte;
+end process_add_waves;
+
+process send_waves
+features
+   wave1output : out event data port integer {Queue_Size => 2;};
+   wave2output : out event data port integer {Queue_Size => 2;};
+properties
+   POK::Needed_Memory_Size => 185 Kbyte;
+end send_waves;
+
+process implementation process_add_waves.impl
+subcomponents
+   thr : thread thread_add_waves.impl;
+connections
+   port wave1 -> thr.wave1; 
+   port wave2 -> thr.wave2;
+end process_add_waves.impl;
+
+process implementation send_waves.impl
+subcomponents
+   thr1 : thread thread_wave1.impl;
+   thr2 : thread thread_wave2.impl;
+connections
+   port thr1.dataout -> wave1output;
+   port thr2.dataout -> wave2output;
+end send_waves.impl;
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu : processor ppc.impl;
+   pr1 : process send_waves.impl;
+   pr2 : process process_add_waves.impl;
+connections
+   port pr1.wave1output -> pr2.wave1;
+   port pr1.wave2output -> pr2.wave2;
+properties
+   actual_processor_binding => 
+      (reference (cpu.partition_secure)) applies to pr2;
+   actual_processor_binding => 
+      (reference (cpu.partition_common)) applies to pr1;
+end node.impl;
+
+end simulink;

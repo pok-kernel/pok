@@ -1,0 +1,113 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2011 POK team 
+--
+--  Created by julien on Sun Dec  4 20:23:07 2011 
+--
+package case_study_osal_software
+
+public
+
+with Data_Model;
+with POK;
+
+
+data integer
+properties
+  Data_Model::Data_Representation => integer;
+end integer;
+
+subprogram snd_spg
+features
+   output : out parameter integer;
+properties
+   source_name => "user_send";
+   source_language => C;
+   POK::Source_Location => "../../../send.o";
+end snd_spg;
+
+subprogram recv_spg
+features
+   input : in parameter integer;
+properties
+   POK::Source_Location => "../../../receive.o";
+   source_language => C;
+   source_name => "user_receive";
+end recv_spg;
+
+thread recv_thr
+features
+   datain : in event data port integer;
+properties
+   Dispatch_Protocol       => Periodic;
+   Recover_Execution_Time  => 10 ms .. 20 ms;
+   Period                  => 500 Ms;
+end recv_thr;
+
+thread send_thr
+features
+   dataout : out event data port integer {Compute_Deadline => 40 ms;};
+properties
+   Dispatch_Protocol       => Periodic;
+   Period                  => 1000 Ms;
+   Recover_Execution_Time  => 10 ms .. 20 ms;
+end send_thr;
+
+thread implementation send_thr.i
+calls 
+   call1 : { pspg : subprogram snd_spg;};
+connections
+   parameter pspg.output -> dataout;
+properties
+   POK::Recovery_Errors => (Deadline_Missed, Application_Error, Numeric_Error);
+   POK::Recovery_Actions => (Thread_Restart, Thread_Restart, Partition_Restart);
+end send_thr.i;
+
+thread implementation recv_thr.i
+calls 
+   call1 : { pspg : subprogram recv_spg;};
+connections
+   parameter datain -> pspg.input;
+properties
+   POK::Recovery_Errors => (Deadline_Missed, Application_Error, Numeric_Error);
+   POK::Recovery_Actions => (Thread_Restart, Thread_Restart, Partition_Restart);
+end recv_thr.i;
+
+process recv_prs
+features
+   pdatain : in event data port integer;
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end recv_prs;
+
+process snd_prs
+features
+   pdataout : out event data port integer;
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end snd_prs;
+
+process implementation recv_prs.i
+subcomponents
+   thr : thread recv_thr.i;
+connections
+   port pdatain -> thr.datain; 
+end recv_prs.i;
+
+process implementation snd_prs.i
+subcomponents
+   thr : thread send_thr.i;
+connections
+   port thr.dataout -> pdataout;
+end snd_prs.i;
+
+end case_study_osal_software;

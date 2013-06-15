@@ -1,0 +1,37 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package types
+
+public
+with Data_Model;
+
+data integer
+properties
+   Data_Model::Data_Representation => integer;
+end integer;
+
+data position
+properties
+   Data_Model::Data_Representation => integer;
+end position;
+
+data boolean
+properties
+   Data_Model::Data_Representation => integer;
+end boolean;
+
+end types;
+

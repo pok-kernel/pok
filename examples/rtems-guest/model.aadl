@@ -1,0 +1,102 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2013 POK team 
+--
+--  Created by phipse on Wed May 15 13:12:32 2013 
+--
+
+
+
+package myHello
+
+public
+
+
+with Data_Model;
+with POK;
+
+virtual processor partition
+properties
+  POK::Scheduler => RMS;
+  POK::Additional_Features => (libc, libc_string, libc_stdio, libc_stdlib, console, pci, io);
+end partition;
+
+
+virtual processor implementation partition.impl
+end partition.impl;
+
+
+processor x86
+end x86;
+
+processor implementation x86.impl
+subcomponents
+  part1 : virtual processor partition.impl;
+properties
+  POK::Architecture => x86;
+  POK::BSP => x86_qemu;
+  POK::Major_Frame => 1000ms;
+  POK::Scheduler => static;
+  POK::Slots => (500ms);
+  POK::Slots_Allocation => ( reference (part1));
+end x86.impl;
+
+
+process myProcess
+end myProcess;
+
+process implementation myProcess.impl
+subcomponents
+  thr1 : thread mythread.impl;
+properties
+  POK::Needed_Memory_Size => 120Kbyte;
+end myProcess.impl;
+
+
+thread mythread
+properties
+  Source_Stack_Size => 30Kbyte;
+end mythread;
+
+thread implementation mythread.impl
+calls
+  call1 : { pspg : subprogram user_hello; };
+properties
+  dispatch_protocol => periodic;
+  period => 1000ms;
+  deadline => 1000ms;
+  compute_execution_time => 1ms .. 2ms;
+end mythread.impl;
+
+
+
+subprogram user_hello
+properties
+  source_name => "user_hello";
+  source_language => (C);
+  POK::Source_Location => "../../../hello.o";
+end user_hello;
+
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+  cpu	:   processor x86.impl;
+  part1	:   process myProcess.impl;
+properties
+   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
+end node.impl;
+
+
+end myHello;

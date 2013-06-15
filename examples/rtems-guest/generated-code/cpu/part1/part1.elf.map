@@ -1,0 +1,253 @@
+Archive member included because of file (symbol)
+
+/home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+                              main.o (pok_do_syscall)
+/home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+                              main.o (pok_thread_attr_init)
+/home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+                              main.o (printf)
+
+Allocating common symbols
+Common symbol       size              file
+
+pok_allocator_memspace
+                    0x8000            /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+errno               0x4               /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+pok_threads         0x8               main.o
+pok_allocator_spaces
+                    0x4b0             /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                0x0000000000000000                . = 0x0
+                0x0000000000000000                __partition_begin = .
+
+.text           0x0000000000000000      0xef6
+ *(.text)
+ .text          0x0000000000000000      0x10b main.o
+                0x0000000000000000                main
+ *fill*         0x000000000000010b        0x1 
+ .text          0x000000000000010c       0x21 activity.o
+                0x000000000000010c                thr1_job
+ *fill*         0x000000000000012d        0x3 
+ .text          0x0000000000000130       0x1c subprograms.o
+                0x0000000000000130                myhello__user_hello
+ .text          0x000000000000014c        0x0 gtypes.o
+ .text          0x000000000000014c       0x8a ../../../hello.o
+                0x000000000000014c                virt_consoleInit
+                0x0000000000000168                virt_charRead
+                0x0000000000000184                virt_charWrite
+                0x00000000000001ae                user_hello
+ *fill*         0x00000000000001d6        0x2 
+ .text          0x00000000000001d8      0x179 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+                0x00000000000001d8                pok_inb
+                0x0000000000000258                pok_outb
+                0x00000000000002d8                pci_register
+                0x000000000000032c                pok_do_syscall
+ *fill*         0x0000000000000351        0x3 
+ .text          0x0000000000000354      0x5c7 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+                0x0000000000000354                pok_allocator_allocate
+                0x00000000000004a0                pok_allocator_delete_space
+                0x00000000000004ee                pok_allocator_merge_space
+                0x00000000000005c2                pok_allocator_free
+                0x00000000000006a0                __pok_partition_start
+                0x00000000000006c4                pok_thread_create
+                0x0000000000000718                pok_thread_attr_init
+                0x0000000000000778                pok_thread_period
+                0x00000000000007cc                pok_thread_status
+                0x0000000000000820                pok_thread_delayed_start
+                0x0000000000000874                pok_thread_set_priority
+                0x00000000000008c8                pok_thread_resume
+ *fill*         0x000000000000091b        0x1 
+ .text          0x000000000000091c      0x5da /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+                0x0000000000000c55                vprintf
+                0x0000000000000dda                printf
+                0x0000000000000e04                memcpy
+                0x0000000000000e40                rand
+                0x0000000000000e88                free
+                0x0000000000000eac                malloc
+                0x0000000000000ed0                calloc
+
+.iplt           0x0000000000000f00        0x0
+ .iplt          0x0000000000000000        0x0 main.o
+
+.rodata         0x0000000000000f00       0x7d
+ *(.rodata)
+ .rodata        0x0000000000000f00       0x7d /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+
+.rodata.str1.1  0x0000000000000f7d       0x55
+ .rodata.str1.1
+                0x0000000000000f7d        0x7 main.o
+ .rodata.str1.1
+                0x0000000000000f84       0x15 ../../../hello.o
+ .rodata.str1.1
+                0x0000000000000f99       0x39 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+
+.rodata.str1.4  0x0000000000000fd4       0x2c
+ .rodata.str1.4
+                0x0000000000000fd4       0x2c main.o
+
+.eh_frame       0x0000000000001000      0x554
+ .eh_frame      0x0000000000001000       0x38 main.o
+ .eh_frame      0x0000000000001038       0x1c activity.o
+                                         0x34 (size before relaxing)
+ .eh_frame      0x0000000000001054       0x20 subprograms.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x0000000000001074       0x80 ../../../hello.o
+                                         0x98 (size before relaxing)
+ .eh_frame      0x00000000000010f4       0x94 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+                                         0xdc (size before relaxing)
+ .eh_frame      0x0000000000001188      0x1a4 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+                                        0x27c (size before relaxing)
+ .eh_frame      0x000000000000132c      0x228 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+                                        0x2b8 (size before relaxing)
+
+.rel.dyn        0x0000000000001554        0x0
+ .rel.iplt      0x0000000000000000        0x0 main.o
+ .rel.text      0x0000000000000000        0x0 main.o
+
+.data           0x0000000000001560     0x8590
+ *(.data)
+ .data          0x0000000000001560        0x0 main.o
+ .data          0x0000000000001560        0x0 activity.o
+ .data          0x0000000000001560        0x0 subprograms.o
+ .data          0x0000000000001560        0x0 gtypes.o
+ .data          0x0000000000001560        0x0 ../../../hello.o
+ .data          0x0000000000001560        0x0 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .data          0x0000000000001560        0x0 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+ .data          0x0000000000001560        0x4 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+ *(.bss)
+ .bss           0x0000000000001564        0x0 main.o
+ .bss           0x0000000000001564        0x0 activity.o
+ .bss           0x0000000000001564        0x0 subprograms.o
+ .bss           0x0000000000001564        0x0 gtypes.o
+ .bss           0x0000000000001564        0x0 ../../../hello.o
+ .bss           0x0000000000001564        0x0 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .bss           0x0000000000001564        0x8 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+                0x0000000000001564                pok_allocator_initialized
+                0x0000000000001568                pok_allocator_used_spaces
+ *fill*         0x000000000000156c       0x14 
+ .bss           0x0000000000001580       0x84 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+ *(COMMON)
+ COMMON         0x0000000000001604        0x8 main.o
+                0x0000000000001604                pok_threads
+ *fill*         0x000000000000160c       0x14 
+ COMMON         0x0000000000001620     0x84d0 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+                0x0000000000001620                pok_allocator_memspace
+                0x0000000000009620                errno
+                0x0000000000009640                pok_allocator_spaces
+                0x0000000000009af0                __partition_end = .
+LOAD main.o
+LOAD activity.o
+LOAD subprograms.o
+LOAD gtypes.o
+LOAD ../../../hello.o
+LOAD /home/phipse/gsoc/pok/trunk/libpok/libpok.a
+OUTPUT(part1.elf elf32-i386)
+
+.igot.plt       0x0000000000009af0        0x0
+ .igot.plt      0x0000000000000000        0x0 main.o
+
+.debug_info     0x0000000000000000     0x3b4a
+ .debug_info    0x0000000000000000      0x4b8 main.o
+ .debug_info    0x00000000000004b8      0x199 activity.o
+ .debug_info    0x0000000000000651       0x4c subprograms.o
+ .debug_info    0x000000000000069d       0xf1 ../../../hello.o
+ .debug_info    0x000000000000078e      0xa61 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .debug_info    0x00000000000011ef     0x1849 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+ .debug_info    0x0000000000002a38     0x1112 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+
+.debug_abbrev   0x0000000000000000     0x1401
+ .debug_abbrev  0x0000000000000000      0x122 main.o
+ .debug_abbrev  0x0000000000000122       0xaf activity.o
+ .debug_abbrev  0x00000000000001d1       0x4a subprograms.o
+ .debug_abbrev  0x000000000000021b       0xd1 ../../../hello.o
+ .debug_abbrev  0x00000000000002ec      0x2ab /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .debug_abbrev  0x0000000000000597      0x7b3 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+ .debug_abbrev  0x0000000000000d4a      0x6b7 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+
+.debug_loc      0x0000000000000000      0x83d
+ .debug_loc     0x0000000000000000       0x1e main.o
+ .debug_loc     0x000000000000001e       0x52 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .debug_loc     0x0000000000000070      0x143 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+ .debug_loc     0x00000000000001b3      0x68a /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+
+.debug_aranges  0x0000000000000000      0x380
+ .debug_aranges
+                0x0000000000000000       0x20 main.o
+ .debug_aranges
+                0x0000000000000020       0x20 activity.o
+ .debug_aranges
+                0x0000000000000040       0x20 subprograms.o
+ .debug_aranges
+                0x0000000000000060       0x20 ../../../hello.o
+ .debug_aranges
+                0x0000000000000080       0x60 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .debug_aranges
+                0x00000000000000e0      0x138 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+ .debug_aranges
+                0x0000000000000218      0x168 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+
+.debug_line     0x0000000000000000     0x11a0
+ .debug_line    0x0000000000000000      0x15d main.o
+ .debug_line    0x000000000000015d       0xc8 activity.o
+ .debug_line    0x0000000000000225       0x3e subprograms.o
+ .debug_line    0x0000000000000263        0x0 gtypes.o
+ .debug_line    0x0000000000000263       0x8b ../../../hello.o
+ .debug_line    0x00000000000002ee      0x268 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .debug_line    0x0000000000000556      0x6e9 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+ .debug_line    0x0000000000000c3f      0x561 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+
+.debug_str      0x0000000000000000      0xe56
+ .debug_str     0x0000000000000000      0x860 main.o
+                                        0x8a4 (size before relaxing)
+ .debug_str     0x0000000000000860       0x3a activity.o
+                                        0x3fb (size before relaxing)
+ .debug_str     0x000000000000089a        0xe subprograms.o
+                                        0x10f (size before relaxing)
+ .debug_str     0x00000000000008a8       0x3f ../../../hello.o
+                                        0x138 (size before relaxing)
+ .debug_str     0x00000000000008e7       0xca /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+                                       0x1651 (size before relaxing)
+ .debug_str     0x00000000000009b1      0x241 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+                                       0x3602 (size before relaxing)
+ .debug_str     0x0000000000000bf2      0x264 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+                                       0x183b (size before relaxing)
+
+.comment        0x0000000000000000       0x2c
+ .comment       0x0000000000000000       0x2c main.o
+                                         0x2d (size before relaxing)
+ .comment       0x0000000000000000       0x2d activity.o
+ .comment       0x0000000000000000       0x2d subprograms.o
+ .comment       0x0000000000000000       0x2d gtypes.o
+ .comment       0x0000000000000000       0x2d ../../../hello.o
+ .comment       0x0000000000000000       0xb4 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .comment       0x0000000000000000      0x627 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+ .comment       0x0000000000000000      0x276 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+
+.note.GNU-stack
+                0x0000000000000000        0x0
+ .note.GNU-stack
+                0x0000000000000000        0x0 main.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 activity.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 subprograms.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 gtypes.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 ../../../hello.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(arch.lo)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(core.lo)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)
+
+.debug_ranges   0x0000000000000000       0x18
+ .debug_ranges  0x0000000000000000       0x18 /home/phipse/gsoc/pok/trunk/libpok/libpok.a(libc.lo)

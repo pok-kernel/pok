@@ -1,0 +1,86 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package subprograms_pilot
+public
+
+with types;
+
+subprogram common
+properties
+   Source_language => C;
+   Source_Text => ("../../../pilot.o");
+   Source_Code_Size  => 3 Kbyte;
+   Source_Data_Size  => 0 Kbyte;
+end common;
+
+subprogram inceptor_simulation extends common
+features
+   volts       : in parameter types::integer;
+   force       : out parameter types::integer;
+   position    : out parameter types::integer;
+properties
+   Source_Name => "user_inceptor";
+end inceptor_simulation;
+
+subprogram af extends common
+features
+   backdrive   : out parameter types::position;
+   error       : out parameter types::boolean;
+properties
+   Source_Name => "user_af";
+end af;
+
+subprogram aislc extends common
+features
+   positionask       : in parameter types::position;
+   voltsask          : out parameter types::integer;
+   measuredforce     : in parameter types::integer;
+   measuredposition  : in parameter types::position;
+   stickposition     : out parameter types::position;
+   error             : out parameter types::boolean;
+properties
+   Source_Name => "user_aislc";
+end aislc;
+
+subprogram pfc extends common
+features
+   stickposition              : in parameter types::position;
+   error                      : out parameter types::boolean;
+   surfacepositionask         : out parameter types::position;
+   surfacepositionfeedback    : in parameter types::position;
+properties
+   Source_Name => "user_pfc";
+end pfc;
+
+subprogram reu extends common
+features
+   pfcerror          : in parameter types::boolean;
+   aislcerror        : in parameter types::boolean;
+   aferror           : in parameter types::boolean;
+   externalerror     : in parameter types::boolean;
+   error             : out parameter types::boolean;
+properties
+   Source_Name => "user_reu";
+end reu;
+
+subprogram warning_display extends common
+features
+   error : in parameter types::boolean;
+properties
+   Source_Name => "user_warning_display";
+end warning_display;
+
+end subprograms_pilot;

@@ -1,0 +1,193 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by laurent on Tue Aug 11 09:11:42 2009 
+%
+
+
+\chapter{Examples}
+
+\section{Assurance Quality}
+At each source code change, the developper must compile and check that examples
+compile fine on all supported architectures.
+
+Consequently, the available examples with the release compiles. Sometimes, you
+can experience some errors since the examples are not run. If you think you find
+a bug, please report it to the developper team.
+
+\section{List of provided examples}
+This section details each example and the services they use.
+These examples are available in each release of POK.
+
+\begin{itemize}
+   \item
+      \textbf{arinc653-blackboard} :
+         test the blackboard service
+         of the ARINC653 layer. This test relies on an AADL
+         model that describe a blackboards between two tasks.
+   
+   \item
+      \textbf{arinc653-buffer}:
+         test the buffer service of ARINC653.
+         It uses AADL models.
+
+   \item
+      \textbf{arinc653-queueing}:
+         test ARINC653 queuing ports with AADL.
+
+   \item
+      \textbf{arinc653-sampling}:
+         test ARINC653 sampling ports with AADL.
+
+   \item
+      \textbf{arinc653-threads}:
+         test ARINC653 processes instanciation.
+         Uses AADL models.
+
+   \item
+      \textbf{case-study-aerotech09}:
+         An ARINC653 examples case study
+         for the AEROTECH09 conference. It uses two partitions
+         that communication temperature across inter-partitions
+         communications.
+   \item
+      \textbf{case-study-sigada09}: a system that contain three partitions
+      with different design patterns (non-preemptive scheduler,
+      ravenscar partition, queued buffers). This example was used
+      as use-case for a publication in the SIGAda conference (SIGAda09).
+   \item
+      \textbf{case-study-mils}: a distributed with two nodes that communicate
+      data at different security levels. Data are encrypted using cipher
+      algorithms provided by the libpok layer. 
+   \item
+      \textbf{case-study-ardupilot}: a case-study made from application code
+      found in the ardupilot project. See.
+      \texttt{http://code.google.com/p/ardupilot/} for documentation about this
+      application code.
+   \item
+      \textbf{case-study-integrated}: a case-study that shows we can use POK for
+      real avionics architecture. For that, we define an avionics architecture
+      using AADL and generates code for POK using Ocarina. The initial model is
+      defined by the Software Engineering Instute (SEI). See
+      \texttt{http://www.aadl.info/aadl/currentsite/examplemodel.html\#Family}
+      for more information about this initial model. Note that we convert this
+      model from AADLv1 to AADLv2 to make it working with Ocarina/POK.
+   \item
+      \textbf{data-arrays}
+         Test the use of array types and their use
+         in communication with queuing ports. Use AADL
+         models to describe types.
+
+   \item
+      \textbf{data-arrays2}
+         Test the use of array types and their use
+         with sampling ports. Use AADL model to describe types.
+
+   \item
+      \textbf{esterel}
+         Use of a third-party language as application-layer.
+         In this case, we use Esterel generated code. Use
+         AADL models.
+
+   \item
+      \textbf{events}
+         Test the use of events ports between threads located
+         in the same partition. DO NOT use AADL models.
+
+   \item
+      \textbf{exceptions-handled}:
+         Test the exceptions catching (recovery
+         handlers). Use AADL models.
+
+   \item
+      \textbf{heterogeneous-partitions}:
+         Define two partitions with
+         different architectures. Demonstrate that the build
+         system can generate, build and run different modules
+         that have different architectures.
+
+
+   \item
+      \textbf{libmath}:
+         Test the inclusion of the libmath library in the libpok layer.
+         Use AADL model.
+
+   \item
+      \textbf{lustre-academic}:
+         Test the inclusion of Lustre application code
+         inside partition. Use AADL models.
+
+   \item
+      \textbf{middleware-blackboard}:
+         Test the use of blackboard service. Use AADL models.
+
+   \item
+      \textbf{middleware-buffer}:
+         Test the use of buffer service. Use AADL models.
+
+   \item
+      \textbf{middleware-buffer-timed}:
+         Test the use of buffer service with timeout.
+         Use AADL models.
+
+   \item
+      \textbf{middleware-queueing}:
+         Test the use of queuing port service. Use AADL models.
+
+   \item
+      \textbf{middleware-queueing-timed}:
+         Test the use of queuing port service with timeout.
+         Use AADL models.
+
+   \item
+      \textbf{middleware-sampling}:
+         Test the use of sampling port service.
+         Use AADL models.
+
+   \item
+      \textbf{mutexes}:
+         Test mutex service (POK layer).
+         Use AADL models.
+
+   \item
+      \textbf{mutexes-timed}:
+         Test mutex service with timeout. Use AADL models.
+         
+   \item
+      \textbf{network}:
+         Test network driver (rtl8029) on x86 architecture.
+         Use AADL models.
+
+   \item
+      \textbf{partitions-scheduling}:
+         Example with different schedulers.
+         Use AADL models.
+
+   \item
+      \textbf{partitions-threads}:
+         Test thread instanciation (POK layer). Use AADL models.
+
+   \item
+      \textbf{semaphores}:
+         Test the use of semaphors (POK layer). Do not use AADL
+         models.
+
+   \item
+      \textbf{simulink}: Test the inclusion of simulink code. Do not
+         work since it needs a dedicated runtime to work. It needs additional
+         services in the libpok layer to work. This additional work is not so
+         difficult to provide, we just need time !
+\end{itemize}
+
+
+

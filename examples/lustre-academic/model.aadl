@@ -1,0 +1,201 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Wed Feb 25 22:07:02 2009 
+--
+package lustre_integration
+
+public
+
+with Data_Model;
+with POK;
+
+
+data integer
+properties
+  Data_Model::Data_Representation => integer;
+end integer;
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libc_stdio);
+end partition;
+
+virtual processor implementation partition.impl
+end partition.impl;
+
+subprogram spg_producer
+features
+   output : out parameter integer;
+properties
+   source_name => "user_send";
+   source_language => C;
+   POK::Source_Location => "../../../send.o";
+end spg_producer;
+
+subprogram spg_computer
+features
+	input : in parameter integer {Source_Name => "n";};
+	output : out parameter integer {Source_Name => "r";};
+properties
+	source_name => "inc";
+	source_language => Lustre;
+	POK::Source_Location => "../../../lustre-code/";
+end spg_computer;
+
+subprogram spg_printer
+features
+   input : in parameter integer;
+properties
+   source_language => C;
+   source_name => "user_receive";
+   POK::Source_Location => "../../../receive.o";
+end spg_printer;
+
+processor pok_kernel
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+end pok_kernel;
+
+processor implementation pok_kernel.three_partitions
+subcomponents
+   producer_runtime : virtual processor partition.impl;
+   computer_runtime : virtual processor partition.impl {POK::Additional_Features => (libc_stdlib);};
+   printer_runtime  : virtual processor partition.impl;
+properties
+   POK::Major_Frame => 900ms;
+   POK::Scheduler => static;
+   POK::Slots => (300ms, 300ms, 300ms);
+   POK::Slots_Allocation => ( reference (producer_runtime), reference (computer_runtime), reference (printer_runtime));
+end pok_kernel.three_partitions;
+
+thread thread_printer
+features
+   datain : in event data port integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+   Period => 300 Ms;
+end thread_printer;
+
+thread thread_producer
+features
+   dataout : out event data port integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 300 Ms;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+end thread_producer;
+
+thread thread_computer
+features
+   dataout : out event data port integer;
+	datain  : in event data port integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 300 Ms;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+end thread_computer;
+
+thread implementation thread_printer.impl
+calls 
+   call1 : { pspg : subprogram spg_printer;};
+connections
+   parameter datain -> pspg.input;
+end thread_printer.impl;
+
+thread implementation thread_producer.impl
+calls 
+   call1 : { pspg : subprogram spg_producer;};
+connections
+   parameter pspg.output -> dataout;
+end thread_producer.impl;
+
+thread implementation thread_computer.impl
+calls 
+   call1 : { pspg : subprogram spg_computer;};
+connections
+   parameter pspg.output -> dataout;
+   parameter datain -> pspg.input;
+end thread_computer.impl;
+
+
+process process_printer
+features
+   printer_datain : in event data port integer;
+properties
+   POK::Needed_Memory_Size => 200 Kbyte;
+end process_printer;
+
+process process_producer
+features
+   producer_dataout : out event data port integer;
+properties
+   POK::Needed_Memory_Size => 200 Kbyte;
+end process_producer;
+
+process process_computer
+features
+   computer_datain  : in event data port integer;
+   computer_dataout : out event data port integer;
+properties
+   POK::Needed_Memory_Size => 200 Kbyte;
+end process_computer;
+
+
+process implementation process_printer.impl
+subcomponents
+   thr : thread thread_printer.impl;
+connections
+   port printer_datain -> thr.datain; 
+end process_printer.impl;
+
+process implementation process_producer.impl
+subcomponents
+   thr : thread thread_producer.impl;
+connections
+   port thr.dataout -> producer_dataout;
+end process_producer.impl;
+
+process implementation process_computer.impl
+subcomponents
+	thr : thread thread_computer.impl;
+connections
+	port thr.dataout -> computer_dataout;
+	port computer_datain -> thr.datain;
+end process_computer.impl;
+
+system partitioned_lustre
+end    partitioned_lustre;
+
+system implementation partitioned_lustre.impl
+subcomponents
+   pok_runtime        : processor pok_kernel.three_partitions;
+   producer_partition : process process_producer.impl;
+   computer_partition : process process_computer.impl;
+   printer_partition  : process process_printer.impl;
+connections
+   port producer_partition.producer_dataout -> computer_partition.computer_datain;
+	port computer_partition.computer_dataout -> printer_partition.printer_datain;
+properties
+   actual_processor_binding => 
+      (reference (pok_runtime.producer_runtime)) applies to producer_partition;
+   actual_processor_binding => 
+      (reference (pok_runtime.computer_runtime)) applies to computer_partition;
+   actual_processor_binding => 
+      (reference (pok_runtime.printer_runtime)) applies to printer_partition;
+end partitioned_lustre.impl;
+
+end lustre_integration;

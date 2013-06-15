@@ -1,0 +1,16 @@
+- This partition use the Ada mapping while the second
+  still uses C
+- In user code, Ada.Text_IO can be replaced by your own
+  implementation of Text_IO. You can call it POK.Text_IO
+  and bind it to pok libc
+
+- This uses the ARINC653 layer.
+
+- This is just code sample. It should not compile and would
+  require some modification to work. It was made to give a
+  first example.
+
+TODO:
+- Map Ada code to C
+- Adapt build system
+- Make it working

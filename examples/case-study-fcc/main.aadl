@@ -1,0 +1,111 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package main
+public
+
+with runtime;
+with runtime_position;
+with runtime_pilot;
+with partitions_position;
+with pilot_partitions;
+with memories;
+with rtl8029;
+
+system main
+end main;
+
+system implementation main.i
+subcomponents
+--  position computation
+   position_kernel                  : processor runtime_position::kernel.i;
+   position_partition_negociation   : process partitions_position::partition_position_negociation.i;
+   position_partition_computation   : process partitions_position::partition_position_computation.i;
+   position_netif                   : device rtl8029::rtl8029.i;
+   position_memory                  : memory memories::ram.position;
+
+--  pilot system
+   pilot_kernel            : processor runtime_pilot::kernel.i;
+   pilot_netif             : device rtl8029::rtl8029.i;
+   pilot_inceptor          : process pilot_partitions::inceptor_simulation.i;
+   pilot_af                : process pilot_partitions::af_partition.i;
+   pilot_aislc             : process pilot_partitions::aislc_partition.i;
+   pilot_pfc               : process pilot_partitions::pfc_partition.i;
+   pilot_reu               : process pilot_partitions::reu_errornotification.i;
+   pilot_errordisplay      : process pilot_partitions::warning_display.i;
+   pilot_memory            : memory memories::ram.pilot;
+
+   ethernet_bus            : bus runtime::ethernet.basic;
+connections
+-- connections inside position node
+   port position_partition_negociation.position_askout      -> position_partition_computation.position_ask;
+   port position_partition_computation.position_feedback    -> position_partition_negociation.position_feedbackin;
+   port position_netif.outgoing_positionask                 -> position_partition_negociation.position_askin;
+   port position_partition_negociation.notify_error         -> position_netif.incoming_error;
+   port position_partition_negociation.position_feedbackout -> position_netif.incoming_positionreal;
+
+-- connections inside the pilot node
+   port pilot_inceptor.force                 -> pilot_aislc.measuredforce;
+   port pilot_inceptor.position              -> pilot_aislc.measuredposition;
+   port pilot_aislc.voltsask                 -> pilot_inceptor.volts;
+   port pilot_af.backdrive                   -> pilot_aislc.positionask;
+   port pilot_af.error                       -> pilot_reu.aferror;
+   port pilot_aislc.error                    -> pilot_reu.aislcerror;
+   port pilot_pfc.error                      -> pilot_reu.pfcerror;
+   port pilot_aislc.stickposition            -> pilot_pfc.stickposition;
+   port pilot_pfc.surfacepositionask         -> pilot_netif.incoming_positionask;
+   port pilot_netif.outgoing_positionreal    -> pilot_pfc.surfacepositionfeedback;
+   port pilot_netif.outgoing_error           -> pilot_reu.externalerror;
+   port pilot_reu.error                      -> pilot_errordisplay.error;
+
+-- network connections
+   port pilot_netif.outgoing_positionask     -> position_netif.incoming_positionask {Actual_Connection_Binding => (reference (ethernet_bus));};
+   port position_netif.outgoing_positionreal -> pilot_netif.incoming_positionreal   {Actual_Connection_Binding => (reference (ethernet_bus));};
+   port position_netif.outgoing_error        -> pilot_netif.incoming_error          {Actual_Connection_Binding => (reference (ethernet_bus));};
+
+   bus access ethernet_bus -> pilot_netif.ethernet_access;
+   bus access ethernet_bus -> position_netif.ethernet_access;
+properties
+--  properties for the position stuff
+   Actual_Processor_Binding => (reference (position_kernel.partition_negociation))  applies to position_partition_negociation;
+   Actual_Processor_Binding => (reference (position_kernel.partition_device))       applies to position_partition_computation;
+   Actual_Processor_Binding => (reference (position_kernel.partition_netif))        applies to position_netif;
+
+   Actual_Memory_Binding => (reference (position_memory.negociation))  applies to position_partition_negociation;
+   Actual_Memory_Binding => (reference (position_memory.calculator))   applies to position_partition_computation;
+   Actual_Memory_Binding => (reference (position_memory.netif))        applies to position_netif;
+
+
+--  properties for the pilot stuff
+   Actual_Processor_Binding => (reference (pilot_kernel.partition_inceptor))        applies to pilot_inceptor;
+   Actual_Processor_Binding => (reference (pilot_kernel.partition_pfc))             applies to pilot_pfc;
+   Actual_Processor_Binding => (reference (pilot_kernel.partition_reu))             applies to pilot_reu;
+   Actual_Processor_Binding => (reference (pilot_kernel.partition_aislc))           applies to pilot_aislc;
+   Actual_Processor_Binding => (reference (pilot_kernel.partition_af))              applies to pilot_af;
+   Actual_Processor_Binding => (reference (pilot_kernel.partition_errordisplay))    applies to pilot_errordisplay;
+   Actual_Processor_Binding => (reference (pilot_kernel.partition_netif))           applies to pilot_netif;
+
+   Actual_Memory_Binding => (reference (pilot_memory.inceptor))        applies to pilot_inceptor;
+   Actual_Memory_Binding => (reference (pilot_memory.pfc))             applies to pilot_pfc;
+   Actual_Memory_Binding => (reference (pilot_memory.reu))             applies to pilot_reu;
+   Actual_Memory_Binding => (reference (pilot_memory.aislc))           applies to pilot_aislc;
+   Actual_Memory_Binding => (reference (pilot_memory.af))              applies to pilot_af;
+   Actual_Memory_Binding => (reference (pilot_memory.errordisplay))    applies to pilot_errordisplay;
+   Actual_Memory_Binding => (reference (pilot_memory.netif))           applies to pilot_netif;
+
+end main.i;
+
+end main;
+

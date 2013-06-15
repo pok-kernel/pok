@@ -1,0 +1,60 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package threads_position
+
+public
+
+with types;
+with threads;
+with subprograms_position;
+
+thread negociation extends threads::common_thread
+features
+   positionin     : in data port types::position;
+   positionout    : out data port types::position;
+   positionrealout   : out data port types::position;
+   positionrealin   : in data port types::position;
+   error          : out event data port types::boolean;
+end negociation;
+
+thread implementation negociation.i
+calls
+   call1 : { pspg : subprogram subprograms_position::negociation;};
+connections
+   parameter positionin             -> pspg.positionin;
+   parameter pspg.positionout       -> positionout;
+   parameter positionrealin         -> pspg.positionrealin;
+   parameter pspg.positionrealout   -> positionrealout;
+   parameter pspg.errorraised       -> error;
+end negociation.i;
+
+
+thread device_emulation extends threads::common_thread
+features
+   position_asked : in data port types::position;
+   position_real  : out data port types::position;
+end device_emulation;
+
+thread implementation device_emulation.i
+calls
+   call1 : { pspg : subprogram subprograms_position::device_emulation;};
+connections
+   parameter position_asked      -> pspg.position_asked;
+   parameter pspg.position_real  -> position_real;
+end device_emulation.i;
+
+
+end threads_position;

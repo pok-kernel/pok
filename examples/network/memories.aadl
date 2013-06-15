@@ -1,0 +1,38 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Mon May  4 12:37:45 2009 
+--
+package memories
+public
+
+   memory memory_segment
+   end memory_segment;
+
+   memory implementation memory_segment.i
+   properties
+      Byte_Count => 80000;
+   end memory_segment.i;
+
+   memory main_memory
+   end main_memory;
+
+   memory implementation main_memory.i
+   subcomponents
+      topsecret       : memory memory_segment.i;
+      secret          : memory memory_segment.i;
+      unclassified    : memory memory_segment.i;
+      driver          : memory memory_segment.i {Byte_Count => 95000;};
+   end main_memory.i;
+
+end memories;

@@ -1,0 +1,22 @@
+<ARINC_653_Module xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=".\A653_Part1_rev1.xsd" ModuleName="ppc_impl">
+ <System_HM_Table/>
+ <Module_HM_Table/>
+ <Partition PartitionName="part1" PartitionIdentifier="1" EntryPoint="main" SystemPartition="true"/>
+ <Partition PartitionName="part2" PartitionIdentifier="2" EntryPoint="main" SystemPartition="true"/>
+ <Partition_Memory PartitionName="part1" PartitionIdentifier="1">
+   <Memory_Requirements SizeBytes="80000" Type="CODE" Access="READ"/>
+ </Partition_Memory>
+ <Partition_Memory PartitionName="part2" PartitionIdentifier="2">
+   <Memory_Requirements SizeBytes="80000" Type="DATA" Access="WRITE"/>
+ </Partition_Memory>
+ <Module_Schedule MajorFrameSeconds=" 1.0000">
+   <Partition_Schedule PartitionName="part1" PartitionIdentifier="1" PeriodSeconds=" 1.0000" PeriodDurationSeconds=" 0.5000">
+     <Window_Schedule WindowStartSeconds=" 0.0000" WindowIdentifier="0" WindowDurationSeconds=" 0.5000"/>
+   </Partition_Schedule>
+   <Partition_Schedule PartitionName="part2" PartitionIdentifier="2" PeriodSeconds=" 1.0000" PeriodDurationSeconds=" 0.5000">
+     <Window_Schedule WindowStartSeconds=" 0.5000" WindowIdentifier="1" WindowDurationSeconds=" 0.5000"/>
+   </Partition_Schedule>
+ </Module_Schedule>
+ <Partition_HM_Table/>
+ <Partition_HM_Table/>
+</ARINC_653_Module>

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="653.38947"
+   height="338.54556"
+   id="svg3409"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docbase="/Users/julien/phdthesis/papers/pok-implementation/imgs"
+   sodipodi:docname="pok-layers.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0">
+  <defs
+     id="defs3411" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.24748737"
+     inkscape:cx="375"
+     inkscape:cy="717.22373"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1039"
+     inkscape:window-height="765"
+     inkscape:window-x="87"
+     inkscape:window-y="23" />
+  <metadata
+     id="metadata3414">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-169.97187,-233.81662)">
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3417"
+       width="370"
+       height="100"
+       x="180.5"
+       y="471.86218"
+       ry="16.785715" />
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3419"
+       width="179.5"
+       height="97.545563"
+       x="180.5"
+       y="354.81662"
+       ry="16.785715" />
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3421"
+       width="179.5"
+       height="97.545563"
+       x="370.5"
+       y="354.31662"
+       ry="16.785715" />
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3423"
+       width="179.5"
+       height="97.545563"
+       x="180.5"
+       y="234.31662"
+       ry="16.785715" />
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3425"
+       width="179.5"
+       height="97.545563"
+       x="370.5"
+       y="234.31662"
+       ry="16.785715" />
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="287.75195"
+       y="531.4657"
+       id="text3427"><tspan
+         sodipodi:role="line"
+         id="tspan3429"
+         x="287.75195"
+         y="531.4657">POK Kernel</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="225.67188"
+       y="403.63562"
+       id="text3431"><tspan
+         sodipodi:role="line"
+         id="tspan3433"
+         x="225.67188"
+         y="403.63562">libpok</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="417.36133"
+       y="406.53796"
+       id="text3435"><tspan
+         sodipodi:role="line"
+         id="tspan3437"
+         x="417.36133"
+         y="406.53796">libpok</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="207.62109"
+       y="291.9657"
+       id="text3439"><tspan
+         sodipodi:role="line"
+         id="tspan3441"
+         x="207.62109"
+         y="291.9657">user-code</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="455.52539"
+       y="273.63562"
+       id="text3443"><tspan
+         sodipodi:role="line"
+         id="tspan3445"
+         x="455.52539"
+         y="273.63562">device</tspan><tspan
+         sodipodi:role="line"
+         x="455.52539"
+         y="308.63562"
+         id="tspan3461">driver</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.9401474;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.94014741, 2.82044224;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 170.44194,462.36218 L 630.05806,462.36218"
+       id="path3447" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.94065768;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.94065767, 2.82197301;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 170.44242,341.86218 L 630.55758,341.86218"
+       id="path3449" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="556.22266"
+       y="501.47937"
+       id="text3451"><tspan
+         sodipodi:role="line"
+         x="556.22266"
+         y="501.47937"
+         id="tspan3455">- Partition scheduling</tspan><tspan
+         sodipodi:role="line"
+         x="556.22266"
+         y="516.47937"
+         id="tspan3459">- Core middleware</tspan><tspan
+         sodipodi:role="line"
+         x="556.22266"
+         y="531.47937"
+         id="tspan3463">- Interupt/exception handling</tspan><tspan
+         sodipodi:role="line"
+         x="556.22266"
+         y="546.47937"
+         id="tspan3467">- Memory manager</tspan><tspan
+         sodipodi:role="line"
+         x="556.22266"
+         y="561.47937"
+         id="tspan3465" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="559.41406"
+       y="367.19226"
+       id="text3469"><tspan
+         sodipodi:role="line"
+         x="559.41406"
+         y="367.19226"
+         id="tspan3471">- Thread scheduling</tspan><tspan
+         sodipodi:role="line"
+         x="559.41406"
+         y="382.19226"
+         id="tspan3473">- Middleware and core middleware interface</tspan><tspan
+         sodipodi:role="line"
+         x="559.41406"
+         y="397.19226"
+         id="tspan3475">- RT-POSIX compliance</tspan><tspan
+         sodipodi:role="line"
+         x="559.41406"
+         y="412.19226"
+         id="tspan3481">- ARINC653 compliance</tspan><tspan
+         sodipodi:role="line"
+         x="559.41406"
+         y="427.19226"
+         id="tspan3477">- Memory allocator</tspan><tspan
+         sodipodi:role="line"
+         x="559.41406"
+         y="442.19226"
+         id="tspan3497">- IPC services</tspan><tspan
+         sodipodi:role="line"
+         x="559.41406"
+         y="457.19226"
+         id="tspan3479" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="560.42578"
+       y="281.47937"
+       id="text3483"><tspan
+         sodipodi:role="line"
+         x="560.42578"
+         y="281.47937"
+         id="tspan3495">- User/driver code</tspan><tspan
+         sodipodi:role="line"
+         x="560.42578"
+         y="296.47937"
+         id="tspan3515">- Use pre-defined standard</tspan></text>
+  </g>
+</svg>

@@ -1,0 +1,493 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Wed Aug 12 15:48:00 2009 
+--
+package sigada09
+
+public
+
+with POK;
+with ARINC653;
+with Data_Model;
+with Cheddar_Properties;
+
+--
+-- Hyphothese sur l'ordonnancement des threads :
+--  Partition 1 : Synchronuous pattern avec round rovin (SCHED_RR + quantum a 2 ms)
+--  Partition 2 : Ravenscar pattern (priorites  fixes differentes). Toute ressource partagee  est accedee
+--                       durant toute la capacite du thread 
+--  Partition 3 : Buffer pattern  (idem partition 2)
+--
+-- Pour chaque partition, periode, capacite, echeance et priorite doivent etre affectees correctement
+--
+
+
+----------------
+--   Runtime  --
+----------------
+
+virtual processor partition_runtime
+properties
+   POK::Additional_Features => (libc_stdio);
+end partition_runtime;
+
+virtual processor implementation partition_runtime.i
+end partition_runtime.i;
+
+processor pok_kernel
+properties
+   POK::Architecture => x86;
+   -- Describe the architecture that runs the kernel.
+
+   POK::BSP => x86_qemu;
+   -- Specify the underlying hardware used by the kernel
+   -- (here, a standard x86 machine that works under QEMU).
+end pok_kernel;
+
+processor implementation pok_kernel.i
+subcomponents
+   part1 : virtual processor partition_runtime.i
+         {
+          Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+          Cheddar_Properties::Preemptive_Scheduler => False;
+          Cheddar_Properties::Scheduler_Quantum => 2 ms;
+         };
+   part2 : virtual processor partition_runtime.i
+         {
+          Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+          Cheddar_Properties::Scheduler_Quantum => 0 ms;
+          Cheddar_Properties::Preemptive_Scheduler => True;
+         };
+   part3 : virtual processor partition_runtime.i 
+         {
+          Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+          Cheddar_Properties::Scheduler_Quantum => 0 ms;
+          Cheddar_Properties::Preemptive_Scheduler => True;
+         };
+properties
+   ARINC653::Module_Major_Frame => 500 ms;
+   ARINC653::Partition_Slots =>
+         (200 ms, 200 ms, 100 ms);
+   ARINC653::Slots_Allocation =>
+         (reference (part1), reference (part2), reference (part3));
+end pok_kernel.i;
+
+
+----------------
+--   Memory  --
+----------------
+memory segment
+end segment;
+
+memory implementation segment.i
+properties
+   Byte_Count => 80000;
+   ARINC653::Memory_Type => (code_memory);
+   ARINC653::Access_Type => read;
+end segment.i;
+
+memory ram
+end ram;
+
+memory implementation ram.i
+subcomponents
+   segment1 : memory segment.i;
+   segment2 : memory segment.i;
+   segment3 : memory segment.i;
+end ram.i;
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+------------------------------------
+--  Generic partition definition  --
+------------------------------------
+
+process partition
+end partition;
+
+
+------------------
+--  Data Types  --
+------------------
+
+data integer
+properties
+   Data_Model::Data_Representation => integer;
+end integer;
+
+data implementation integer.i
+end integer.i;
+
+data shaded
+end shaded;
+
+data implementation shaded.i
+properties
+   Data_Model::Data_Representation => integer;
+end shaded.i;
+
+data black
+end black;
+
+data implementation black.i
+properties
+   Data_Model::Data_Representation => integer;
+end black.i;
+
+--  integer is a single integer data type
+
+data speed_altitude
+end speed_altitude;
+
+data implementation speed_altitude.i
+subcomponents
+   speed    : data integer.i;
+   altitude : data integer.i;
+properties
+   Data_Model::Data_Representation => struct;
+end speed_altitude.i;
+
+--  speed_altitude is a C structure that contains
+--  two field potentially modified by different
+--  subprograms. One field is used to store the speed
+--  the other store the altitude.
+
+------------------------------------------
+--  Threads uses in several partitions  --
+------------------------------------------
+thread thread_shaded
+features
+   shaded_features : requires data access shaded.i;
+end thread_shaded;
+-- Equivalent of J1 in pcp2.aadl
+
+thread thread_black
+features
+   black_features : requires data access black.i;
+end thread_black;
+-- Equivalent of J2 in pcp2.aadl
+
+thread thread_print_infos
+end thread_print_infos;
+-- Equivalent to J3 in pcp2.aadl
+
+thread thread_shaded_and_black
+features
+   shaded_features : requires data access shaded.i;
+   black_features : requires data access black.i;
+end thread_shaded_and_black;
+
+thread thread_black2
+features
+   black_features : requires data access black.i;
+end thread_black2;
+
+
+subprogram subprogram_increment_shaded
+features
+   mydata : requires data access shaded.i;
+properties
+   source_language => C;
+   source_name     => "user_increment_shaded";
+   source_text     => ("../../../common.o");
+end subprogram_increment_shaded;
+
+
+
+thread implementation thread_shaded.i
+calls
+mycall : {
+   singlecall : subprogram subprogram_increment_shaded;
+};
+connections
+   data access shaded_features -> singlecall.mydata;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time =>  0 ms ..  3 ms;
+   Deadline  =>  50 ms;
+   Period =>  50 ms;
+   Cheddar_Properties::Dispatch_Absolute_Time =>  7 ms;
+   Cheddar_Properties::POSIX_Scheduling_Policy => SCHED_FIFO;
+   Cheddar_Properties::Fixed_Priority =>  5;
+   Cheddar_Properties::Bound_On_Data_Blocking_Time =>  0 ms;
+end thread_shaded.i;
+
+
+subprogram subprogram_increment_black
+features
+   mydata : requires data access black.i;
+properties
+   source_language => C;
+   source_name     => "user_increment_black";
+   source_text     => ("../../../common.o");
+end subprogram_increment_black;
+
+
+thread implementation thread_black.i
+calls
+mycall : {
+   singlecall : subprogram subprogram_increment_black;
+};
+connections
+   data access black_features -> singlecall.mydata;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time =>  3 ms ..  3 ms;
+   Deadline  =>  50 ms;
+   Period =>  50 ms;
+   Cheddar_Properties::Dispatch_Absolute_Time =>  5 ms;
+   Cheddar_Properties::POSIX_Scheduling_Policy => SCHED_FIFO;
+   Cheddar_Properties::Fixed_Priority =>  4;
+   Cheddar_Properties::Bound_On_Data_Blocking_Time =>  0 ms;
+end thread_black.i;
+
+subprogram subprogram_print_infos
+properties
+   source_language => C;
+   source_name     => "user_print_infos";
+   source_text     => ("../../../common.o");
+end subprogram_print_infos;
+
+
+thread implementation thread_print_infos.i
+calls
+mycall : {
+   singlecall : subprogram subprogram_print_infos;
+};
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time =>  2 ms ..  2 ms;
+   Deadline  =>  50 ms;
+   Period =>  50 ms;
+   Cheddar_Properties::POSIX_Scheduling_Policy => SCHED_FIFO;
+   Cheddar_Properties::Fixed_Priority =>  3;
+   Cheddar_Properties::Dispatch_Absolute_Time =>  4 ms;
+   Cheddar_Properties::Bound_On_Data_Blocking_Time =>  0 ms;
+end thread_print_infos.i;
+
+
+subprogram subprogram_decrement_shaded_black
+features
+   shaded_data : requires data access shaded.i;
+   black_data  : requires data access black.i;
+properties
+   source_language => C;
+   source_name     => "user_decrement_shaded_and_black";
+   source_text     => ("../../../common.o");
+end subprogram_decrement_shaded_black;
+
+
+thread implementation thread_shaded_and_black.i
+calls
+mycall : {
+   singlecall : subprogram subprogram_decrement_shaded_black;
+};
+connections
+   data access shaded_features -> singlecall.shaded_data;
+   data access black_features -> singlecall.black_data;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time =>  1 ms ..  6 ms;
+   Deadline  =>  50 ms;
+   Period =>  50 ms;
+   Cheddar_Properties::POSIX_Scheduling_Policy => SCHED_FIFO;
+   Cheddar_Properties::Fixed_Priority =>  2;
+   Cheddar_Properties::Bound_On_Data_Blocking_Time =>  0 ms;
+   Cheddar_Properties::Dispatch_Absolute_Time =>  2 ms;
+end thread_shaded_and_black.i;
+
+
+subprogram subprogram_play_with_black
+features
+   mydata : requires data access black.i;
+properties
+   source_language => C;
+   source_name     => "user_play_black";
+   source_text     => ("../../../common.o");
+end subprogram_play_with_black;
+
+thread implementation thread_black2.i
+calls
+mycall : {
+   singlecall : subprogram subprogram_play_with_black;
+};
+connections
+   data access black_features -> singlecall.mydata;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time =>  1 ms ..  6 ms;
+   Deadline  =>  50 ms;
+   Period =>  50 ms;
+   Cheddar_Properties::Fixed_Priority =>  1;
+   Cheddar_Properties::POSIX_Scheduling_Policy => SCHED_FIFO;
+   Cheddar_Properties::Bound_On_Data_Blocking_Time =>  0 ms;
+end thread_black2.i;
+
+
+
+----------------------------------------
+--  Synchronuous data flow partition  --
+----------------------------------------
+process implementation partition.synchronuous
+subcomponents
+--   instancied_j1 : thread thread_shaded.i;
+   instancied_j2 : thread thread_black.i;
+   instancied_j3 : thread thread_print_infos.i;
+--   instancied_j4 : thread thread_shaded_and_black.i;
+   instancied_j5 : thread thread_black2.i;
+--   instancied_shaded : data shaded.i;
+   instancied_black : data black.i;
+connections
+--   data access instancied_shaded -> instancied_J1.shaded_features;
+   data access instancied_black -> instancied_J2.black_features;
+--   data access instancied_shaded -> instancied_J4.shaded_features;
+--   data access instancied_black -> instancied_J4.black_features;
+   data access instancied_black -> instancied_J5.black_features;
+end partition.synchronuous;
+
+
+---------------------------
+--  Ravenscar partition  --
+---------------------------
+process implementation partition.ravenscar
+subcomponents
+--   instancied_j1 : thread thread_shaded.i;
+   instancied_j2 : thread thread_black.i;
+   instancied_j3 : thread thread_print_infos.i;
+--   instancied_j4 : thread thread_shaded_and_black.i;
+   instancied_j5 : thread thread_black2.i;
+--   instancied_shaded : data shaded.i
+--         {Cheddar_Properties::Data_Concurrency_State => 1;
+--         Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;};
+   instancied_black : data black.i
+         {Cheddar_Properties::Data_Concurrency_State => 1;
+         Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;};
+connections
+--   data access instancied_shaded -> instancied_J1.shaded_features;
+   data access instancied_black -> instancied_J2.black_features;
+--   data access instancied_shaded -> instancied_J4.shaded_features;
+--   data access instancied_black -> instancied_J4.black_features;
+   data access instancied_black -> instancied_J5.black_features;
+end partition.ravenscar;
+
+--------------------------------
+--  Queued buffers partition  --
+--------------------------------
+
+subprogram queued_buffer_producer_spg
+features
+   produced_data : out parameter integer.i;
+properties
+   source_language => C;
+   source_name     => "user_queued_buffer_producer";
+   source_text     => ("../../../queued-buffer.o");
+end queued_buffer_producer_spg;
+
+subprogram queued_buffer_consumer_spg
+features
+   consumed_data : in parameter integer.i;
+properties
+   source_language => C;
+   source_name     => "user_queued_buffer_consumer";
+   source_text     => ("../../../queued-buffer.o");
+end queued_buffer_consumer_spg;
+
+process implementation partition.queued_buffer
+subcomponents
+   thr_producer   : thread queued_buffer_producer.i;
+   thr_producer2  : thread queued_buffer_producer.i;
+   thr_consumer1  : thread queued_buffer_consumer.i { Period => 50 ms;};
+connections
+   port thr_producer.produced_data -> thr_consumer1.consumed_data;
+   port thr_producer2.produced_data -> thr_consumer1.consumed_data;
+end partition.queued_buffer;
+
+thread queued_buffer_producer
+features
+   produced_data : out event data port integer.i
+         {Queue_Size => 2;
+         Queue_Processing_Protocol => FIFO;};
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 20 ms;
+   Deadline => 20 ms;
+   Compute_Execution_Time =>  0 ms ..  3 ms;
+   Cheddar_Properties::Fixed_Priority => 2;
+end queued_buffer_producer;
+
+thread queued_buffer_consumer
+features
+   consumed_data : in event data port integer.i {Queue_Size => 3;};
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 10 ms;
+   Deadline => 10 ms;
+   Compute_Execution_Time =>  0 ms ..  1 ms;
+   Cheddar_Properties::Fixed_Priority => 1;
+end queued_buffer_consumer;
+
+thread implementation queued_buffer_producer.i
+calls
+   mycall : {
+      singlecall : subprogram queued_buffer_producer_spg;
+   };
+connections
+   parameter singlecall.produced_data -> produced_data;
+end queued_buffer_producer.i;
+
+thread implementation queued_buffer_consumer.i
+calls
+   mycall : {
+      singlecall : subprogram queued_buffer_consumer_spg;
+   };
+connections
+   parameter consumed_data -> singlecall.consumed_data;
+end queued_buffer_consumer.i;
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+--------------
+--  System  --
+--------------
+
+system casestudy
+end casestudy;
+
+system implementation casestudy.i
+subcomponents
+   module : processor pok_kernel.i;
+   mem    : memory ram.i;
+   part1  : process partition.synchronuous;
+   part2  : process partition.ravenscar;
+   part3  : process partition.queued_buffer;
+properties
+  --  Association between partitions processes and partitions runtimes
+   Actual_Processor_Binding => (reference (module.part1)) applies to part1;
+   Actual_Processor_Binding => (reference (module.part2)) applies to part2;
+   Actual_Processor_Binding => (reference (module.part3)) applies to part3;
+
+  --  Association between partitions processes and memory segments
+   Actual_Memory_Binding    => (reference (mem.segment1)) applies to part1;
+   Actual_Memory_Binding    => (reference (mem.segment2)) applies to part2;
+   Actual_Memory_Binding    => (reference (mem.segment3)) applies to part3;
+end casestudy.i;
+
+
+
+end sigada09;
+
+

@@ -1,0 +1,30 @@
+KERNEL
+========================================================================
+ - Make a little memory allocator for the kernel space
+ - Implement the health monitor that is near of the ARINC653 definition
+ - Implement FIFO scheduler
+ - Implement queueing discipline
+ - CHECK MAIN KERNEL THREAD STACK SIZE
+
+LIBPOK
+========================================================================
+ - Create an API that implements ARINC653 APEX
+ - Create an API that implements POSIX
+ - Implement fault callback function
+
+GENERAL
+========================================================================
+ - Make a tool that handle dependencies between NEEDS maccro
+
+POKCHECKER
+========================================================================
+ - Checks that Sum (Thread_Code_Data_Size) < Partition_Memory_Code_Size
+ - Checks that Partition_Duration < Sum(Window_Schedule_Duration)
+ - Checks that No Window_Schedule overlap in Major Frame
+ - Checks that Period of a periodic thread is a multiple of Partition period
+
+CODE GENERATION
+========================================================================
+ - handle lockobjects for partitions and kernel
+ - add POK_NEEDS_LOCKJECTS and so on
+

@@ -13,34 +13,34 @@
 /* Startup functions */
 
 int 
-virt_getWorkSpaceArea( void );
+virt_getWorkSpaceArea( void ) __attribute__((fastcall));
 
 
 
 /* Interrupts */
 int
-virt_requestIrq( int vector );
+virt_requestIrq( int vector ) __attribute__((fastcall));
 
 void
-virt_detachIrq( int vector );
+virt_detachIrq( int vector ) __attribute__((fastcall));
 
 void
-virt_enableInterrupts( int _level );
+virt_enableInterrupts( int _level ) __attribute__((fastcall));
 
 void
-virt_disableInterrupts( int _level );
+virt_disableInterrupts( int _level ) __attribute__((fastcall));
 
 void 
-virt_flashInterrupts( int _level );
+virt_flashInterrupts( int _level ) __attribute__((fastcall));
 
 void
-virt_openInterrupts( void );
+virt_openInterrupts( void ) __attribute__((fastcall));
 
 void
-virt_closeInterrupts( void );
+virt_closeInterrupts( void ) __attribute__((fastcall));
 
 int
-virt_getInterruptLevel( int _level );
+virt_getInterruptLevel( int _level ) __attribute__((fastcall));
 
 
 
@@ -51,13 +51,13 @@ virt_getInterruptLevel( int _level );
  */
 
 void
-virt_idleThread( void );
+virt_idleThread( void ) __attribute__((fastcall));
 
 
 /* Error handling */
 
 void
-virt_execStopError( int _error );
+virt_execStopError( int _error ) __attribute__((fastcall));
 
 #endif /* ASM */
 

@@ -38,7 +38,7 @@ int user_hello( void )
  * \brief Initializes the console.
  *
  */
-int
+__attribute__((fastcall)) int
 virt_consoleInit(void)
 {
   return 0;
@@ -47,7 +47,7 @@ virt_consoleInit(void)
 /**
  * \brief Reads a character from the console.
  */
-char
+__attribute__((fastcall)) char
 virt_charRead(void)
 {
   /* Console read is currently not supported by POK. -- phi 06/10/2013 */
@@ -57,7 +57,7 @@ virt_charRead(void)
 /**
  * \brief Writes a character to the console.
  */
-void
+__attribute__((fastcall)) void
 virt_charWrite(char *c)
 {
   printf("%s", c);
@@ -72,7 +72,7 @@ virt_charWrite(char *c)
 
 /* Startup functions */
 
-int 
+__attribute__((fastcall)) int 
 virt_getWorkSpaceArea( void )
 {
   return 0;
@@ -81,43 +81,43 @@ virt_getWorkSpaceArea( void )
 
 
 /* Interrupts */
-int
+__attribute__((fastcall)) int
 virt_requestIrq( int vector )
 {
   return 0;
 }
 
-void
+__attribute__((fastcall)) void
 virt_detachIrq( int vector )
 {
 }
 
-void
+__attribute__((fastcall)) void
 virt_enableInterrupts( int _level )
 {
 }
 
-void
+__attribute__((fastcall)) void
 virt_disableInterrupts( int _level )
 {
 }
 
-void 
+__attribute__((fastcall)) void 
 virt_flashInterrupts( int _level )
 {
 }
 
-void
+__attribute__((fastcall)) void
 virt_openInterrupts( void )
 {
 }
 
-void
+__attribute__((fastcall)) void
 virt_closeInterrupts( void )
 {
 }
 
-int
+__attribute__((fastcall)) int
 virt_getInterruptLevel( int _level )
 {
   return 0;
@@ -131,7 +131,7 @@ virt_getInterruptLevel( int _level )
  * @brief Lowest priority thread, doing nothing, never returns;
  */
 
-void
+__attribute__((fastcall)) void
 virt_idleThread( void )
 {
   while(1);
@@ -140,7 +140,7 @@ virt_idleThread( void )
 
 /* Error handling */
 
-void
+__attribute__((fastcall)) void
 virt_execStopError( int _error )
 {
   printf( "!!! An ERROR occured: %i\n", _error );

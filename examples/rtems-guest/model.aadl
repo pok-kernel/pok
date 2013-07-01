@@ -58,13 +58,13 @@ process implementation myProcess.impl
 subcomponents
   thr1 : thread mythread.impl;
 properties
-  POK::Needed_Memory_Size => 120Kbyte;
+  POK::Needed_Memory_Size => 4096Kbyte;
 end myProcess.impl;
 
 
 thread mythread
 properties
-  Source_Stack_Size => 30Kbyte;
+  Source_Stack_Size => 128Kbyte;
 end mythread;
 
 thread implementation mythread.impl

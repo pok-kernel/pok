@@ -17,7 +17,7 @@
 #include <libc/stdio.h>
 
 #include "virtLayerBSP.h"
-//#include "virtLayerCPU.h"
+#include "virtLayerCPU.h"
 
 int user_hello( void )
 {
@@ -51,7 +51,7 @@ char
 virt_charRead(void)
 {
   /* Console read is currently not supported by POK. -- phi 06/10/2013 */
-  return '\0';
+  return -1;
 }
 
 /**
@@ -61,4 +61,87 @@ void
 virt_charWrite(char *c)
 {
   printf("%s", c);
+}
+
+/* Date:      06/19/2013
+ * Author:    Philipp Eppelt
+ * Purpose:   CPU part of the virtualization layer.
+ * Licencse:  see RTEMS License.
+ */
+
+
+/* Startup functions */
+
+int 
+virt_getWorkSpaceArea( void )
+{
+  return 0;
+}
+
+
+
+/* Interrupts */
+int
+virt_requestIrq( int vector )
+{
+  return 0;
+}
+
+void
+virt_detachIrq( int vector )
+{
+}
+
+void
+virt_enableInterrupts( int _level )
+{
+}
+
+void
+virt_disableInterrupts( int _level )
+{
+}
+
+void 
+virt_flashInterrupts( int _level )
+{
+}
+
+void
+virt_openInterrupts( void )
+{
+}
+
+void
+virt_closeInterrupts( void )
+{
+}
+
+int
+virt_getInterruptLevel( int _level )
+{
+  return 0;
+}
+
+
+
+/* Idle Thread */
+
+/**
+ * @brief Lowest priority thread, doing nothing, never returns;
+ */
+
+void
+virt_idleThread( void )
+{
+  while(1);
+}
+
+
+/* Error handling */
+
+void
+virt_execStopError( int _error )
+{
+  printf( "!!! An ERROR occured: %i\n", _error );
 }

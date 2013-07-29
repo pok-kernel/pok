@@ -1,3 +1,4 @@
+# This target produces a new library consisting of the contents of libpok.a and the partition's object files.
 libpart: $(OBJS)
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[AR] $@.a "
 	/bin/ar -x libpok.a

@@ -135,4 +135,14 @@ void name##_handler(interrupt_frame* frame);				\
 void name##_handler(interrupt_frame* frame)
 
 
+struct meta_handler
+{
+  unsigned vector;
+  void (*handler[POK_CONFIG_NB_PARTITIONS])(void);
+};
+typedef struct meta_handler meta_handler;
+
+void _C_isr_handler( unsigned vector );
+
+
 #endif /* !__POK_INTERRUPT_H__ */

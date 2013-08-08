@@ -13,6 +13,7 @@ LO_OBJS=	arch.o		\
 			space.o		\
 			syscalls.o	\
 			interrupt.o	\
+			interrupt_prologue.o	\
 			pci.o		\
 			exceptions.o
 

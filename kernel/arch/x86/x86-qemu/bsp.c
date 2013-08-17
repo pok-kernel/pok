@@ -17,17 +17,43 @@
 
 #include <errno.h>
 #include <arch.h>
+#include <arch/x86/interrupt.h> /* meta handler */
+#include <core/partition.h>	/* POK_SCHED_CURRENT_PARTITION */
 
 #include "cons.h"
 #include "pm.h"
 #include "pit.h"
 #include "pic.h"
 
+static meta_handler handler_table[16]; 
+
+pok_ret_t pok_meta_handler_init( void )
+{
+  int i, j;
+  for( i = 0; i < 16; i++ )
+  {
+    meta_handler init;
+    init.vector = 0xFFF; /* magic number > IDT_SIZE */
+    for( j = 0; j < POK_CONFIG_NB_PARTITIONS; j++ )
+      init.handler[j] = NULL; /* No handlers present */
+    handler_table[i] = init; 
+  }
+
+  return (POK_ERRNO_OK);
+}
+
+void _C_isr_handler( unsigned vector, interrupt_frame *frame ) 
+{
+  if( handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION] != NULL )
+    handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION](vector, (void*)frame);
+}
+
 pok_ret_t pok_bsp_init (void)
 {
    pok_cons_init ();
    pok_pm_init ();
    pok_pic_init ();
+   pok_meta_handler_init();
 
    return (POK_ERRNO_OK);
 }
@@ -37,6 +63,26 @@ pok_ret_t pok_bsp_irq_acknowledge (uint8_t irq)
    pok_pic_eoi (irq);
 
    return (POK_ERRNO_OK);
+}
+
+pok_ret_t pok_bsp_irq_register_hw (uint8_t   irq,
+				   void      (*irq_handler)(unsigned, void*))
+{
+  if( irq > 15 )
+    return (POK_ERRNO_EINVAL);
+
+  pok_pic_unmask (irq);
+  
+  /* magic number: set in pok_meta_handler_init()
+   * meaning: vector not yet used */
+  if( handler_table[irq].vector == 0xFFF ) 
+    handler_table[irq].vector = irq;
+
+  handler_table[irq].handler[POK_SCHED_CURRENT_PARTITION] = irq_handler;
+
+  pok_arch_event_register (32 + irq, NULL);
+
+  return (POK_ERRNO_OK);
 }
 
 pok_ret_t pok_bsp_irq_register (uint8_t   irq,

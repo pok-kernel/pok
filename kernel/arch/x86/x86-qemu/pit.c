@@ -30,9 +30,10 @@
 #define PIT_BASE 0x40
 #define PIT_IRQ 0
 
-INTERRUPT_HANDLER (pit_interrupt)
+void pit_ISR (unsigned vector, void *frame)
 {
-   (void) frame;
+   frame = (interrupt_frame*) frame;
+   (void) vector;
    pok_pic_eoi (PIT_IRQ);
    CLOCK_HANDLER
 }
@@ -47,9 +48,29 @@ pok_ret_t pok_x86_qemu_timer_init ()
    outb (PIT_BASE, (OSCILLATOR_RATE / pit_freq) & 0xff);
    outb (PIT_BASE, ((OSCILLATOR_RATE / pit_freq) >> 8) & 0xff);
 
-   pok_bsp_irq_register (PIT_IRQ, pit_interrupt);
+   pok_bsp_irq_register_hw (PIT_IRQ, pit_ISR);
 
    return (POK_ERRNO_OK);
 }
 
+/*INTERRUPT_HANDLER(pit_interrupt)
+{
+   (void) frame;
+   pok_pic_eoi (PIT_IRQ);
+   CLOCK_HANDLER
+}
 
+pok_ret_t pok_x86_qemu_timer_init ()
+{
+   uint16_t pit_freq;
+
+   pit_freq = POK_TIMER_FREQUENCY;
+
+   outb (PIT_BASE + 3, 0x34); *//* Channel0, rate generator, Set LSB then MSB */
+/*   outb (PIT_BASE, (OSCILLATOR_RATE / pit_freq) & 0xff);
+   outb (PIT_BASE, ((OSCILLATOR_RATE / pit_freq) >> 8) & 0xff);
+
+   pok_bsp_irq_register_hw (PIT_IRQ, pit_interrupt);
+
+   return (POK_ERRNO_OK);
+}*/

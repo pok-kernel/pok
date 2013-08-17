@@ -34,6 +34,9 @@ pok_ret_t pok_bsp_irq_acknowledge (uint8_t irq);
 
 pok_ret_t pok_bsp_irq_register (uint8_t irq,
 				                    void    (*handler)(void));
+/* use only for the hardware interrupts */
+pok_ret_t pok_bsp_irq_register_hw (uint8_t   irq,
+				   void      (*irq_handler)(unsigned, void*));
 
 void  *pok_bsp_mem_alloc (size_t size);
 

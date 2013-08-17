@@ -23,33 +23,15 @@
 
 #include <errno.h>
 #include <core/partition.h>
-#include <arch/x86/interrupt.h>
 
 #include "event.h"
 #include "gdt.h"
 
-static meta_handler handler_table[16]; 
-
-pok_ret_t pok_meta_handler_init( void )
-{
-  int i, j;
-  for( i = 0; i < 16; i++ )
-  {
-    meta_handler init;
-    init.vector = 0xFFF; /* magic number > IDT_SIZE */
-    for( j = 0; j < POK_CONFIG_NB_PARTITIONS; j++ )
-      init.handler[j] = NULL; /* No handlers present */
-    handler_table[i] = init; 
-  }
-
-  return (POK_ERRNO_OK);
-}
 
 pok_ret_t pok_arch_init ()
 {
   pok_gdt_init ();
   pok_event_init ();
-  pok_meta_handler_init();
 
   return (POK_ERRNO_OK);
 }
@@ -113,26 +95,14 @@ static void (*pok_irq_prologue[16])(void) = {
   pok_irq_prologue_15
 };
 
-void _C_isr_handler( unsigned vector ) 
-{
-  handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION]();
-}
-
 pok_ret_t pok_arch_event_register  (uint8_t vector,
                                     void (*handler)(void))
 {
-  if( vector < 16 )
+  if( vector > 31 && vector < 48 ) /* first 32 lines reserved by intel */
   {
-    /* magic number: set in pok_meta_handler_init()
-     * meaning: vector not yet used */
-    if( handler_table[vector].vector == 0xFFF ) 
-      handler_table[vector].vector = vector;
-
-    handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION] = handler;
-
     pok_idt_set_gate (vector,
                      GDT_CORE_CODE_SEGMENT << 3,
-		     (uint32_t) pok_irq_prologue[vector],
+		     (uint32_t) pok_irq_prologue[vector - 32], /* to fit the prologue array */
                      IDTE_TRAP,
                      3);
 

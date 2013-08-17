@@ -51,7 +51,7 @@ void pok_time_init (void)
 }
 
 
-#ifdef POK_NEEDS_GETTICK
+#if 1//def POK_NEEDS_GETTICK
 /**
  * Get the current ticks value, store it in
  * \a clk_val

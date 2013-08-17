@@ -81,7 +81,7 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
 
 #endif
 
-#if defined POK_NEEDS_GETTICK
+#if 1//defined POK_NEEDS_GETTICK
       case POK_SYSCALL_GETTICK:
          POK_CHECK_PTR_OR_RETURN(infos->partition, args->arg1 + infos->base_addr)
          return pok_gettick_by_pointer ((uint64_t*) (args->arg1 + infos->base_addr));

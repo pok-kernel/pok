@@ -6,7 +6,6 @@
 
 _ISR_Handler:
 /* the IRQ vector number resides in EAX */
-/*      movl  %esp, %ebp	      ;	*/ /* save stack pointer */ 
       push  %eax		      ; /* push vector number to stack */
       call  _C_isr_handler	      ; /* func expects the argument on the stack */
       pop   %ecx		      ; /* grab vector number from stack */
@@ -28,8 +27,6 @@ _ISR_Handler:
       pop   %ds		      ;
       popa		      ;
       addl  $4, %esp	      ; /* remove interrupt_frame padding from stack */
-
-/*      movl  %ebp, %esp	      ;	*//* move back to the previous stack */
 
       sti		      ; /* enable interrupts again */
 

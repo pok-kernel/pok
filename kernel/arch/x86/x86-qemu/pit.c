@@ -34,7 +34,6 @@ void pit_ISR (unsigned vector, void *frame)
 {
    frame = (interrupt_frame*) frame;
    (void) vector;
-   pok_pic_eoi (PIT_IRQ);
    CLOCK_HANDLER
 }
 

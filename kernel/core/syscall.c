@@ -350,6 +350,7 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
        break;
 #endif /* POK_NEEDS_PCI */
 
+#ifdef i386
       /**
        * This shall register an irq handler with the meta_handler for the
        * requested interrupt number.
@@ -366,7 +367,7 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
        return pok_bsp_irq_register_hw (args->arg1, 
 		 (void(*)(unsigned, void*)) ((args->arg2 + infos->base_addr)) );
        break;
-
+#endif
       /**
        * Here is the default syscall handler. In this case, the syscall
        * ID was not properly identified and thus, we should return an 

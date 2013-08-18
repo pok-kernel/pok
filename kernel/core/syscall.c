@@ -350,6 +350,22 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
        break;
 #endif /* POK_NEEDS_PCI */
 
+      /**
+       * This shall register an irq handler with the meta_handler for the
+       * requested interrupt number.
+       * arg1: vector nubmer, 
+       * arg2: handler/callback function
+       */
+     case POK_SYSCALL_IRQ_REGISTER_HANDLER:
+//       POK_CHECK_PTR_OR_RETURN(infos->partition, args->arg1 + infos->base_addr)
+       POK_CHECK_PTR_OR_RETURN(infos->partition, args->arg2 + infos->base_addr)
+       /* arg1 is just a number, arg2 is a pointer to a function in the
+	* partition, therefore the partitions base_addr must be added to become
+	* a valid pointer for the kernel.
+	*/
+       return pok_bsp_irq_register_hw (args->arg1, 
+		 (void(*)(unsigned, void*)) ((args->arg2 + infos->base_addr)) );
+       break;
 
       /**
        * Here is the default syscall handler. In this case, the syscall

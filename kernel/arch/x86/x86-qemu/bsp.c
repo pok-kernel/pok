@@ -34,18 +34,12 @@ pok_ret_t pok_meta_handler_init( void )
   {
     meta_handler init;
     init.vector = 0xFFF; /* magic number > IDT_SIZE */
-    for( j = 0; j < POK_CONFIG_NB_PARTITIONS; j++ )
+    for( j = 0; j < POK_CONFIG_NB_PARTITIONS+1; j++ )
       init.handler[j] = NULL; /* No handlers present */
     handler_table[i] = init; 
   }
 
   return (POK_ERRNO_OK);
-}
-
-void _C_isr_handler( unsigned vector, interrupt_frame *frame ) 
-{
-  if( handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION] != NULL )
-    handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION](vector, (void*)frame);
 }
 
 pok_ret_t pok_bsp_init (void)
@@ -65,6 +59,18 @@ pok_ret_t pok_bsp_irq_acknowledge (uint8_t irq)
    return (POK_ERRNO_OK);
 }
 
+void _C_isr_handler( unsigned vector, interrupt_frame *frame ) 
+{
+  /* If kernel handler registered */
+  if( handler_table[vector].handler[POK_CONFIG_NB_PARTITIONS] != NULL )
+    handler_table[vector].handler[POK_CONFIG_NB_PARTITIONS](vector, (void*)frame);
+
+  if( handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION] != NULL )
+    handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION](vector, (void*)frame);
+
+  pok_bsp_irq_acknowledge(vector);
+}
+
 pok_ret_t pok_bsp_irq_register_hw (uint8_t   irq,
 				   void      (*irq_handler)(unsigned, void*))
 {
@@ -78,7 +84,17 @@ pok_ret_t pok_bsp_irq_register_hw (uint8_t   irq,
   if( handler_table[irq].vector == 0xFFF ) 
     handler_table[irq].vector = irq;
 
-  handler_table[irq].handler[POK_SCHED_CURRENT_PARTITION] = irq_handler;
+  if( pok_partitions[0].base_addr == 0 )
+  {
+    if( (uint32_t)irq_handler < 0x112000 )
+      handler_table[irq].handler[POK_CONFIG_NB_PARTITIONS] = irq_handler;
+  }
+  else if( (uint32_t)irq_handler < pok_partitions[0].base_addr )
+    /* must be a kernel handler */
+    handler_table[irq].handler[POK_CONFIG_NB_PARTITIONS] = irq_handler;
+  else
+    /* partition handler otherwise */
+    handler_table[irq].handler[POK_SCHED_CURRENT_PARTITION] = irq_handler;
 
   pok_arch_event_register (32 + irq, NULL);
 

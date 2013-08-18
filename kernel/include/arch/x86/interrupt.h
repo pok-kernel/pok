@@ -50,9 +50,6 @@ extern uint32_t pok_tss;
 
 void update_tss (interrupt_frame* frame);
 
-#define INTERRUPT_HANDLER_irq(name)						\
-void name(unsigend vector, interrupt_frame* frame)
-
 #define INTERRUPT_HANDLER(name)						\
 void name (void);							\
 void name##_handler(interrupt_frame* frame);				\
@@ -140,7 +137,8 @@ void name##_handler(interrupt_frame* frame)
 struct meta_handler
 {
   unsigned vector;
-  void (*handler[POK_CONFIG_NB_PARTITIONS])(unsigned, void*);
+  /* POK_CONFIG_NB_PARTITIONS + KERNEL */
+  void (*handler[POK_CONFIG_NB_PARTITIONS+1])(unsigned, void*);
 };
 typedef struct meta_handler meta_handler;
 

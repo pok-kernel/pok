@@ -371,6 +371,13 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
      case POK_SYSCALL_IRQ_UNREGISTER_HANDLER:
        return pok_bsp_irq_unregister_hw (args->arg1);
        break;
+   /* enable/disable interrupt delivery to a partition */
+    case POK_SYSCALL_IRQ_PARTITION_ENABLE:
+       return pok_bsp_irq_partition_enable (args->arg1);
+       break;
+    case POK_SYSCALL_IRQ_PARTITION_DISABLE:
+       return pok_bsp_irq_partition_disable (args->arg1);
+       break;
 #endif
       /**
        * Here is the default syscall handler. In this case, the syscall

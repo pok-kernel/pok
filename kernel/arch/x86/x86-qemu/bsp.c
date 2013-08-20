@@ -25,7 +25,8 @@
 #include "pit.h"
 #include "pic.h"
 
-static meta_handler handler_table[16]; 
+static meta_handler handler_table[16];
+static unsigned int partition_irq_enabled[POK_CONFIG_NB_PARTITIONS];
 
 pok_ret_t pok_meta_handler_init( void )
 {
@@ -42,12 +43,24 @@ pok_ret_t pok_meta_handler_init( void )
   return (POK_ERRNO_OK);
 }
 
+pok_ret_t pok_partition_irq_init( void )
+{
+  int i;
+  for( i = 0; i < POK_CONFIG_NB_PARTITIONS; i++ )
+  {
+    partition_irq_enabled[i] = 0;
+  }
+
+  return (POK_ERRNO_OK);
+}
+
 pok_ret_t pok_bsp_init (void)
 {
    pok_cons_init ();
    pok_pm_init ();
    pok_pic_init ();
    pok_meta_handler_init();
+   pok_partition_irq_init();
 
    return (POK_ERRNO_OK);
 }
@@ -70,8 +83,11 @@ void _C_isr_handler( unsigned vector, interrupt_frame *frame )
   /* TODO to ensure segregation some code must be written.
    */
 
-  if( handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION] != NULL )
-    handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION](vector, (void*)frame);
+  if( partition_irq_enabled[POK_SCHED_CURRENT_PARTITION] == 0 )
+  {
+    if( handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION] != NULL )
+      handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION](vector, (void*)frame);
+  }
 
 }
 
@@ -121,6 +137,25 @@ pok_ret_t pok_bsp_irq_register (uint8_t   irq,
    pok_arch_event_register (32 + irq, handler);
 
    return (POK_ERRNO_OK);
+}
+
+pok_ret_t pok_bsp_irq_partition_enable (uint8_t level)
+{
+  (void)level;
+  if( partition_irq_enabled[POK_SCHED_CURRENT_PARTITION] == 0)
+    level = 0;
+  else
+    level = --partition_irq_enabled[POK_SCHED_CURRENT_PARTITION];
+  
+  return (POK_ERRNO_OK);
+}
+
+pok_ret_t pok_bsp_irq_partition_disable (uint8_t level)
+{
+  (void)level;
+  level = ++partition_irq_enabled[POK_SCHED_CURRENT_PARTITION];
+  
+  return (POK_ERRNO_OK);
 }
 
 /**

@@ -67,6 +67,9 @@ void _C_isr_handler( unsigned vector, interrupt_frame *frame )
   if( handler_table[vector].handler[POK_CONFIG_NB_PARTITIONS] != NULL )
     handler_table[vector].handler[POK_CONFIG_NB_PARTITIONS](vector, (void*)frame);
 
+  /* TODO to ensure segregation some code must be written.
+   */
+
   if( handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION] != NULL )
     handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION](vector, (void*)frame);
 
@@ -94,6 +97,19 @@ pok_ret_t pok_bsp_irq_register_hw (uint8_t   irq,
 
   pok_arch_event_register (32 + irq, NULL);
 
+  return (POK_ERRNO_OK);
+}
+
+pok_ret_t pok_bsp_irq_unregister_hw (uint8_t  irq)
+{
+  if( irq > 15 )
+    return (POK_ERRNO_EINVAL);
+
+  handler_table[irq].handler[POK_SCHED_CURRENT_PARTITION] = NULL;
+
+  /* TODO should check if all handler are detached and then close the irq line.
+   */
+  
   return (POK_ERRNO_OK);
 }
 

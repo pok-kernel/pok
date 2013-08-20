@@ -367,6 +367,10 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
        return pok_bsp_irq_register_hw (args->arg1, 
 		 (void(*)(unsigned, void*)) ((args->arg2 + infos->base_addr)) );
        break;
+     
+     case POK_SYSCALL_IRQ_UNREGISTER_HANDLER:
+       return pok_bsp_irq_unregister_hw (args->arg1);
+       break;
 #endif
       /**
        * Here is the default syscall handler. In this case, the syscall

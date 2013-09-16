@@ -42,6 +42,7 @@ pok_ret_t pok_bsp_irq_unregister_hw (uint8_t   irq);
 
 pok_ret_t pok_bsp_irq_partition_enable (uint8_t level);
 pok_ret_t pok_bsp_irq_partition_disable (uint8_t level);
+pok_ret_t pok_bsp_irq_partition_ack (unsigned vector);
 
 void  *pok_bsp_mem_alloc (size_t size);
 

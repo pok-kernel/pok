@@ -23,8 +23,42 @@
 
 void interrupt_middleman( unsigned vector, void* frame )
 {
+  // search for the magic value 0xffeeddcc on the stack to determin the begin
+  // of the vector number and the interrut context. 
+  // See kernel/arch/x86/x86-qemu/bsp.c
+  asm volatile( "movl %%esp, %%eax \t\n"
+      "1: \t\n"
+      "addl $0x4, %%eax \t\n"
+      "movl (%%eax), %%ebx \t\n"
+      "cmp $0xffeeddcc, %%ebx \t\n"
+      "jne  1b \t\n"
+      "addl $0x4, %%eax \t\n"
+      "movl (%%eax), %0\t\n"
+      : "=r"(vector)
+      :
+      : "%eax", "%ebx"
+     );
+  
   (void)frame;
+  
   C_dispatch_isr(vector);
+  
+  pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ACK, vector );
+  // TODO recover frame, restore registers, place return eip;
+  asm volatile( "movl %%esp, %%eax \t\n"
+      "1: \t\n"
+      "addl $0x4, %%eax \t\n"
+      "movl (%%eax), %%ebx \t\n"
+      "cmp $0xffeeddcc, %%ebx \t\n"
+      "jne  1b \t\n"
+      "addl $0x8, %%eax \t\n"
+      "movl %%eax, %%esp \t\n"
+      "popa \t\n"
+      "ret	  \t\n"
+      :
+      :
+      : "%eax", "%ebx", "%ecx", "%edx"
+      );
 }
 
 

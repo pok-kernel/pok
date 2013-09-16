@@ -30,6 +30,7 @@ typedef enum
    /* enable/disable interrupt delivery to a partition */
    POK_SYSCALL_IRQ_PARTITION_ENABLE		   =  27,
    POK_SYSCALL_IRQ_PARTITION_DISABLE		   =  28,
+   POK_SYSCALL_IRQ_PARTITION_ACK		   =  29,
 	 POK_SYSCALL_INT_NUMBER                          =  42,
 	 POK_SYSCALL_THREAD_CREATE                       =  50,
 	 POK_SYSCALL_THREAD_SLEEP_UNTIL                  =  51,

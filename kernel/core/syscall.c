@@ -378,6 +378,9 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
     case POK_SYSCALL_IRQ_PARTITION_DISABLE:
        return pok_bsp_irq_partition_disable (args->arg1);
        break;
+    case POK_SYSCALL_IRQ_PARTITION_ACK:
+       return pok_bsp_irq_partition_ack(args->arg1);
+       break;
 #endif
       /**
        * Here is the default syscall handler. In this case, the syscall

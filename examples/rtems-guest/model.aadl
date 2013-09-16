@@ -74,7 +74,7 @@ properties
   dispatch_protocol => periodic;
   period => 1000ms;
   deadline => 1000ms;
-  compute_execution_time => 1ms .. 2ms;
+  compute_execution_time => 50ms .. 100ms;
 end mythread.impl;
 
 

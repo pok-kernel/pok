@@ -139,6 +139,7 @@ struct meta_handler
   unsigned vector;
   /* POK_CONFIG_NB_PARTITIONS + KERNEL */
   void (*handler[POK_CONFIG_NB_PARTITIONS+1])(unsigned, void*);
+  int waiting[POK_CONFIG_NB_PARTITIONS+1];
 };
 typedef struct meta_handler meta_handler;
 

@@ -358,7 +358,6 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
        * arg2: handler/callback function
        */
      case POK_SYSCALL_IRQ_REGISTER_HANDLER:
-//       POK_CHECK_PTR_OR_RETURN(infos->partition, args->arg1 + infos->base_addr)
        POK_CHECK_PTR_OR_RETURN(infos->partition, args->arg2 + infos->base_addr)
        /* arg1 is just a number, arg2 is a pointer to a function in the
 	* partition, therefore the partitions base_addr must be added to become

@@ -19,12 +19,11 @@ _ISR_Handler:
       pop   %es		      ;	/* remove interrupt_frame from stack */
       pop   %ds		      ; /* and restore old context */
       popa		      ;
-      addl  $4, %esp	      ; /* remove interrupt_frame padding from stack */
+      addl  $4, %esp	      ; /* remove error code  padding from stack */
 
       sti		      ; /* enable interrupts again */
 
-      /* Acknowledging the interrupt must be done in the user defined handler
-       * code */
+      /* Acknowledging the interrupt must be done in the kernel handler code */
       iret		      ; /* return from interrupt */
 
       

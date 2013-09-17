@@ -84,22 +84,16 @@ pok_ret_t pok_bsp_irq_partition_ack (unsigned vector)
 
 void _C_isr_handler( unsigned vector, interrupt_frame *frame ) 
 {
-//  pok_bsp_irq_acknowledge(vector);
 
-  /* If kernel handler registered */
+  // If kernel handler registered 
   if( handler_table[vector].handler[POK_CONFIG_NB_PARTITIONS] != NULL )
     handler_table[vector].handler[POK_CONFIG_NB_PARTITIONS](vector, (void*)frame);
 
 
-  /* TODO to ensure segregation some code must be written.
-   * it has something to do with setting the right CS
-   * The CS stored in the interrupt frame should be the right one. 
-   */
-
-  /* the following solution kills the cleanup and the update_tss code running
-   * after the _C_isr_handler.
-   * Stack is cleaned up and user space restored as far as necessary.
-   */
+  // the following solution kills the cleanup and the update_tss code running
+  // after the _C_isr_handler.
+  // Stack is cleaned up and user space restored as far as necessary.
+  
   if( partition_irq_enabled[POK_SCHED_CURRENT_PARTITION] == 0 )
   {
     if( handler_table[vector].handler[POK_SCHED_CURRENT_PARTITION] != NULL )
@@ -153,7 +147,7 @@ void _C_isr_handler( unsigned vector, interrupt_frame *frame )
 
 	    "movl %0,	    %%gs:-36(%%ebx) \t\n" //arg1
 
-	    "movl $0xffeeddcc, %%eax \t\n" // MAGIC NUMBER
+	    "movl $0xffeeddcc, %%eax \t\n" // MAGIC NUMBER -> searched for in user space handler
 	    "movl %%eax,	    %%gs:-40(%%ebx) \t\n"
 
 	    "movl 56(%1),	    %%eax \t\n"
@@ -232,8 +226,15 @@ pok_ret_t pok_bsp_irq_unregister_hw (uint8_t  irq)
 
   handler_table[irq].handler[POK_SCHED_CURRENT_PARTITION] = NULL;
 
-  /* TODO should check if all handler are detached and then close the irq line.
-   */
+  // If no one is interested in the irq anymore, mask line.
+  int no_handler_left = 1;
+  int i = 0;
+  for( i = 0; i < POK_CONFIG_NB_PARTITIONS; i++ )
+    if( handler_table[irq].handler[i] != NULL )
+      no_handler_left = 0;
+
+  if( no_handler_left )
+    pok_pic_mask (irq);
   
   return (POK_ERRNO_OK);
 }

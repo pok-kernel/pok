@@ -21,6 +21,14 @@
 #include "virtualizationlayercpu.h"
 
 
+/**
+ * @brief Forwards the interrupt to the partition and returns to the point of
+ *	  interruption.
+ *
+ * Recovers the interrupted context and the vector number from the stack, calls
+ * the RTEMS interrupt handler, restores the context afterwards and returns to
+ * the interrupted instruction.
+ */
 void interrupt_middleman( unsigned vector, void* frame )
 {
   // search for the magic value 0xffeeddcc on the stack to determin the begin
@@ -44,7 +52,7 @@ void interrupt_middleman( unsigned vector, void* frame )
   C_dispatch_isr(vector);
   
   pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ACK, vector );
-  // TODO recover frame, restore registers, place return eip;
+  // recover frame, restore registers, place return eip;
   asm volatile( "movl %%esp, %%eax \t\n"
       "1: \t\n"
       "addl $0x4, %%eax \t\n"
@@ -62,7 +70,9 @@ void interrupt_middleman( unsigned vector, void* frame )
 }
 
 
-
+/**
+ * @brief Hello World!
+ */
 int user_hello( void )
 {
   _BSP_Virtual_Char_write( "Hello POK world!\n");
@@ -82,7 +92,7 @@ int user_hello( void )
  * \brief Initializes the console.
  *
  */
-__attribute__((fastcall)) int
+int
 _BSP_Virtual_Console_init(void)
 {
   return 0;
@@ -91,7 +101,7 @@ _BSP_Virtual_Console_init(void)
 /**
  * \brief Reads a character from the console.
  */
-__attribute__((fastcall)) char
+char
 _BSP_Virtual_Char_read(void)
 {
   /* Console read is currently not supported by POK. -- phi 06/10/2013 */
@@ -101,7 +111,7 @@ _BSP_Virtual_Char_read(void)
 /**
  * \brief Writes a character to the console.
  */
-__attribute__((fastcall)) void
+void
 _BSP_Virtual_Char_write(char *c)
 {
   printf("%s", c);
@@ -111,21 +121,16 @@ _BSP_Virtual_Char_write(char *c)
 
 /* Startup functions */
 
-__attribute__((fastcall)) int 
+int 
 _BSP_Virtual_getworkspacearea( void )
 {
   return 0;
 }
 
 
-/* Date:      06/19/2013
- * Author:    Philipp Eppelt
- * Purpose:   CPU part of the virtualization layer.
- * Licencse:  see RTEMS License.
- */
-
 /* Interrupts */
-__attribute__((fastcall)) int
+
+int
 _CPU_Virtual_Irq_request( int vector )
 {
   pok_ret_t ret = pok_syscall2( POK_SYSCALL_IRQ_REGISTER_HANDLER, vector, (uint32_t)&interrupt_middleman );
@@ -138,7 +143,7 @@ _CPU_Virtual_Irq_request( int vector )
   return 0;
 }
 
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_Irq_detach( int vector )
 {
   pok_syscall1( POK_SYSCALL_IRQ_UNREGISTER_HANDLER, vector);
@@ -150,7 +155,7 @@ _CPU_Virtual_Irq_detach( int vector )
  * To assure proper usage, use _level previously returned by
  * _CPU_Virtual_Interrupts_disable!
  */
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_Interrupts_enable( int _level )
 {
   pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ENABLE, _level );
@@ -158,7 +163,7 @@ _CPU_Virtual_Interrupts_enable( int _level )
 /**
  * \brief disables interrupts and returns previous level
  */ 
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_Interrupts_disable( int _level )
 {
   pok_syscall1( POK_SYSCALL_IRQ_PARTITION_DISABLE, _level );
@@ -168,7 +173,7 @@ _CPU_Virtual_Interrupts_disable( int _level )
  * \brief enables interrupt and disables them again; returned _level should be
  * the same as passed _level.
  */
-__attribute__((fastcall)) void 
+void 
 _CPU_Virtual_Interrupts_flash( int _level )
 {
   pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ENABLE, _level );
@@ -178,7 +183,7 @@ _CPU_Virtual_Interrupts_flash( int _level )
 /**
  * @deprecated use _CPU_Virtual_Interrupts_enable with 0 as _level
  */
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_Interrupts_open( void )
 {
   pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ENABLE, 0 );
@@ -187,13 +192,13 @@ _CPU_Virtual_Interrupts_open( void )
 /**
  * @deprecated use _CPU_Virtual_Interrupts_enable with 0 as _level
  */
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_Interrupts_close( void )
 {
   pok_syscall1( POK_SYSCALL_IRQ_PARTITION_DISABLE, 1 );
 }
 
-__attribute__((fastcall)) int
+int
 _CPU_Virtual_Interrupts_get_level( int _level )
 {
   /* Really necessary?*/
@@ -208,7 +213,7 @@ _CPU_Virtual_Interrupts_get_level( int _level )
  * @brief Lowest priority thread, doing nothing, never returns;
  */
 
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_idle_thread( void )
 {
   while(1);
@@ -218,7 +223,7 @@ _CPU_Virtual_idle_thread( void )
 
 /* Error handling */
 
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_exec_stop_error( int _error )
 {
   printf( "!!! An ERROR occured: %i\n", _error );

@@ -17,13 +17,13 @@
 /**
  * \brief Requests an interrupt vector.
  */
-__attribute__((fastcall)) int
+int
 _CPU_Virtual_Irq_request( int vector );
 
 /**
  * \brief Releases an interrupt vector.
  */
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_Irq_detach( int vector );
 
 /**
@@ -33,26 +33,26 @@ _CPU_Virtual_Irq_detach( int vector );
  * use its returned _level as argument to this function to assure proper
  * behaviour.
  */
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_Interrupts_enable( int _level );
 
 /**
  * \brief Disables interrupt delivery and returns the previous level.
  *
  */
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_Interrupts_disable( int _level );
 
 /**
  * \brief Enables and directly disables interrupt delivery.
  */
-__attribute__((fastcall)) void 
+void 
 _CPU_Virtual_Interrupts_flash( int _level );
 
 /**
  * \brief Requests the current interrupt level.
  */
-__attribute__((fastcall)) int
+int
 _CPU_Virtual_Interrupts_get_level( int _level );
 
 
@@ -63,7 +63,7 @@ _CPU_Virtual_Interrupts_get_level( int _level );
  * \brief Lowest priority thread, doing nothing, never returns;
  */
 
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_idle_thread( void );
 
 
@@ -72,7 +72,7 @@ _CPU_Virtual_idle_thread( void );
 /**
  * \brief Handlers execution errors.
  */
-__attribute__((fastcall)) void
+void
 _CPU_Virtual_exec_stop_error( int _error );
 
 #endif /* ASM */

@@ -27,6 +27,7 @@
 
 static meta_handler handler_table[16];
 static unsigned int partition_irq_enabled[POK_CONFIG_NB_PARTITIONS];
+#define UNUSED_VECTOR_NUMBER 0xFFF // MAGIC NUMBER used for disabled vectors.
 
 pok_ret_t pok_meta_handler_init( void )
 {
@@ -34,7 +35,7 @@ pok_ret_t pok_meta_handler_init( void )
   for( i = 0; i < 16; i++ )
   {
     meta_handler init;
-    init.vector = 0xFFF; /* magic number > IDT_SIZE */
+    init.vector = UNUSED_VECTOR_NUMBER;
     for( j = 0; j < POK_CONFIG_NB_PARTITIONS+1; j++ )
     {
       init.handler[j] = NULL; /* No handlers present */
@@ -197,14 +198,12 @@ void _C_isr_handler( unsigned vector, interrupt_frame *frame )
 pok_ret_t pok_bsp_irq_register_hw (uint8_t   irq,
 				   void      (*irq_handler)(unsigned, void*))
 {
-  if( irq > 15 )
+  if( irq > 15)
     return (POK_ERRNO_EINVAL);
 
   pok_pic_unmask (irq);
   
-  /* magic number: set in pok_meta_handler_init()
-   * meaning: vector not yet used */
-  if( handler_table[irq].vector == 0xFFF ) 
+  if( handler_table[irq].vector == UNUSED_VECTOR_NUMBER ) 
     handler_table[irq].vector = irq;
 
   if( pok_partitions[0].base_addr == 0 || (uint32_t)irq_handler < pok_partitions[0].base_addr)
@@ -217,7 +216,7 @@ pok_ret_t pok_bsp_irq_register_hw (uint8_t   irq,
   pok_arch_event_register (32 + irq, NULL);
 
   return (POK_ERRNO_OK);
-}<F9>
+}
 
 pok_ret_t pok_bsp_irq_unregister_hw (uint8_t  irq)
 {

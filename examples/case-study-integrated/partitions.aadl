@@ -1,0 +1,261 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Dec  3 10:21:25 2009 
+--
+package partitions
+public
+with threads;
+with types;
+
+------------------------------------------------
+--  GENERIC COMPONENT
+------------------------------------------------
+virtual processor runtime
+end runtime;
+
+
+------------------------------------------------
+--  WARNING ANNUNCIATION MANAGER
+------------------------------------------------
+
+--  Model both virtual processor and process for the
+--  Warning Annunciation Manager partition
+
+virtual processor implementation runtime.warningannunciationmanager
+end runtime.warningannunciationmanager;
+
+process process_warningannunciationmanager
+end process_warningannunciationmanager;
+
+process implementation process_warningannunciationmanager.impl
+subcomponents
+   thr : thread threads::thread_warningannunciationmanager.impl;
+end process_warningannunciationmanager.impl;
+
+
+------------------------------------------------
+--  DISPLAY MANAGER
+------------------------------------------------
+
+--  Model both virtual processor and process for the
+--  Display Manager partition
+
+virtual processor implementation runtime.displaymanager
+end runtime.displaymanager;
+
+process process_displaymanager
+features
+--   Old declarations that use feature group (integrated1 example).
+--   DMToDisplay: feature group types::PageReturn;
+--   DMToPCM: feature group types::PageRequest;
+
+   DMToDisplay_Request  : in data port types::PageRequestCmd;
+   DMToDisplay_Page     : out data port types::PageContent;
+
+   DMToPCM_Request      : out data port types::PageRequestCmd;
+   DMToPCM_Page         : in data port types::PageContent;
+end process_displaymanager;
+
+process implementation process_displaymanager.impl
+subcomponents
+   thr : thread threads::thread_displaymanager.impl;
+connections
+--   old code from the integrated1 example
+--  feature group DMToDisplay -> thr.DMToDisplay;
+--  port DMToPCM -> thr.DMToPCM; 
+
+   port DMToDisplay_Request   -> thr.DMToDisplay_Request;
+   port thr.DMToDisplay_Page  -> DMToDisplay_Page;
+   port DMToPCM_Page          -> thr.DMToPCM_Page;
+   port thr.DMToPCM_Request   -> DMToPCM_Request;
+end process_displaymanager.impl;
+
+
+------------------------------------------------
+--  PAGE CONTENT MANAGER
+------------------------------------------------
+
+--  Model both virtual processor and process for the
+--  Page Content Manager partition
+
+virtual processor implementation runtime.pagecontentmanager
+end runtime.pagecontentmanager;
+
+process process_pagecontentmanager
+features
+--   old code from the integrated1 example
+--   PCMToDM: feature group types::PageReturn;
+--   PCMToFM: feature group types::PageRequest;
+
+   PCMToFM_Request   : out data port types::PageRequestCmd;
+   PCMToFM_Page      : in data port types::PageContent;
+   PCMToDM_Request   : in data port types::PageRequestCmd;
+   PCMToDM_Page      : out data port types::PageContent;
+end process_pagecontentmanager;
+
+process implementation process_pagecontentmanager.impl
+subcomponents
+   thr : thread threads::thread_pagecontentmanager.impl;
+connections
+--   old code from the integrated1 example
+--   feature group thr.PCMToDM -> PCMToDM;
+
+   port PCMToDM_Request       -> thr.PCMToDM_Request;
+   port thr.PCMToDM_Page      -> PCMToDM_Page;
+   port thr.PCMToFM_Request   -> PCMToFM_Request;
+   port PCMToFM_Page          -> thr.PCMToFM_Page;
+end process_pagecontentmanager.impl;
+
+
+------------------------------------------------
+--  FLIGHT MANAGER
+------------------------------------------------
+
+--  Model both virtual processor and process for the
+--  Flight Manager partition
+
+virtual processor implementation runtime.flightmanager
+end runtime.flightmanager;
+
+process process_flightmanager
+features
+--  previous declarations from the integrated1 model
+--   FMIn: feature group types::FMInData;
+--   FMOut: feature group types::FMOutData;
+   FMToPCM_Request   : in data port types::PageRequestCmd;
+   FMToPCM_Page      : out data port types::PageContent;
+   FMToFD_Request    : out data port types::PageRequestCmd;
+   FMToFD_Page       : in data port types::PageContent;
+   FMIn_fuelFlow     : in data port types::FuelFlowData;
+   FMIn_navSignal    : in data port types::NavSignalData;
+   FMOut_guidanceOut : out data port types::GuidanceData;
+   FMOut_fpDataOut   : out data port types::FPData;
+   FMOut_navDataOut  : out data port types::NavData;
+end process_flightmanager;
+
+process implementation process_flightmanager.pio
+subcomponents
+   NSP: thread threads::NavigationSensorProcessing.impl;
+   INav: thread threads::IntegratedNavigation.impl;
+   GP: thread threads::GuidanceProcessing.impl;
+   FPP: thread threads::FlightPlanProcessing.impl;
+   APC: thread threads::AircraftPerformanceCalculation.impl;
+   pageFeed: thread threads::HandlePageRequest.impl;
+   PerIO: thread threads::PeriodicIO.impl;
+connections
+   navsensorconn:          port NSP.navSensorDataToIN                -> INav.navSensorDataFromNSP;
+   navdataconn1:           port INav.navDataToGPAPC                  -> GP.navDataFromIN;
+   navdataconn2:           port INav.navDataToGPAPC                  -> APC.navDataFromIN;
+   guidanceconn1:          port GP.guidanceToFPP                     -> FPP.guidanceFromGP;
+   performancedataconn:    port APC.perfDataToFPP                    -> FPP.perfDataFromAPC;
+   fpdataconn1:            port FPP.fpDataToGPAPC                    -> GP.fpDataFromFPP;
+   fpdataconn2:            port FPP.fpDataToGPAPC                    -> APC.fpDataFromFPP;
+   inflow:                 port FMIn_fuelFlow                        -> PerIO.fromOutside_fuelFlow;
+   inflow2:                port FMIn_navSignal                       -> PerIO.fromOutside_navSignal;
+   outflow:                port PerIO.toOutside_guidanceOut          -> FMOut_guidanceOut;
+   outflow2:               port PerIO.toOutside_fpDataOut            -> FMOut_fpDataOut;
+   outflow3:               port PerIO.toOutside_navDataOut           -> FMOut_navDataOut;
+   fuelflowconn:           port PerIO.fuelFlow                       -> APC.fuelFlow;
+   navsignalconn:          port PerIO.navSignal                      -> NSP.navSignalDataFromSensor;
+   navdataconn3:           port INav.navDataToGPAPC                  -> PerIO.navDataOut;
+   guidanceconn2:          port GP.guidanceToFPP                     -> PerIO.guidanceOut;
+   fpdataconn3:            port FPP.fpDataToGPAPC                    -> PerIO.fpDataOut;
+   inPageRequestPIO:       port FMToPCM_Request                      -> PerIO.New_Page_Request_From_PCM;
+   inPageRequest:          port PerIO.New_Page_Request_To_PageFeed   -> pageFeed.New_Page_Request_From_PCM;
+   outPageRequest:         port pageFeed.New_Page_Request_To_FD      -> PerIO.New_Page_Request_From_PageFeed;
+   outPageRequestPIO:      port PerIO.New_Page_Request_To_FD         -> FMToFD_Request;
+   inPageContentPIO:       port FMToFD_Page                          -> PerIO.New_Page_Content_from_FD;
+   inPageContent:          port PerIO.New_Page_Content_To_PageFeed   -> pageFeed.New_Page_Content_from_FD;
+   outPageContentPIO:      port PerIO.New_Page_Content_To_PCM        -> FMToPCM_Page;
+   outPageContent:         port pageFeed.New_Page_Content_To_PCM     -> PerIO.New_Page_Content_From_PageFeed;
+end process_flightmanager.pio;
+
+
+------------------------------------------------
+--  FLIGHT DIRECTOR
+------------------------------------------------
+
+--  Model both virtual processor and process for the
+--  Flight Director partition
+
+virtual processor implementation runtime.flightdirector
+end runtime.flightdirector;
+
+process process_flightdirector
+features
+--   old declaration from integrated1 model
+--   FDToFM: feature group types::PageReturn;
+
+   FDToFM_Request : in data port types::PageRequestCmd;
+   FDToFM_Page    : out data port types::PageContent;
+end process_flightdirector;
+
+process implementation process_flightdirector.impl
+subcomponents
+   thr : thread threads::thread_flightdirector.impl;
+connections
+--   old declaration from integrated1 model
+--   feature group thr.FDToFM -> FDToFM; 
+   port thr.FDToFM_Page -> FDToFM_Page;
+   port FDToFM_Request  -> thr.FDToFM_Request;
+end process_flightdirector.impl;
+
+
+
+
+------------------------------------------------
+--  MFD
+------------------------------------------------
+
+virtual processor implementation runtime.mfd
+end runtime.mfd;
+
+process mfd_driver
+features
+   DisplayToDM_Request  : out data port types::PageRequestCmd;
+   DisplayToDM_Page     : in data port types::PageContent;
+end mfd_driver;
+
+process implementation mfd_driver.i
+subcomponents
+   thr : thread threads::thread_mfd_driver.i;
+connections
+   port thr.DisplayToDM_Request -> DisplayToDM_Request;
+   port DisplayToDM_Page -> thr.DisplayToDM_Page;
+end mfd_driver.i;
+
+abstract mfd_driver_wrapper
+end mfd_driver_wrapper;
+
+abstract implementation mfd_driver_wrapper.i
+subcomponents
+   p : process mfd_driver.i;
+end mfd_driver_wrapper.i;
+
+
+
+device mfd
+features
+--   old declaration from integrated1 model
+--   DisplayToDm : feature group types::PageRequest;
+   DisplayToDM_Request  : out data port types::PageRequestCmd;
+   DisplayToDM_Page     : in data port types::PageContent;
+end mfd;
+
+device implementation mfd.i
+properties
+   Implemented_As => classifier (partitions::mfd_driver_wrapper.i);
+end mfd.i;
+
+end partitions;

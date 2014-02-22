@@ -1,0 +1,57 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Mon Nov 30 07:40:17 2009 
+--
+package layers
+
+public
+
+with poklib;
+with POK;
+
+--
+--  Security Layers (topsecret, secret, etc ...)
+--  Extends virtual buses from the poklib
+--
+
+virtual bus secret
+end secret;
+
+virtual bus implementation secret.i extends poklib::des.i
+properties
+   POK::Security_Level => 2;
+
+   POK::Blowfish_Key => "{0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xf0,0xe1,0xd2,0xc3,0xb4,0xa5,0x96,0x87}";
+   POK::Blowfish_Init => "{0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10}";
+end secret.i;
+
+virtual bus topsecret
+end topsecret;
+
+virtual bus implementation topsecret.i extends poklib::blowfish.i
+properties
+   POK::Security_Level => 3;
+   POK::Blowfish_Key => "{0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xf0,0xe1,0xd2,0xc3,0xb4,0xa5,0x96,0x87}";
+   POK::Blowfish_Init => "{0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10}";
+end topsecret.i;
+
+virtual bus unclassified
+end unclassified;
+
+virtual bus implementation unclassified.i extends poklib::ceasar.i
+properties
+   POK::Security_Level => 0;
+end unclassified.i;
+
+end layers;

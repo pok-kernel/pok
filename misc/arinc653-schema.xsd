@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com)  --> 
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"> 
+ <xs:element name="ARINC_653_Module"> 
+  <xs:annotation> 
+   <xs:documentation>XML-Schema for configuring an ARINC 653 instance.</xs:documentation> 
+  </xs:annotation> 
+  <xs:complexType> 
+   <xs:sequence> 
+    <xs:element name="System_HM_Table" type="System_HM_TableType"> 
+     <xs:annotation> 
+      <xs:documentation>The table that maps the system state and error IDs to an error level.</xs:documentation> 
+     </xs:annotation> 
+    </xs:element> 
+    <xs:element name="Module_HM_Table" type="Module_HM_Type"> 
+     <xs:annotation> 
+      <xs:documentation>The actions to take when a module level error occurs.</xs:documentation> 
+     </xs:annotation> 
+    </xs:element> 
+    <xs:element name="Partition" maxOccurs="unbounded"> 
+     <xs:annotation> 
+      <xs:documentation>The application space and its ports.</xs:documentation> 
+      <xs:documentation>Where the Applications resides. Uses ARINC 653 API</xs:documentation> 
+     </xs:annotation> 
+     <xs:complexType> 
+      <xs:complexContent> 
+       <xs:extension base="PartitionType"/> 
+      </xs:complexContent> 
+     </xs:complexType> 
+    </xs:element> 
+    <xs:element name="Partition_Memory" maxOccurs="unbounded"> 
+     <xs:annotation> 
+      <xs:documentation>Partition memory requirements.</xs:documentation> 
+     </xs:annotation> 
+     <xs:complexType> 
+      <xs:sequence> 
+       <xs:element name="Memory_Requirements" maxOccurs="unbounded"> 
+        <xs:annotation> 
+         <xs:documentation>A single partition can have multiple mapping requirements. Defines memory 
+bounds of the 
+partition, with appropriate code/data segregation.</xs:documentation> 
+        </xs:annotation> 
+        <xs:complexType> 
+         <xs:attribute name="RegionName" type="NameType" use="optional"/> 
+         <xs:attribute name="Type" type="xs:string" use="required"/> 
+         <xs:attribute name="SizeBytes" type="DecOrHexValueType" use="required"/> 
+         <xs:attribute name="PhysicalAddress" type="DecOrHexValueType" use="optional"/> 
+         <xs:attribute name="Access" type="xs:string" use="required"/> 
+        </xs:complexType> 
+       </xs:element> 
+       <xs:any namespace="Memory_Ext" minOccurs="0" maxOccurs="unbounded"> 
+        <xs:annotation> 
+         <xs:documentation>Implementer unique extensions.</xs:documentation> 
+        </xs:annotation> 
+       </xs:any> 
+      </xs:sequence> 
+      <xs:attribute name="PartitionIdentifier" type="IdentifierValueType" use="required"/> 
+      <xs:attribute name="PartitionName" type="NameType" use="optional"/> 
+     </xs:complexType> 
+    </xs:element> 
+    <xs:element name="Module_Schedule"> 
+     <xs:annotation> 
+      <xs:documentation>The scheduling requirements for the module</xs:documentation> 
+     </xs:annotation> 
+     <xs:complexType> 
+      <xs:sequence> 
+       <xs:element name="Partition_Schedule" maxOccurs="unbounded"> 
+        <xs:annotation> 
+         <xs:documentation>The scheduling requirements for partitions within the 
+module.</xs:documentation> 
+        </xs:annotation> 
+        <xs:complexType> 
+         <xs:sequence> 
+          <xs:element name="Window_Schedule" maxOccurs="unbounded"> 
+           <xs:annotation> 
+            <xs:documentation>The allocation of the partition to partition windows within a major 
+frame.</xs:documentation> 
+           </xs:annotation> 
+           <xs:complexType> 
+            <xs:attribute name="WindowIdentifier" type="DecOrHexValueType" use="required"/> 
+            <xs:attribute name="WindowStartSeconds" type="xs:float" use="required"/> 
+            <xs:attribute name="WindowDurationSeconds" type="xs:float" use="required"/> 
+            <xs:attribute name="PartitionPeriodStart" type="xs:boolean" default="false"/> 
+           </xs:complexType> 
+          </xs:element> 
+          <xs:any namespace="Window_Sched_Ext" minOccurs="0" maxOccurs="unbounded"> 
+           <xs:annotation> 
+            <xs:documentation>Implementer unique extensions.</xs:documentation> 
+           </xs:annotation> 
+          </xs:any> 
+         </xs:sequence> 
+         <xs:attribute name="PartitionIdentifier" type="IdentifierValueType" use="required"/> 
+         <xs:attribute name="PartitionName" type="NameType" use="optional"/> 
+         <xs:attribute name="PeriodSeconds" type="xs:float" use="required"/> 
+         <xs:attribute name="PeriodDurationSeconds" type="xs:float" use="required"/> 
+        </xs:complexType> 
+       </xs:element> 
+       <xs:any namespace="Part_Sched_Ext" minOccurs="0" maxOccurs="unbounded"> 
+        <xs:annotation> 
+         <xs:documentation>Implementer unique extensions.</xs:documentation> 
+        </xs:annotation> 
+       </xs:any> 
+      </xs:sequence> 
+      <xs:attribute name="MajorFrameSeconds" type="xs:float" use="required"/> 
+     </xs:complexType> 
+    </xs:element> 
+    <xs:element name="Partition_HM_Table" type="Partition_HM_Type" maxOccurs="unbounded"> 
+     <xs:annotation> 
+      <xs:documentation>The actions to take when a partition level error occurs.</xs:documentation> 
+     </xs:annotation> 
+    </xs:element> 
+    <xs:element name="Connection_Table"> 
+     <xs:annotation> 
+      <xs:documentation>A table of channels and their port mappings</xs:documentation> 
+     </xs:annotation> 
+     <xs:complexType> 
+      <xs:sequence> 
+       <xs:element name="Channel" maxOccurs="unbounded"> 
+        <xs:annotation> 
+         <xs:documentation>Globally identifies a channel connected to this module.</xs:documentation> 
+        </xs:annotation> 
+        <xs:complexType> 
+         <xs:sequence> 
+          <xs:element name="Source" type="PortMappingType"> 
+           <xs:annotation> 
+            <xs:documentation>The source port for the channel. </xs:documentation> 
+           </xs:annotation> 
+          </xs:element> 
+          <xs:element name="Destination" type="PortMappingType" maxOccurs="unbounded"> 
+           <xs:annotation> 
+            <xs:documentation>The destination ports for the channel. </xs:documentation> 
+           </xs:annotation> 
+          </xs:element> 
+         </xs:sequence> 
+         <xs:attribute name="ChannelIdentifier" type="IdentifierValueType" use="required"/> 
+         <xs:attribute name="ChannelName" type="NameType" use="optional"/> 
+        </xs:complexType> 
+       </xs:element> 
+      </xs:sequence> 
+     </xs:complexType> 
+    </xs:element> 
+    <xs:any namespace="ModExt" minOccurs="0" maxOccurs="unbounded"> 
+     <xs:annotation> 
+      <xs:documentation>Provider Unique for Module level attributes</xs:documentation> 
+     </xs:annotation> 
+    </xs:any> 
+   </xs:sequence> 
+   <xs:attribute name="ModuleName" type="NameType" use="optional"/> 
+   <xs:attribute name="ModuleVersion" type="NameType" use="optional"/> 
+   <xs:attribute name="ModuleId" type="IdentifierValueType" use="optional"/> 
+  </xs:complexType> 
+ </xs:element> 
+ <xs:complexType name="PortType"> 
+  <xs:annotation> 
+   <xs:documentation>The base port attributes of both sampling and queuing ports</xs:documentation> 
+  </xs:annotation> 
+  <xs:sequence> 
+   <xs:any namespace="PortExt" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>Implementer unique extensions.</xs:documentation> 
+    </xs:annotation> 
+   </xs:any> 
+  </xs:sequence> 
+  <xs:attribute name="Name" type="NameType" use="required"/> 
+  <xs:attribute name="MaxMessageSize" type="DecOrHexValueType" use="required"/> 
+  <xs:attribute name="Direction" type="DirectionType" use="required"/> 
+ </xs:complexType> 
+ <xs:complexType name="SamplingPortType"> 
+  <xs:annotation> 
+   <xs:documentation>The configurable attributes of the sampling port.</xs:documentation> 
+  </xs:annotation> 
+  <xs:complexContent> 
+   <xs:extension base="PortType"> 
+    <xs:attribute name="RefreshRateSeconds" type="xs:float" use="required"/> 
+   </xs:extension> 
+  </xs:complexContent> 
+ </xs:complexType> 
+ <xs:complexType name="QueuingPortType"> 
+  <xs:annotation> 
+   <xs:documentation>The configurable attributes of queuing ports.</xs:documentation> 
+  </xs:annotation> 
+  <xs:complexContent> 
+   <xs:extension base="PortType"> 
+    <xs:attribute name="MaxNbMessages" type="xs:integer" use="required"/> 
+   </xs:extension> 
+  </xs:complexContent> 
+ </xs:complexType> 
+ <xs:complexType name="ProcessType"> 
+  <xs:annotation> 
+   <xs:documentation>Optional process configuration parameters</xs:documentation> 
+ </xs:annotation> 
+  <xs:sequence> 
+   <xs:any namespace="Proc_Ext" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>Implementer Unique</xs:documentation> 
+    </xs:annotation> 
+   </xs:any> 
+  </xs:sequence> 
+  <xs:attribute name="Name" type="NameType" use="optional"/> 
+  <xs:attribute name="StackSize" type="DecOrHexValueType" use="optional"/> 
+ </xs:complexType> 
+ <xs:complexType name="PartitionType"> 
+  <xs:annotation> 
+   <xs:documentation>The system and application partition type definition.</xs:documentation> 
+  </xs:annotation> 
+  <xs:sequence> 
+   <xs:element name="Sampling_Port" type="SamplingPortType" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>The sampling ports for this partition.</xs:documentation> 
+    </xs:annotation> 
+   </xs:element> 
+   <xs:element name="Queuing_Port" type="QueuingPortType" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>The queuing ports for this partition.</xs:documentation> 
+    </xs:annotation> 
+   </xs:element> 
+   <xs:element name="Process" type="ProcessType" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>Optional process attributes for this partition.</xs:documentation> 
+    </xs:annotation> 
+   </xs:element> 
+   <xs:any namespace="PartitionExt" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>Implementer unique extensions.</xs:documentation> 
+    </xs:annotation> 
+   </xs:any> 
+  </xs:sequence> 
+  <xs:attribute name="PartitionIdentifier" type="IdentifierValueType" use="required"/> 
+  <xs:attribute name="PartitionName" type="NameType" use="optional"/> 
+  <xs:attribute name="Criticality" type="CriticalityType" default="LEVEL_A"/> 
+  <xs:attribute name="SystemPartition" type="xs:boolean" default="false"/> 
+  <xs:attribute name="EntryPoint" type="NameType" use="required"/> 
+ </xs:complexType> 
+ <xs:complexType name="Partition_HM_Type"> 
+  <xs:annotation> 
+   <xs:documentation>Error codes are mapped to actions taken at the partition level.</xs:documentation> 
+  </xs:annotation> 
+  <xs:sequence> 
+   <xs:element name="System_State_Entry" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>The state of the system when the error occurred.</xs:documentation> 
+    </xs:annotation> 
+    <xs:complexType> 
+     <xs:sequence> 
+      <xs:element name="Error_ID_Action" maxOccurs="unbounded"> 
+       <xs:annotation> 
+        <xs:documentation>The error code and the action to take</xs:documentation> 
+       </xs:annotation> 
+       <xs:complexType> 
+        <xs:attribute name="ErrorIdentifier" type="IdentifierValueType" use="required"/> 
+        <xs:attribute name="Description" type="NameType" use="optional"/> 
+        <xs:attribute name="Action" type="PartitionActionType" use="required"/> 
+        <xs:anyAttribute namespace="##any"/> 
+       </xs:complexType>
+      </xs:element> 
+     </xs:sequence> 
+     <xs:attribute name="SystemState" type="IdentifierValueType" use="required"/> 
+     <xs:attribute name="Description" type="NameType" use="optional"/> 
+    </xs:complexType> 
+   </xs:element> 
+   <xs:any namespace="Part_HM_Ext" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>Implementers unique extensions.</xs:documentation> 
+    </xs:annotation> 
+   </xs:any> 
+  </xs:sequence> 
+  <xs:attribute name="PartitionIdentifier" type="IdentifierValueType" use="required"/> 
+  <xs:attribute name="PartitionName" type="NameType" use="optional"/> 
+  <xs:attribute name="PartitionCallback" type="NameType" use="optional"/> 
+ </xs:complexType> 
+ <xs:complexType name="Module_HM_Type"> 
+  <xs:annotation> 
+   <xs:documentation>System state and error codes are mapped to actions taken at the module level.</xs:documentation> 
+  </xs:annotation> 
+  <xs:sequence> 
+   <xs:element name="System_State_Entry" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>The state of the system when the error occurred.</xs:documentation> 
+    </xs:annotation> 
+    <xs:complexType> 
+     <xs:sequence> 
+      <xs:element name="Error_ID_Action" maxOccurs="unbounded"> 
+       <xs:annotation> 
+        <xs:documentation>The error IDs and the action to take</xs:documentation> 
+       </xs:annotation> 
+       <xs:complexType> 
+        <xs:attribute name="ErrorIdentifier" type="xs:integer" use="required"/> 
+        <xs:attribute name="Description" type="NameType" use="optional"/> 
+        <xs:attribute name="Action" type="ModuleActionType" use="required"/> 
+       </xs:complexType> 
+      </xs:element> 
+     </xs:sequence> 
+     <xs:attribute name="SystemState" type="IdentifierValueType" use="required"/> 
+     <xs:attribute name="Description" type="NameType" use="optional"/> 
+    </xs:complexType> 
+   </xs:element> 
+   <xs:any namespace="Mod_HM_Ext" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>Implementer unique extensions.</xs:documentation> 
+    </xs:annotation> 
+   </xs:any> 
+  </xs:sequence> 
+  <xs:attribute name="ModuleCallback" type="NameType" use="optional"/> 
+ </xs:complexType> 
+ <xs:simpleType name="DecOrHexValueType"> 
+  <xs:annotation> 
+   <xs:documentation>Allows hex and decimal numbers. Hex start 0x</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="xs:string"> 
+   <xs:pattern value="[+-]{0,1}[0-9]+|[+-]{0,1}0x[0-9a-fA-F]+"/> 
+  </xs:restriction> 
+ </xs:simpleType> 
+ <xs:simpleType name="IdentifierValueType"> 
+  <xs:annotation> 
+   <xs:documentation>Restricts indentifiers to hex or decimal numbers.</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="DecOrHexValueType"/> 
+ </xs:simpleType> 
+  <xs:simpleType name="NameType"> 
+  <xs:annotation> 
+   <xs:documentation>A 1..30 character string.</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="xs:string"> 
+   <xs:minLength value="1"/> 
+   <xs:maxLength value="30"/> 
+  </xs:restriction> 
+ </xs:simpleType> 
+ <xs:simpleType name="CriticalityType"> 
+  <xs:annotation> 
+   <xs:documentation>Level A ... Level E</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="xs:string"> 
+   <xs:enumeration value="LEVEL_A"/> 
+   <xs:enumeration value="LEVEL_B"/> 
+   <xs:enumeration value="LEVEL_C"/> 
+   <xs:enumeration value="LEVEL_D"/> 
+   <xs:enumeration value="LEVEL_E"/> 
+  </xs:restriction> 
+ </xs:simpleType> 
+ <xs:simpleType name="DirectionType"> 
+  <xs:annotation> 
+   <xs:documentation>SOURCE or DESTINATION</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="xs:string"> 
+   <xs:enumeration value="SOURCE"/> 
+   <xs:enumeration value="DESTINATION"/> 
+  </xs:restriction> 
+ </xs:simpleType> 
+ <xs:complexType name="System_HM_TableType"> 
+  <xs:annotation> 
+   <xs:documentation> The system states and error codes are mapped to the Module, Partition or Process 
+level.</xs:documentation> 
+  </xs:annotation> 
+  <xs:sequence> 
+   <xs:element name="System_State_Entry" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>The state of the system when the error occurred.</xs:documentation> 
+    </xs:annotation> 
+    <xs:complexType> 
+     <xs:sequence> 
+      <xs:element name="Error_ID_Level" maxOccurs="unbounded"> 
+       <xs:annotation> 
+        <xs:documentation>The mapping of error IDs to the module, partition or process 
+level.</xs:documentation> 
+       </xs:annotation> 
+       <xs:complexType> 
+        <xs:attribute name="ErrorIdentifier" type="IdentifierValueType" use="required"/> 
+        <xs:attribute name="Description" type="NameType" use="optional"/> 
+        <xs:attribute name="ErrorLevel" type="ErrorLevelType" use="required"/> 
+        <xs:attribute name="ErrorCode" type="ErrorCodeType" use="optional"/> 
+       </xs:complexType> 
+      </xs:element> 
+     </xs:sequence> 
+     <xs:attribute name="SystemState" type="IdentifierValueType" use="required"/> 
+     <xs:attribute name="Description" type="NameType" use="optional"/> 
+    </xs:complexType> 
+   </xs:element> 
+   <xs:any namespace="SysHM_Ext" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>Implementer unique extensions.</xs:documentation> 
+    </xs:annotation> 
+   </xs:any> 
+     </xs:sequence> 
+ </xs:complexType> 
+ <xs:simpleType name="ErrorLevelType"> 
+  <xs:annotation> 
+   <xs:documentation>MODULE, PARTITION, or PROCESS level error.</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="xs:string"> 
+   <xs:enumeration value="MODULE"/> 
+   <xs:enumeration value="PARTITION"/> 
+   <xs:enumeration value="PROCESS"/> 
+  </xs:restriction> 
+ </xs:simpleType> 
+ <xs:simpleType name="ErrorCodeType"> 
+  <xs:annotation> 
+   <xs:documentation>The predefined ARINC 653 process errors.</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="xs:string"> 
+   <xs:enumeration value="DEADLINE_MISSED"/> 
+   <xs:enumeration value="APPLICATION_ERROR"/> 
+   <xs:enumeration value="NUMERIC_ERROR"/> 
+   <xs:enumeration value="ILLEGAL_REQUEST"/> 
+   <xs:enumeration value="STACK_OVERFLOW"/> 
+   <xs:enumeration value="MEMORY_VIOLATION"/> 
+   <xs:enumeration value="HARDWARE_FAULT"/> 
+   <xs:enumeration value="POWER_FAILURE"/> 
+  </xs:restriction> 
+ </xs:simpleType> 
+ <xs:simpleType name="ModuleActionType"> 
+  <xs:annotation> 
+   <xs:documentation>The actions to take when module level errors occur.</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="xs:string"> 
+   <xs:enumeration value="IGNORE"/> 
+   <xs:enumeration value="SHUTDOWN"/> 
+   <xs:enumeration value="RESET"/> 
+  </xs:restriction> 
+ </xs:simpleType> 
+ <xs:simpleType name="PartitionActionType"> 
+  <xs:annotation> 
+   <xs:documentation>The actions to take when partition level errors occur.</xs:documentation> 
+  </xs:annotation> 
+  <xs:restriction base="xs:string"> 
+   <xs:enumeration value="IGNORE"/> 
+   <xs:enumeration value="IDLE"/> 
+   <xs:enumeration value="WARM_START"/> 
+   <xs:enumeration value="COLD_START"/> 
+  </xs:restriction> 
+ </xs:simpleType> 
+ <xs:complexType name="PortMappingType"> 
+  <xs:annotation> 
+   <xs:documentation> The port communication mapping.</xs:documentation> 
+  </xs:annotation> 
+  <xs:choice> 
+   <xs:element name="Pseudo_Partition"> 
+    <xs:annotation> 
+     <xs:documentation>A partition that is external to the module. </xs:documentation> 
+    </xs:annotation> 
+    <xs:complexType> 
+     <xs:attribute name="Name" type="NameType" use="optional"/> 
+     <xs:attribute name="PhysicalAddress" type="DecOrHexValueType" use="optional"/> 
+     <xs:attribute name="Procedure" type="NameType" use="optional"/> 
+    </xs:complexType> 
+   </xs:element> 
+   <xs:element name="Standard_Partition"> 
+    <xs:annotation> 
+     <xs:documentation>A partition within the module.</xs:documentation> 
+    </xs:annotation> 
+    <xs:complexType> 
+     <xs:attribute name="PartitionIdentifier" type="IdentifierValueType" use="required"/> 
+     <xs:attribute name="PartitionName" type="NameType" use="optional"/> 
+     <xs:attribute name="PortName" type="NameType" use="required"/> 
+     <xs:attribute name="PhysicalAddress" type="DecOrHexValueType" use="optional"/> 
+    </xs:complexType> 
+   </xs:element> 
+   <xs:any namespace="PortMap_Ext" minOccurs="0" maxOccurs="unbounded"> 
+    <xs:annotation> 
+     <xs:documentation>Implementers unique extension.</xs:documentation> 
+    </xs:annotation> 
+   </xs:any> 
+  </xs:choice> 
+ </xs:complexType> 
+</xs:schema> 
+ 
+ 

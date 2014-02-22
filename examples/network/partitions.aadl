@@ -1,0 +1,46 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Mon May  4 12:37:45 2009 
+--
+package partitions
+public
+   with threads;
+   with types;
+
+   process process_sender
+   features
+      outgoing : out data port types::integer;
+   end process_sender;
+
+   process implementation process_sender.i
+   subcomponents
+      thr : thread threads::send_value.impl;
+   connections
+      port thr.outgoing_value -> outgoing;
+   end process_sender.i;
+
+
+   process process_receiver
+   features
+      incoming : in data port types::integer;
+   end process_receiver;
+
+   process implementation process_receiver.i
+   subcomponents
+      thr : thread threads::receive_value.impl;
+   connections
+      port incoming -> thr.incoming_value;
+   end process_receiver.i;
+
+end partitions;

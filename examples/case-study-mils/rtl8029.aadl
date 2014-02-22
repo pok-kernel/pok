@@ -1,0 +1,117 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Mon May 18 18:44:51 2009 
+--
+package rtl8029
+public
+with POK;
+with types;
+with runtime;
+
+   data anydata
+   end anydata;
+
+   subprogram init
+   properties
+      source_name => "rtl8029_init";
+      source_language => C;
+   end init;
+
+   subprogram poll
+   properties
+      source_name => "rtl8029_polling";
+      source_language => C;
+   end poll;
+
+
+   thread thr_poller
+   properties
+      Dispatch_Protocol => Periodic;
+      Compute_Execution_Time => 0 ms .. 1 ms;
+      Period => 100 Ms;
+   end thr_poller;
+
+   thread implementation thr_poller.i
+   calls 
+      call1 : { pspg : subprogram poll;};
+   end thr_poller.i;
+
+   thread thr_handler
+   features
+      incoming_topsecret      : in data port types::integer;
+      incoming_secret         : in data port types::integer;
+      incoming_unclassified   : in data port types::integer;
+      outgoing_topsecret      : out data port types::integer;
+      outgoing_secret         : out data port types::integer;
+      outgoing_unclassified   : out data port types::integer;
+   properties
+      Dispatch_Protocol => Periodic;
+      Compute_Execution_Time => 0 ms .. 1 ms;
+      Period => 1000 Ms;
+      Source_Code_Size  => 3 Kbyte;
+      Source_Data_Size  => 0 Kbyte;
+      Source_Stack_Size  => 3000 Kbyte;
+   end thr_handler;
+
+   thread implementation thr_handler.i
+   connections
+      port incoming_topsecret    -> outgoing_topsecret;
+      port incoming_secret       -> outgoing_secret;
+      port incoming_unclassified -> outgoing_unclassified;
+   end thr_handler.i;
+
+   process driver
+   end driver;
+
+   process implementation driver.i
+   subcomponents
+      data_handler   : thread thr_handler.i;
+      poller         : thread thr_poller.i;
+   properties
+     POK::Needed_Memory_Size => 160 Kbyte;
+   end driver.i;
+
+   device rtl8029
+   features
+      incoming_topsecret      : in data port types::integer;
+      incoming_secret         : in data port types::integer;
+      incoming_unclassified   : in data port types::integer;
+      outgoing_topsecret      : out data port types::integer;
+      outgoing_secret         : out data port types::integer;
+      outgoing_unclassified   : out data port types::integer;
+      ethernet_access         : requires bus access runtime::ethernet.unsecure;
+   properties
+      Initialize_Entrypoint => classifier (rtl8029::init);
+      POK::Device_Name => "rtl8029";
+   end rtl8029;
+
+   abstract driver_container
+   end driver_container;
+
+   abstract implementation driver_container.i
+   subcomponents
+      p : process driver.i;
+   end driver_container.i;
+
+
+   device implementation rtl8029.i
+--   connections
+--      port incoming_secret -> outgoing_secret;
+--      port incoming_unclassified -> outgoing_unclassified;
+--      port incoming_topsecret -> outgoing_topsecret;
+   properties
+      Implemented_As => classifier (rtl8029::driver_container.i);
+   end rtl8029.i;
+
+end rtl8029;

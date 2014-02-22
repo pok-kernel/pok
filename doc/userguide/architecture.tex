@@ -1,0 +1,307 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Thu Apr 30 14:07:20 2009 
+%
+
+
+\chapter{Architecture}
+   \section{Directories hierarchy}
+   The project is organized with a hierarchy of several directories:
+   \begin{itemize}
+      \item
+         \textbf{examples}: sample code that uses pok and libpok. Code of
+         examples is mostly generated from AADL models by Ocarina.
+
+      \item
+         \textbf{kernel}: code of the kernel that provides time and space
+         partitioning services.
+
+      \item
+         \textbf{libpok}: code of libpok, the runtime of each partition. 
+         It contains libc, POSIX and arinc653 compliant abstraction layers.
+
+      \item
+         \textbf{misc}: misc files, such as makefiles, various tools to 
+         compile POK and so on.
+   \end{itemize}
+
+   \section{"Schyzophrenic" architecture}
+   POK can be used as an executive (i.e a kernel that contains different tasks
+   but does not provide partitioning functionnalities) or a partitioned
+   architecture (a kernel isolates tasks in so-called partitions in terms
+   of space and time).
+
+   Moreover, it was designed to support several API and services. But you can
+   finely tune the kernel to avoid unused services, reduce memory footprint and
+   ease certification/verification efforts.
+
+   Next sections discusses the different architectures that can be used.
+
+      \subsection{Partitioned architecture}
+      The partitioned architecture pattern can be used with POK. In that case,
+      the kernel will execute several partitions on top of the POK kernel and
+      provide time and space partitioning across partitions. 
+
+      \onehugefig{imgs/pok-layers}{The different pok layers}{figure:pok-layers}
+
+      Each partition contains their memory allocators, their runtime and
+      ressources (the so-called \textit{libpok} part). Partitions can have
+      different scheduling algorithms to schedule their tasks.
+
+      In that case, the kernel provides communication isolation across
+      partitions as well as space isolation (each partition has its own memory
+      segment).
+
+      The overall architecture is illustrated in figure \ref{figure:pok-layers}.
+      The kernel executes the partitions, each partition contains its
+      application code. Drivers are executed in partitions and don't reside
+      inside the kernel.
+
+
+
+      To build a such architecture, you must have:
+      \begin{itemize}
+         \item
+            For each partition
+            \begin{itemize}
+               \item
+                  The application code
+               \item
+                  The configuration code
+            \end{itemize}
+         \item
+            For the kernel
+            \begin{itemize}
+               \item
+                  The configuration code
+            \end{itemize}
+      \end{itemize}
+
+      \onehugefig{imgs/partitions-build-steps}{Build steps for a partitioned
+      system}{figure:partitioned-architecture-build}
+
+
+
+      Then, each part of the system is compiled and integrated, as depicted in
+      figure \ref{figure:partitioned-architecture-build}. The kernel is
+      compiled and each partitions is compiled. Eeach part produces a binary
+      file. Since POK relies on the ELF file format, each binary of each part is
+      compiled into an ELF file.
+
+
+      Then, we integrate \textbf{ALL} ELF files to produce a single bootable binary so
+      that the final binary contains different binaries:
+      the code for the kernel and the code of all partitions. Since POK relies
+      on the ELF file format, the final ELF file contains other ELF files. The
+      organization of the final binary is depiceted in figure
+      \ref{figure:pok-elf-file}.
+
+
+      When kernel boots, it loads each elf file of each partition in a different
+      memory segment to achieve space isolation. So, each ELF file of each
+      partition is loaded in a single and protected memory area of the system.
+
+      \onehugefig{imgs/pok-elf-file}{ELF file format of a POK system}{figure:pok-elf-file}
+
+      \subsection{Executive architecture}
+      At this time, the execute architecture pattern is not finished.
+
+\section{Kernel services}
+   \subsection{Partitioning service}
+   The partitioning service of POK isolates code in time and space. Each
+   partition has one or more time slots to execute their code and they are
+   isolated in a memory segment.
+
+   Using this design guideline, one partition cannot access the memory of other
+   partitions (and \textit{vice-versa}). During partitions initialization, POK
+   automatically creates a memory segment for each partition and copy its code
+   into this protected space.
+
+   However, partitions can communicate with other partitions using so-called
+   ports. Inter-partitions ports are also supervised by the kernel in order to
+   avoid unallowed communication channel. See section
+   \ref{kernel-service-communication} for more information.
+
+   Partitions have time slots to execute their threads. During this execution
+   time, they schedule their threads according to their own scheduling protocol
+   so that partitions can schedule their threads in an independent way. This
+   scheduling strategy is often described as a hierarchical scheduling.
+
+   \subsection{Thread service}
+   The thread service executes tasks. The system is built to execute a
+   predefined number of tasks. When using partitioning services, each partitions
+   has a predefined amount of tasks.
+
+   The scheduler can be preemptive so that tasks can interrupt each other. The
+   thread service can start, stop or pause a task (sleep).
+
+   \subsection{Time service}
+   The time service provides an efficient way to manage the time on your
+   machine. It is used by the scheduler to scheduler partitions and tasks
+   according to their timing requirements (period, execution time and so on).
+
+   \subsection{Communication service}
+   \label{kernel-service-communication}
+   The kernel provides communication services. It allows partitions and threads
+   to communicate. The communication service is achieved using \textit{ports}.
+   \textit{Out} ports (ports that send data) can have several destinations 
+   while \textit{in} ports (ports that receive data) can have only one source. 
+
+   Data are sent and received on this ports. The kernel configuration specifies
+   the owner of a port, its destination and its size.
+
+   If you use partitioning service, each port is dedicated to a partition.
+   Consequently, when creating the port, the kernel checks that requested port
+   belongs to the partition.
+
+      \subsubsection{Communication using network}
+      When using the network, the port must be bound to a network interface so
+      that data from/to the port will be sent over the network. The binding
+      between a port and a network interface is specified in the kernel
+      configuration.
+
+      Please note that in POK, when you are using partitioning services, device
+      drivers are executed in partitions.
+
+   \subsection{Scheduling service}
+   The scheduling service schedules tasks and partitions according to their
+   timing requirements. It relies on the time service.
+
+   Partitions are scheduled using a cyclic scheduling algorithm.
+
+   Partitions threads are scheduled using a Round-Robin, RMS or other available
+   scheduling algorithms.
+
+
+\section{libpok services}
+   \subsection{Thread management}
+   Thread management consist in interfacing functions with the kernel. It
+   provides functions to start/suspend/stop a thread. It provides also locking
+   services for mutexes/semaphores and so on.
+
+   \subsection{Communication service}
+   Libpok provides two kind of communication services:
+   \begin{itemize}
+      \item
+         \textbf{Inter-partition communication} which consists in
+         kernel-interfacing functions to use kernel communication ports.
+      \item
+         \textbf{Intra-partition communication service} which provides
+         communication facilities to communicate inside a partition.
+   \end{itemize}
+
+   In the following, we detail intra-partition communication services.
+
+   Intra-partition communication service provides four communication patterns:
+   \begin{enumerate}
+      \item
+         \textbf{Buffer} : thread send data. New data are queued according to a
+         specific queueing policy. Items are dequeued when a task reads the
+         buffer. We can store several instance of the same data.
+
+         You need to define the \texttt{POK\_NEEDS\_BUFFERS} maccro to activate
+         this service.
+      \item
+         \textbf{Blackboard} : a shared memory space to store a data. New
+         instances of the data replace the older value. We can store only one
+         instance of the same data.
+
+         You need to define the \texttt{POK\_NEEDS\_BLACKBOARDS} maccro to activate
+         this service.
+      \item
+         \textbf{Events} : are used to synchronized tasks. It corresponds to
+         POSIX mutexes and conditions.
+
+         You need to define the \texttt{POK\_NEEDS\_EVENTS} maccro to activate
+         this service.
+      \item
+         \textbf{Semaphores} : counting semaphores, as in the POSIX standard.
+
+         You need to define the \texttt{POK\_NEEDS\_SEMAPHORES} maccro to activate
+         this service.
+   \end{enumerate}
+
+   \subsection{Memory allocator}
+   POK also provides a memory allocator. This memory allocator was designed to
+   be deterministic and highly configurable. You define the amount of memory for
+   the memory allocator and the number of memory slices that can be allocated.
+
+   Consequently, the memory allocator can be configured with different maccros.
+   The service is activated by defining the
+   \texttt{POK\_CONFIG\_NEEDS\_ALLOCATOR} maccro. Then, the
+   \texttt{POK\_CONFIG\_ALLOCATOR\_MEMORY\_SIZE} is used to specify the amount
+   of memory dedicated for the memory allocator. Finally the
+   \texttt{POK\_CONFIG\_ALLOCATOR\_NB\_SPACES} specifies the number of spaces
+   you can allocate with the memory allocator.
+
+   This memory allocator can be used with the legacy layer (with the
+   \texttt{pok\_allocator\_allocate()} or \texttt{pok\_allocator\_free()}
+   functions) or with the C-library layer (\texttt{malloc()}, \texttt{free()},
+   \texttt{calloc()}).
+
+   \subsection{Mathematic library service}
+   We also add mathematic functions to ease the portability of third-party code.
+   These functions were imported from the NetBSD\footnote{http://www.netbsd.org}
+   project. It provides all necessary functions to perform math operations
+   (\texttt{sqrt()}, ...).
+
+   To enable the libmath functions, you must define the maccro
+   \texttt{POK\_NEEDS\_LIBMATH}.
+
+   To have the complete list, please refer to the libpok reference manual
+   available on each POK release. A list of these functions is also available in
+   this document, in chapter \ref{chapter-api}.
+
+
+   \subsection{Protocols}
+   The libpok layer contains predefined protocols to marshall/unmarshall
+   application data before sending them on the network. These protocols library
+   could be used for several purposes: encrypt data before sending it on an
+   unsecure network, adapt application data to constrained protocols such as
+   CORBA, \ldots
+
+   These protocols can be automatically used through \aadl models and
+   appropriate properties associated to \aadl data ports on \aadl process
+   components. To have more information about \aadl and protocol binding, see
+   section \ref{chapter-automatic-configuration}.
+
+   At this time, the libpok layer is focuses on crypto and provides the following protocols:
+   \begin{itemize}
+      \item
+         Ceasar
+      \item
+         DES
+      \item
+         SSL
+   \end{itemize}
+
+   For each protocol, we have:
+   \begin{itemize}
+      \item
+         A function to marshall data.
+      \item
+         A function to unmarshall data.
+      \item
+         An associated type if the protocol needs a special data type to store
+         marshalled values.
+   \end{itemize}
+
+   Marshalling functions and types are described in their header files (see
+   \texttt{des.h}, \texttt{ssl.h}, \texttt{ceasar.h} and so on). If there is no
+   associated marshalling type, then, the marshall/unmarshall functions uses the
+   same type as the application type or not particular type are required.
+
+
+   Details of each protocol can be found in the API section (chapter
+   \ref{chapter-api}).

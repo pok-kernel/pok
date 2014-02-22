@@ -1,0 +1,60 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Wed Oct 14 12:42:24 2009 
+--
+package ardupilot_system
+
+public
+
+with pok;
+with poklib;
+with ardupilot_platform;
+with ardupilot_software;
+
+system   ardupilot
+end      ardupilot;
+
+system implementation ardupilot.i
+subcomponents
+   kernel         : processor poklib::pok_kernel.x86_qemu_four_partitions_with_libmath;
+   mem            : memory    ardupilot_platform::mem.i;
+   prs_gps        : process   ardupilot_software::process_gps.i;
+   prs_mgmt       : process   ardupilot_software::process_mgmt.i;
+   prs_throttle   : process   ardupilot_software::process_throttle.i;
+   prs_yaw        : process   ardupilot_software::process_yaw.i;
+connections
+   port prs_gps.altitude   -> prs_mgmt.altitude;
+   port prs_gps.latitude   -> prs_mgmt.latitude;
+   port prs_gps.longitude  -> prs_mgmt.longitude;
+   port prs_mgmt.speed     -> prs_throttle.speed;
+   port prs_mgmt.angle     -> prs_yaw.angle;
+properties
+   Actual_Memory_Binding => (reference (mem.segment1)) applies to prs_gps;
+   Actual_Memory_Binding => (reference (mem.segment2)) applies to prs_mgmt;
+   Actual_Memory_Binding => (reference (mem.segment3)) applies to prs_throttle;
+   Actual_Memory_Binding => (reference (mem.segment4)) applies to prs_yaw;
+
+   Actual_Processor_Binding => (reference (kernel.partition1)) applies to prs_gps;
+   Actual_Processor_Binding => (reference (kernel.partition2)) applies to prs_mgmt;
+   Actual_Processor_Binding => (reference (kernel.partition3)) applies to prs_throttle;
+   Actual_Processor_Binding => (reference (kernel.partition4)) applies to prs_yaw;
+
+   POK::Additional_Features => (console, libc_stdio, libc_stdlib) applies to kernel.partition1;
+   POK::Additional_Features => (libmath, console, libc_stdio, libc_stdlib) applies to kernel.partition2;
+   POK::Additional_Features => (console, libc_stdio, libc_stdlib) applies to kernel.partition3;
+   POK::Additional_Features => (console, libc_stdio, libc_stdlib) applies to kernel.partition4;
+end ardupilot.i;
+
+
+end ardupilot_system;

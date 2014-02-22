@@ -1,0 +1,106 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2011 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package case_study_osal
+
+public
+
+with Data_Model;
+with case_study_osal_software;
+with POK;
+
+memory segment
+properties
+   Byte_Count => 80000;
+end segment;
+
+memory implementation segment.i
+end segment.i;
+
+memory ram
+end ram;
+
+memory implementation ram.i
+subcomponents
+   seg1: memory segment.i;
+   seg2: memory segment.i;
+end ram.i;
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+   POK::Recovery_Errors       => (Numeric_Error, Illegal_Request);
+   POK::Recovery_Actions      => (Partition_Restart, Partition_Restart);
+   POK::Additional_Features   => (console, libc_stdio);
+end partition;
+
+
+virtual processor implementation partition.common
+properties
+   POK::Timeslice          => 500 ms;
+   POK::Recovery_Errors    => (Partition_Init, Partition_Scheduling);
+   POK::Recovery_Actions   => (Partition_Stop, Partition_Stop);
+end partition.common;
+
+processor pok_kernel
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   POK::Recovery_Errors => (Hardware_Fault);
+   POK::Recovery_Actions => (Kernel_Restart);
+end pok_kernel;
+
+processor implementation pok_kernel.i
+subcomponents
+   partition_sender     : virtual processor partition.common;
+   partition_receiver   : virtual processor partition.common;
+properties
+   POK::Major_Frame => 1000ms;
+   POK::Scheduler => static;
+   POK::Slots => (500ms, 500ms);
+   POK::Slots_Allocation => ( reference (partition_sender), 
+                              reference (partition_receiver));
+   POK::Recovery_Errors => (Kernel_Init, Kernel_Scheduling);
+   POK::Recovery_Actions => (Kernel_Stop, Kernel_Stop);
+   POK::Additional_Features   => (console, libc_stdio, libc);
+end pok_kernel.i;
+
+
+
+system osal
+end osal;
+
+system implementation osal.i
+subcomponents
+   cpu      : processor pok_kernel.i;
+   sender   : process   case_study_osal_software::snd_prs.i;
+   receiver : process   case_study_osal_software::recv_prs.i;
+   mem      : memory    ram.i;
+connections
+   port sender.pdataout -> receiver.pdatain;
+properties
+   actual_processor_binding => 
+      (reference (cpu.partition_receiver)) applies to receiver;
+   actual_processor_binding => 
+      (reference (cpu.partition_sender)) applies to sender;
+   actual_memory_binding => 
+      (reference (mem.seg1)) applies to receiver;
+   actual_memory_binding => 
+      (reference (mem.seg2)) applies to sender;
+end osal.i;
+
+end case_study_osal;

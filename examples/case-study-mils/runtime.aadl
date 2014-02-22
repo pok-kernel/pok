@@ -1,0 +1,66 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+--  This file contains general purpose runtime components.
+
+package runtime
+
+public
+
+with POK;
+with layers;
+
+virtual processor partition_runtime
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (console);
+end partition_runtime;
+
+virtual processor implementation partition_runtime.topsecret
+properties
+   Provided_Virtual_Bus_Class => ( classifier (layers::topsecret.i));
+end partition_runtime.topsecret;
+
+virtual processor implementation partition_runtime.secret
+properties
+   Provided_Virtual_Bus_Class => ( classifier (layers::secret.i));
+end partition_runtime.secret;
+
+virtual processor implementation partition_runtime.secretandtopsecret
+properties
+   Provided_Virtual_Bus_Class => ( classifier (layers::secret.i), classifier (layers::topsecret.i));
+end partition_runtime.secretandtopsecret;
+
+virtual processor implementation partition_runtime.unclassified
+properties
+   Provided_Virtual_Bus_Class => ( classifier (layers::unclassified.i));
+end partition_runtime.unclassified;
+
+processor pok_kernel
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+end pok_kernel;
+
+bus ethernet
+end ethernet;
+
+bus implementation ethernet.unsecure
+properties
+   Provided_Virtual_Bus_Class => (classifier (poklib::unencrypted));
+end ethernet.unsecure;
+
+
+end runtime;

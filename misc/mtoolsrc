@@ -1,0 +1,2 @@
+# For older versions of mtools, you may have to remove "filter"
+drive v: file="floppy.img" 1.44M filter

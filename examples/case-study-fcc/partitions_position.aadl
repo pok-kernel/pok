@@ -1,0 +1,58 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package partitions_position
+
+public
+
+with POK;
+with types;
+with threads_position;
+
+process partition_position_negociation
+features
+   position_askin       : in data port types::position;
+   position_askout      : out data port types::position;
+   position_feedbackin  : in data port types::position;
+   position_feedbackout : out data port types::position;
+   notify_error         : out event data port types::boolean;
+end partition_position_negociation;
+
+process implementation partition_position_negociation.i
+subcomponents
+   thr : thread threads_position::negociation.i;
+connections
+   port position_askin        -> thr.positionin;
+   port thr.positionout       -> position_askout;
+   port thr.positionrealout   -> position_feedbackout;
+   port position_feedbackin   -> thr.positionrealin;
+   port thr.error             -> notify_error;
+end partition_position_negociation.i;
+
+process partition_position_computation
+features
+   position_ask         : in data port types::position;
+   position_feedback    : out data port types::position;
+end partition_position_computation;
+
+process implementation partition_position_computation.i
+subcomponents
+   thr : thread threads_position::device_emulation.i;
+connections
+   port position_ask -> thr.position_asked;
+   port thr.position_real -> position_feedback;
+end partition_position_computation.i;
+
+end partitions_position;

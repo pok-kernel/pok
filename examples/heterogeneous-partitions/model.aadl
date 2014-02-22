@@ -1,0 +1,160 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Wed May  6 12:09:21 2009 
+--
+package heterogenous_systems
+
+public
+
+with Data_Model;
+with POK;
+
+virtual processor partition
+properties
+
+   POK::Additional_Features => (libc_stdio);
+end partition;
+
+virtual processor implementation partition.impl
+end partition.impl;
+
+processor pokkernel
+end pokkernel;
+
+processor implementation pokkernel.impl
+subcomponents
+   part1 : virtual processor partition.impl {POK::Scheduler => RMS;};
+   part2 : virtual processor partition.impl {POK::Scheduler => RR;};
+properties
+   POK::Major_Frame => 4000ms;
+   POK::Scheduler => static;
+   POK::Slots => (2000ms, 2000ms);
+   POK::Slots_Allocation => ( reference (part1), reference (part2));
+end pokkernel.impl;
+
+process myprocess
+end myprocess;
+
+process implementation myprocess.impl1
+subcomponents
+   thr1 : thread mythread.impl1;
+   thr2 : thread mythread.impl2;
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end myprocess.impl1;
+
+process implementation myprocess.impl2
+subcomponents
+   thr1 : thread mythread.impl3;
+   thr2 : thread mythread.impl4;
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end myprocess.impl2;
+
+thread mythread
+end mythread;
+
+thread implementation mythread.impl1
+calls 
+   call1 : { pspg : subprogram hello_p1t1; };
+properties
+   dispatch_protocol => periodic;
+   period            => 300ms;
+   deadline          => 300ms;
+   compute_execution_time => 0ms .. 1ms;
+end mythread.impl1;
+
+thread implementation mythread.impl2
+calls 
+   call1 : { pspg : subprogram hello_p1t2; };
+properties
+   dispatch_Protocol => periodic;
+   period            => 100ms;
+   deadline          => 100ms;
+   compute_execution_time => 0ms .. 1ms;
+end mythread.impl2;
+
+thread implementation mythread.impl3
+calls 
+   call1 : { pspg : subprogram hello_p2t1; };
+properties
+   dispatch_protocol => periodic;
+   period            => 300ms;
+   deadline          => 300ms;
+   compute_execution_time => 0ms .. 1ms;
+end mythread.impl3;
+
+thread implementation mythread.impl4
+calls 
+   call1 : { pspg : subprogram hello_p2t2; };
+properties
+   dispatch_Protocol => periodic;
+   period            => 100ms;
+   deadline          => 100ms;
+end mythread.impl4;
+
+
+subprogram hello_p1t1
+properties
+   source_name => "user_hello_part1t1";
+   source_language => C;
+   POK::Source_Location => "../../../hello1.o";
+end hello_p1t1;
+
+subprogram hello_p1t2
+properties
+   source_name => "user_hello_part1t2";
+   source_language => C;
+   POK::Source_Location => "../../../hello1.o";
+end hello_p1t2;
+
+subprogram hello_p2t1
+properties
+   source_name => "user_hello_part2t1";
+   source_language => C;
+   POK::Source_Location => "../../../hello2.o";
+end hello_p2t1;
+
+subprogram hello_p2t2
+properties
+   source_name => "user_hello_part2t2";
+   source_language => C;
+   POK::Source_Location => "../../../hello2.o";
+end hello_p2t2;
+
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   intel   : processor pokkernel.impl{
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   };
+   powerpc : processor pokkernel.impl{
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   };
+   part11  : process myprocess.impl1;
+   part12  : process myprocess.impl2;
+   part21  : process myprocess.impl1;
+   part22  : process myprocess.impl2;
+properties
+   Actual_Processor_Binding => (reference (powerpc.part1)) applies to part11;
+   Actual_Processor_Binding => (reference (powerpc.part2)) applies to part12;
+   Actual_Processor_Binding => (reference (intel.part1)) applies to part21;
+   Actual_Processor_Binding => (reference (intel.part2)) applies to part22;
+end node.impl;
+end heterogenous_systems;

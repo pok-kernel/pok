@@ -1,0 +1,126 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package test
+public
+
+
+with Data_Model;
+with POK;
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libc_stdio, console);
+end partition;
+
+virtual processor implementation partition.impl
+end partition.impl;
+
+processor ppc
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   part1 : virtual processor partition.impl;
+   part2 : virtual processor partition.impl {POK::Additional_Features => (libc_stdlib, libc_stdio);};
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   POK::Major_Frame => 20ms;
+   POK::Scheduler => static;
+   POK::Slots => (10ms, 10ms);
+   POK::Slots_Allocation => ( reference (part1), reference (part2));
+end ppc.impl;
+
+process myprocess
+end myprocess;
+
+process implementation myprocess.impl1
+subcomponents
+   thr1 : thread mythread.impl1;
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end myprocess.impl1;
+
+process implementation myprocess.impl2
+subcomponents
+   thr2 : thread mythread.impl2;
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end myprocess.impl2;
+
+thread mythread
+properties
+   Source_Stack_Size => 30 Kbyte;
+end mythread;
+
+thread implementation mythread.impl1
+calls 
+   call1 : { pspg : subprogram hello_part1;};
+properties
+   Initialize_Entrypoint => classifier (test::thread_starting);
+   dispatch_protocol => periodic;
+   period            => 1 ms;
+   deadline          => 1 ms;
+   compute_execution_time => 1ms .. 2ms;
+end mythread.impl1;
+
+thread implementation mythread.impl2
+calls 
+   call1 : { pspg : subprogram hello_part2;};
+properties
+   dispatch_Protocol => periodic;
+   period            => 1ms;
+   deadline          => 1ms;
+end mythread.impl2;
+
+subprogram thread_starting
+properties
+   source_name => "user_thread_starting";
+   source_language => C;
+   POK::Source_Location => "../../../threadstart.o";
+end thread_starting;
+
+subprogram hello_part1
+properties
+   source_name => "user_hello_part1";
+   source_language => C;
+   POK::Source_Location => "../../../hello1.o";
+end hello_part1;
+
+subprogram hello_part2
+properties
+   POK::Source_Location => "../../../hello2.o";
+   source_language => C;
+   source_name => "user_hello_part2";
+end hello_part2;
+
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu   : processor ppc.impl;
+   part1 : process myprocess.impl1;
+   part2 : process myprocess.impl2;
+properties
+   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
+   Actual_Processor_Binding => (reference (cpu.part2)) applies to part2;
+end node.impl;
+end test;

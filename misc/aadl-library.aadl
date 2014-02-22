@@ -1,0 +1,463 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Wed Oct 14 12:42:24 2009 
+--
+package poklib
+
+public
+
+with POK;
+with Data_Model;
+
+------------------
+--  Processor   --
+------------------
+
+processor pok_kernel
+properties
+   POK::Scheduler => static;
+end pok_kernel;
+
+processor implementation pok_kernel.x86_qemu
+properties
+   POK::Scheduler => static;
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+end pok_kernel.x86_qemu;
+
+processor implementation pok_kernel.ppc_prep
+properties
+   POK::Architecture => ppc;
+   POK::BSP => prep;
+end pok_kernel.ppc_prep;
+
+processor implementation pok_kernel.sparc_leon3
+properties
+   POK::Architecture => sparc;
+   POK::BSP => leon3;
+end pok_kernel.sparc_leon3;
+
+processor implementation pok_kernel.x86_qemu_two_partitions extends pok_kernel.x86_qemu
+subcomponents
+   partition1 : virtual processor poklib::pok_partition.basic_for_example;
+   partition2 : virtual processor poklib::pok_partition.basic_for_example;
+properties
+   POK::Major_Frame => 1000ms;
+   POK::Scheduler => static;
+   POK::Slots => (500ms, 500ms);
+   POK::Slots_Allocation => ( reference (partition1), reference (partition2));
+end pok_kernel.x86_qemu_two_partitions;
+
+processor implementation pok_kernel.x86_qemu_three_partitions extends pok_kernel.x86_qemu
+subcomponents
+   partition1 : virtual processor poklib::pok_partition.basic_for_example;
+   partition2 : virtual processor poklib::pok_partition.basic_for_example;
+   partition3 : virtual processor poklib::pok_partition.basic_for_example;
+properties
+   POK::Major_Frame => 1500ms;
+   POK::Scheduler => static;
+   POK::Slots => (500ms, 500ms, 500ms);
+   POK::Slots_Allocation => ( reference (partition1), reference (partition2), reference (partition3));
+end pok_kernel.x86_qemu_three_partitions;
+
+processor implementation pok_kernel.x86_qemu_four_partitions extends pok_kernel.x86_qemu
+subcomponents
+   partition1 : virtual processor poklib::pok_partition.basic_for_example;
+   partition2 : virtual processor poklib::pok_partition.basic_for_example;
+   partition3 : virtual processor poklib::pok_partition.basic_for_example;
+   partition4 : virtual processor poklib::pok_partition.basic_for_example;
+properties
+   POK::Major_Frame => 2000ms;
+   POK::Scheduler => static;
+   POK::Slots => (500ms, 500ms, 500ms, 500ms);
+   POK::Slots_Allocation => ( reference (partition1), reference (partition2), reference (partition3), reference (partition4));
+end pok_kernel.x86_qemu_four_partitions;
+
+processor implementation pok_kernel.x86_qemu_four_partitions_with_libmath extends pok_kernel.x86_qemu
+subcomponents
+   partition1 : virtual processor poklib::pok_partition.basic_for_example_with_libmath;
+   partition2 : virtual processor poklib::pok_partition.basic_for_example_with_libmath;
+   partition3 : virtual processor poklib::pok_partition.basic_for_example_with_libmath;
+   partition4 : virtual processor poklib::pok_partition.basic_for_example_with_libmath;
+properties
+   POK::Major_Frame => 2000ms;
+   POK::Scheduler => static;
+   POK::Slots => (500ms, 500ms, 500ms, 500ms);
+   POK::Slots_Allocation => ( reference (partition1), reference (partition2), reference (partition3), reference (partition4));
+end pok_kernel.x86_qemu_four_partitions_with_libmath;
+
+---------------------
+--  Virtual Buses  --
+---------------------
+
+--  Unclassified virtual bus
+
+virtual bus unencrypted
+end unencrypted;
+
+virtual bus implementation unencrypted.i
+properties
+   POK::Protocol        => unknown;
+end unencrypted.i;
+
+--  blowfish virtual bus
+
+subprogram blowfish_send
+features
+   datain   : in parameter poklib::pointed_void;
+   countin  : in parameter poklib::integer;
+   dataout  : out parameter poklib::pointed_void;
+   countout : out parameter poklib::integer;
+properties
+   Source_Name => "pok_protocols_blowfish_marshall";
+end blowfish_send;
+
+subprogram implementation blowfish_send.i
+end blowfish_send.i;
+
+subprogram blowfish_receive
+features
+   datain   : in parameter poklib::pointed_void;
+   countin  : in parameter poklib::integer;
+   dataout  : out parameter poklib::pointed_void;
+   countout : out parameter poklib::integer;
+properties
+   Source_Name => "pok_protocols_blowfish_unmarshall";
+end blowfish_receive;
+
+subprogram implementation blowfish_receive.i
+end blowfish_receive.i;
+
+data blowfish_data
+end blowfish_data;
+
+data implementation blowfish_data.i
+properties
+   Type_Source_Name => "pok_protocols_blowfish_data_t";
+end blowfish_data.i;
+
+abstract vbus_blowfish_wrapper
+end vbus_blowfish_wrapper;
+
+abstract implementation vbus_blowfish_wrapper.i
+subcomponents
+   send              : subprogram blowfish_send.i;
+   receive           : subprogram blowfish_receive.i;
+   marshalling_type  : data blowfish_data.i;
+end vbus_blowfish_wrapper.i;
+
+virtual bus blowfish
+end blowfish;
+
+virtual bus implementation blowfish.i
+properties
+   Implemented_As          => classifier (poklib::vbus_blowfish_wrapper.i);
+   POK::Protocol           => blowfish;
+end blowfish.i;
+
+--  DES virtual bus
+
+subprogram des_send
+features
+   datain      : in parameter    poklib::pointed_void;
+   count_in    : in parameter    poklib::integer;
+   dataout     : out parameter   poklib::pointed_void;
+   count_out   : out parameter   poklib::integer;
+end des_send;
+
+subprogram implementation des_send.i
+properties
+   Source_Name => "pok_protocols_des_marshall";
+end des_send.i;
+
+subprogram des_receive
+features
+   datain   : in parameter poklib::pointed_void;
+   countin  : in parameter poklib::integer;
+   dataout  : out parameter poklib::pointed_void;
+   countout : out parameter poklib::integer;
+end des_receive;
+
+subprogram implementation des_receive.i
+properties
+   Source_Name => "pok_protocols_des_unmarshall";
+end des_receive.i;
+
+data des_data
+end des_data;
+
+data implementation des_data.i
+properties
+   Type_Source_Name => "pok_protocols_des_data_t";
+end des_data.i;
+
+abstract vbus_des_wrapper
+end vbus_des_wrapper;
+
+abstract implementation vbus_des_wrapper.i
+subcomponents
+   send              : subprogram des_send.i;
+   receive           : subprogram des_receive.i;
+   marshalling_type  : data des_data.i;
+end vbus_des_wrapper.i;
+
+virtual bus des
+end des;
+
+virtual bus implementation des.i
+properties
+   Implemented_As          => classifier (poklib::vbus_des_wrapper.i);
+   POK::Protocol           => des;
+end des.i;
+
+--  ceasar virtual bus
+
+subprogram ceasar_send
+features
+   datain   : in parameter poklib::pointed_void;
+   countin  : in parameter poklib::integer;
+   dataout  : out parameter poklib::pointed_void;
+   countout : out parameter poklib::integer;
+properties
+   Source_Name => "pok_protocols_ceasar_marshall";
+end ceasar_send;
+
+subprogram implementation ceasar_send.i
+end ceasar_send.i;
+
+subprogram ceasar_receive
+features
+   datain   : in parameter poklib::pointed_void;
+   countin  : in parameter poklib::integer;
+   dataout  : out parameter poklib::pointed_void;
+   countout : out parameter poklib::integer;
+properties
+   Source_Name => "pok_protocols_ceasar_unmarshall";
+end ceasar_receive;
+
+subprogram implementation ceasar_receive.i
+end ceasar_receive.i;
+
+data ceasar_data
+end ceasar_data;
+
+data implementation ceasar_data.i
+properties
+   Type_Source_Name => "pok_protocols_ceasar_data_t";
+end ceasar_data.i;
+
+
+abstract vbus_ceasar_wrapper
+end vbus_ceasar_wrapper;
+
+abstract implementation vbus_ceasar_wrapper.i
+subcomponents
+   send              : subprogram ceasar_send.i;
+   receive           : subprogram ceasar_receive.i;
+end vbus_ceasar_wrapper.i;
+
+virtual bus ceasar
+end ceasar;
+
+virtual bus implementation ceasar.i
+properties
+   Implemented_As          => classifier (poklib::vbus_ceasar_wrapper.i);
+   POK::Protocol           => ceasar;
+end ceasar.i;
+
+--  gzip virtual bus
+
+subprogram gzip_send
+features
+   datain   : in parameter poklib::pointed_void;
+   countin  : in parameter poklib::integer;
+   dataout  : out parameter poklib::pointed_void;
+   countout : out parameter poklib::integer;
+properties
+   Source_Name => "pok_protocols_gzip_marshall";
+end gzip_send;
+
+subprogram implementation gzip_send.i
+end gzip_send.i;
+
+subprogram gzip_receive
+features
+   datain   : in parameter poklib::pointed_void;
+   countin  : in parameter poklib::integer;
+   dataout  : out parameter poklib::pointed_void;
+   countout : out parameter poklib::integer;
+properties
+   Source_Name => "pok_protocols_gzip_unmarshall";
+end gzip_receive;
+
+subprogram implementation gzip_receive.i
+end gzip_receive.i;
+
+data gzip_data
+end gzip_data;
+
+data implementation gzip_data.i
+properties
+   Type_Source_Name => "pok_protocols_gzip_data_t";
+end gzip_data.i;
+
+abstract vbus_gzip_wrapper
+end vbus_gzip_wrapper;
+
+abstract implementation vbus_gzip_wrapper.i
+subcomponents
+   send              : subprogram gzip_send.i;
+   receive           : subprogram gzip_receive.i;
+   marshalling_type  : data gzip_data.i;
+end vbus_gzip_wrapper.i;
+
+virtual bus gzip
+end gzip;
+
+virtual bus implementation gzip.i
+properties
+   Implemented_As          => classifier (poklib::vbus_gzip_wrapper.i);
+end gzip.i;
+
+-------------------------
+--  Virtual Processor  --
+-------------------------
+
+virtual processor pok_partition
+end pok_partition;
+
+virtual processor implementation pok_partition.basic
+properties
+   POK::Scheduler => RR;
+end pok_partition.basic;
+
+virtual processor implementation pok_partition.driver
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (pci, io);
+end pok_partition.driver;
+
+virtual processor implementation pok_partition.application
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libc_stdio, libc_stdlib);
+end pok_partition.application;
+
+virtual processor implementation pok_partition.basic_for_example extends pok_partition.basic
+properties
+   POK::Additional_Features => (libc_stdio, libc_stdlib);
+end pok_partition.basic_for_example;
+
+virtual processor implementation pok_partition.basic_for_example_with_libmath extends pok_partition.basic
+properties
+   POK::Additional_Features => (libc_stdio, libc_stdlib, libmath, console);
+end pok_partition.basic_for_example_with_libmath;
+
+
+----------------
+--  Memories  --
+----------------
+
+memory pok_memory
+end pok_memory;
+
+memory implementation pok_memory.x86_segment
+end pok_memory.x86_segment;
+
+memory implementation pok_memory.x86_main
+end pok_memory.x86_main;
+
+
+---------------
+--  Threads  --
+---------------
+
+thread thr_periodic
+properties
+   Dispatch_Protocol          => Periodic;
+   Period                     => 100ms;
+   Deadline                   => 100ms;
+   Compute_Execution_Time     => 5ms .. 10ms;
+end thr_periodic;
+
+thread thr_sporadic
+properties
+   Dispatch_Protocol          => Sporadic;
+   Period                     => 100ms;
+   Deadline                   => 100ms;
+   Compute_Execution_Time     => 5ms .. 10ms;
+end thr_sporadic;
+
+-------------------
+--  Subprograms  --
+-------------------
+
+subprogram spg_c
+properties
+   Source_Language  => C;
+   Source_Text      => ("../../../user-functions.o");
+end spg_c;
+
+---------------
+--  Integer  --
+---------------
+
+data void
+properties
+   Type_Source_Name => "void";
+end void;
+
+data implementation void.i
+end void.i;
+
+data pointed_void
+properties
+   Type_Source_Name => "void*";
+end pointed_void;
+
+data implementation pointed_void.i
+end pointed_void.i;
+
+data char
+properties
+   Type_Source_Name => "char";
+end char;
+
+data implementation char.i
+end char.i;
+
+data pointed_char
+properties
+   Type_Source_Name => "char*";
+end pointed_char;
+
+data implementation pointed_char.i
+end pointed_char.i;
+
+data integer
+properties
+   Data_Model::Data_Representation => integer;
+end integer;
+
+
+data float
+properties
+   Data_Model::Data_Representation => float;
+end float;
+
+
+
+
+end poklib;
+

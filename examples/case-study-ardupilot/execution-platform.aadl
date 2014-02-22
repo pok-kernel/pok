@@ -1,0 +1,34 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Wed Oct 14 12:42:24 2009 
+--
+package ardupilot_platform
+
+public
+
+with poklib;
+
+processor cpu end cpu;
+
+memory mem end mem;
+
+memory implementation mem.i extends poklib::pok_memory.x86_main
+subcomponents
+   segment1 : memory poklib::pok_memory.x86_segment {Byte_Count => 100000;};
+   segment2 : memory poklib::pok_memory.x86_segment {Byte_Count => 100000;};
+   segment3 : memory poklib::pok_memory.x86_segment {Byte_Count => 100000;};
+   segment4 : memory poklib::pok_memory.x86_segment {Byte_Count => 100000;};
+end mem.i;
+
+end ardupilot_platform;

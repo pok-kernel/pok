@@ -1,0 +1,365 @@
+theorem One_Security_Level_By_Memory
+
+    foreach m in memory_set do   
+
+      P := {x in Process_Set | is_bound_to (x, m)};
+
+      VP := {x in Virtual_Processor_Set | is_bound_to (P, x)};
+
+      B := {x in Virtual_Bus_Set | is_provided_class (VP, x)}; 
+
+    check (all_equals (property (B, "POK::Security_Level")));
+
+end One_Security_Level_By_Memory;
+
+theorem partitions_execution
+    foreach p in Processor_Set do
+      VP := { x in Virtual_Processor_Set | Is_Subcomponent_Of (x, p)};
+
+      check (Is_In (list (VP), Get_Property_Value (p, "ARINC653::Slots_Allocation")));
+end partitions_execution;
+
+
+theorem Check_Virtual_Bus_Cipher_Algorithms
+
+    foreach VB1 in virtual_bus_set do   
+
+      VB2 := {x in Virtual_Bus_Set | 
+                  (get_property_value (x, "POK::Security_Level") <> 
+                   get_property_value (VB1, "POK::Security_Level")) };
+
+      check (
+                 ((not property_exists (VB1, "pok::blowfish_key")) or 
+                  (not property_exists (VB2, "pok::blowfish_key"))) or 
+                  (get_property_value(VB1, "pok::blowfish_key") <>
+                   Head (get_property_value (VB2, "pok::blowfish_key")))
+               );
+-- fixme : faire aussi pour DES et Ceasar
+
+end Check_Virtual_Bus_Cipher_Algorithms;
+
+
+theorem Contains_Memories
+
+   foreach s in system_set do
+      mainmem := {y in Memory_Set | is_subcomponent_of (y, s)};
+      partitionsmem := {x in Memory_Set | is_subcomponent_of (x, mainmem)};
+
+    check ( (Cardinal (mainmem) > 0) and
+            (Property_Exists (partitionsmem, "Word_Count"))
+          );
+end Contains_Memories;
+
+
+theorem Virtual_Bus_On_Virtual_Processors
+
+   foreach vp in virtual_processor_set do
+      VB := {x in Virtual_Bus_Set | is_provided_class (vp, x)};
+
+    check ((Cardinal (VB) > 0) and (Property_Exists (VB, "POK::Security_Level"))) ;
+end Virtual_Bus_On_Virtual_Processors;
+
+
+theorem Virtual_Bus_On_Buses
+
+   foreach b in bus_set do
+      VB := {x in Virtual_Bus_Set | is_provided_class (b, x)};
+      VB2 := {y in Virtual_Bus_Set | is_subcomponent_of (y, b)};
+
+    check ((Cardinal (VB) > 0 or Cardinal (VB2) > 0) and ((Property_Exists (VB, "POK::Security_Level")) or (Property_Exists(VB2, "POK::Security_Level")))) ;
+end Virtual_Bus_On_Buses;
+
+
+theorem bell_lapadula
+
+    foreach p_src in process_set do   
+
+      VP1 := {x in Virtual_Processor_Set | is_bound_to (p_src, x)};
+
+      B_Src := {x in Virtual_Bus_Set | is_provided_class (VP1, x)};
+
+      P_Dest := {x in Process_Set | Is_Connected_To (p_src, x)};
+
+      VP2 := {x in Virtual_Processor_Set | is_bound_to (P_Dest, x)};
+
+      B_Dst := {x in Virtual_Bus_Set | is_provided_class (VP2, x)};
+
+    check (Cardinal (P_Dest) = 0 or  
+            (max (property (B_Src, "POK::Security_Level")) <= 
+             min (property (B_Dst, "POK::Security_Level"))));
+
+end bell_lapadula;
+
+theorem biba
+
+    foreach p_src in process_set do   
+
+      VP1 := {x in Virtual_Processor_Set | is_bound_to (p_src, x)};
+
+      B_Src := {x in Virtual_Bus_Set | is_provided_class (VP1, x)};
+
+      P_Dest := {x in Process_Set | Is_Connected_To (p_src, x)};
+
+      VP2 := {x in Virtual_Processor_Set | is_bound_to (P_Dest, x)};
+
+      B_Dst := {x in Virtual_Bus_Set | is_provided_class (VP2, x)};
+
+    check (Cardinal (P_Dest) = 0 or  
+            (min (property (B_Src, "POK::Security_Level")) >=
+             max (property (B_Dst, "POK::Security_Level"))));
+end biba;
+
+theorem MILS_1
+
+    foreach p_src in process_set do   
+
+      VP1 := {x in Virtual_Processor_Set | is_bound_to (p_src, x)};
+
+      B_Src := {x in Virtual_Bus_Set | is_provided_class (VP1, x)};
+
+      P_Dest := {x in Process_Set | Is_Connected_To (p_src, x)};
+
+      VP2 := {x in Virtual_Processor_Set | is_bound_to (P_Dest, x)};
+
+      B_Dst := {x in Virtual_Bus_Set | is_provided_class (VP2, x)};
+
+    check (Cardinal (P_Dest) = 0 or  
+            ((max (property (B_Src, "POK::Security_Level")) = 
+              max (property (B_Dst, "POK::Security_Level"))) and
+             (min (property (B_Src, "POK::Security_Level")) = 
+              min (property (B_Dst, "POK::Security_Level")))));
+end MILS_1;
+
+theorem MILS_2
+
+    foreach p_src in process_set do
+
+      VP1 := {x in Virtual_Processor_Set | is_bound_to (p_src, x)};
+
+      B_Src := {x in Virtual_Bus_Set | is_provided_class (VP1, x)};
+
+      Cnx := {x in Connection_Set | is_accessing_to (p_src, x)};
+
+      P_Dest := {x in Process_Set | is_accessing_to (x, Cnx)};
+
+      VP2 := {x in Virtual_Processor_Set | is_bound_to (P_Dest, x)};
+
+      B_Dst := {x in Virtual_Bus_Set | is_provided_class (VP2, x)};
+
+      B_Cnx := {x in Virtual_Bus_Set | is_bound_to (Cnx, x)};
+
+    check (Cardinal (Cnx) = 0 or  
+            ((max (property (B_Src, "POK::Security_Level")) = 
+              max (property (B_Dst, "POK::Security_Level"))) and
+             (min (property (B_Src, "POK::Security_Level")) = 
+              min (property (B_Dst, "POK::Security_Level")))) and 
+             ((min (property (B_Dst, "POK::Security_Level")) =
+               min (property (B_Cnx, "POK::Security_Level"))) and
+              (max (property (B_Dst, "POK::Security_Level")) =
+               max (property (B_Cnx, "POK::Security_Level")))));
+end MILS_2;
+
+theorem scheduling_major_frame
+    foreach cpu in processor_set do
+    check ((property_exists(cpu, "POK::Major_Frame") and
+            ((float (property (cpu, "POK::Major_Frame")) = 
+            sum (property (cpu, "POK::Slots")))))
+          or
+         (float (property (cpu, "ARINC653::Module_Major_Frame")) = 
+           sum (property (cpu, "ARINC653::Partition_Slots"))));
+end scheduling_major_frame;
+
+
+theorem check_error_coverage
+
+   foreach thr in thread_set do
+
+      Prs := {x in Process_Set | is_subcomponent_of (thr, x)};
+
+      VP := {x in Virtual_Processor_Set | is_bound_to (Prs, x)};
+
+      CPU := {x in Processor_Set | is_subcomponent_of (VP, x)};
+
+      var errors := list ("Module_Config", "Module_Init", "Module_Scheduling",
+                          "Partition_Scheduling", "Partition_Config", "Partition_Handler", "Partition_Init",
+                          "Deadline_Miss", "Application_Error", "Numeric_Error", "Illegal_Request", "Stack_Overflow", "Memory_Violation", "Hardware_Fault", "Power_Fail");
+
+      var actual_errors := (property (CPU, "ARINC653::HM_Errors") +
+                            property (VP, "ARINC653::HM_Errors") + 
+                            property (thr, "ARINC653::HM_Errors"));
+
+      check (is_in (errors, actual_errors) and is_in (actual_errors, errors));
+end check_error_coverage;
+
+
+--  The check_omission checks the following :
+--  We have two partitions, assuming P1 and P2.
+--  P1 and P2 are connected, P1 SENDS data to P2 (connection direction is from P1 to P2)
+--  In that case, we want to check if there can be some omission, meaning that
+--  partition P1 can omit to send data to partition P2.
+--  We can detect that using recovering mecanisms. If the partition restarts
+--  when an error is raised, it will possibly miss its deadline. Moreover, it is
+--  especially critical if P2 is more critical than P1.
+--  So, if the source partition P1 is possibly restarted (threads or partitions specify
+--  a restart recovering action) and its criticality is inferior to criticality of P2
+--  the theorem is not verified.
+
+
+theorem check_omission_transient
+
+   foreach Src_Prs in process_set do
+
+      Src_Thr := {x in Thread_Set | is_subcomponent_of (x, Src_Prs)};
+
+      Src_Runtime := {x in Virtual_Processor_Set | is_bound_to (Src_Prs, x)};
+
+      Dst_Prs := {x in Process_Set | is_connected_to (Src_Prs, x)};
+
+      Dst_Runtime := {x in Virtual_Processor_Set | is_bound_to (Dst_Prs, x)};
+
+      var restart_actions := list ("Partition_Restart", "Process_Restart", "Confirm");
+
+      var src_recovery_actions :=  (property (Src_Runtime, "ARINC653::HM_Actions") +
+                                    property (Src_Thr, "ARINC653::HM_Actions"));
+
+      check ( ( (cardinal (Src_Prs) > 0) and (cardinal (Dst_Prs) >= 0) and ( is_in (restart_actions, src_recovery_actions)) and (max (property (Dst_Runtime, "POK::Criticality")) < max ((property (Src_Runtime,"POK::Criticality")))))
+            or
+            ( not (is_in (restart_actions, src_recovery_actions))));
+
+end check_omission_transient;
+
+
+
+theorem check_omission_permanent
+
+   foreach Src_Prs in process_set do
+
+      Src_Thr := {x in Thread_Set | is_subcomponent_of (x, Src_Prs)};
+
+      Src_Runtime := {x in Virtual_Processor_Set | is_bound_to (Src_Prs, x)};
+
+      Dst_Prs := {x in Process_Set | is_connected_to (Src_Prs, x)};
+
+      Dst_Runtime := {x in Virtual_Processor_Set | is_bound_to (Dst_Prs, x)};
+
+      var restart_actions := list ("Partition_Stop", "Process_Stop_And_Start_Another", "Process_Stop");
+
+      var src_recovery_actions :=  (property (Src_Runtime, "ARINC653::HM_Actions") +
+                                    property (Src_Thr, "ARINC653::HM_Actions"));
+
+      check ( ( (cardinal (Src_Prs) > 0) and (cardinal (Dst_Prs) >= 0) and ( is_in (restart_actions, src_recovery_actions)) and (max (property (Dst_Runtime, "POK::Criticality")) < max ((property (Src_Runtime,"POK::Criticality")))))
+            or
+            ( not (is_in (restart_actions, src_recovery_actions))));
+
+end check_omission_permanent;
+
+
+
+--  Check memory requirements 
+--  For each partition, we take its associated memory component
+--  and check that this memory segment is larger than the requirements
+--  of each thread of the partition.
+
+theorem check_memory_requirements_partitions
+
+   foreach prs in process_set do
+
+      Thrs := {x in Thread_Set | is_subcomponent_of (x, prs)};
+
+      mems := { x in Memory_Set | is_bound_to (Prs, x)};
+
+
+      check
+         (
+            (sum (property (Thrs, "Source_Stack_Size")) + sum (property (Thrs, "Source_Data_Size")) + sum (property (Thrs, "Source_Code_Size")))
+            < (sum (property (mems, "word_count")))
+         );
+end check_memory_requirements_partitions;
+
+
+-- For each thread, check that its Source_Code_Size property is correct
+-- regarding its called subprograms
+
+theorem check_memory_requirements_threads
+
+   foreach thr in thread_set do
+
+      spgs := {x in Subprogram_Set | Is_Called_By (x, thr)};
+
+      check ((sum (property (spgs, "Source_Code_Size")) < property (thr, "Source_Code_Size"))
+            and
+            (sum (property (spgs, "Source_Data_Size")) < property (thr, "Source_Data_Size")));
+end check_memory_requirements_threads;
+
+
+theorem check_processor_hm_validity
+
+   foreach mycpu in processor_set do
+
+      var allowed_module_errors  := list ("Module_Config", "Module_Init", "Module_Scheduling");
+      var allowed_module_actions := list ("Nothing", "Module_Stop", "Module_Restart");
+
+      var module_actions :=  (property (mycpu, "ARINC653::HM_Actions"));
+      var module_errors  :=  (property (mycpu, "ARINC653::HM_Errors"));
+
+      check ((property_exists (mycpu, "ARINC653::HM_Actions")) and
+             (property_exists (mycpu, "ARINC653::HM_Errors")) and
+             ( is_in (module_actions, allowed_module_actions)) and 
+             ( is_in (module_errors, allowed_module_errors)));
+
+end check_processor_hm_validity;
+
+
+theorem check_virtual_processor_hm_validity
+
+   foreach vp in virtual_processor_set do
+
+      var allowed_module_errors  := list ("Partition_Config", "Partition_Init", "Partition_Scheduling", "Partition_Handler");
+      var allowed_module_actions := list ("Nothing", "Partition_Stop", "Partition_Restart");
+
+      var module_actions :=  (property (vp, "ARINC653::HM_Actions"));
+      var module_errors  :=  (property (vp, "ARINC653::HM_Errors"));
+
+      check ((property_exists (vp, "ARINC653::HM_Actions")) and
+             (property_exists (vp, "ARINC653::HM_Errors")) and
+             ( is_in (module_actions, allowed_module_actions)) and 
+             ( is_in (module_errors, allowed_module_errors)));
+
+end check_virtual_processor_hm_validity;
+
+
+theorem check_thread_hm_validity
+
+   foreach thr in thread_set do
+
+      var allowed_module_errors  := list ("Deadline_Miss", "Application_Error", "Numeric_Error", "Illegal_Request", "Stack_Overflow", "Memory_Violation", "Hardware_Fault", "Power_Fail");
+      var allowed_module_actions := list ("Ignore", "Confirm", "Process_Stop", "Process_Stop_And_Start_Another", "Process_Restart", "Partition_Stop", "Partition_Restart");
+
+      var module_actions :=  (property (thr, "ARINC653::HM_Actions"));
+      var module_errors  :=  (property (thr, "ARINC653::HM_Errors"));
+
+      check ((property_exists (thr, "ARINC653::HM_Actions")) and
+             (property_exists (thr, "ARINC653::HM_Errors")) and
+             ( is_in (module_actions, allowed_module_actions)) and 
+             ( is_in (module_errors, allowed_module_errors)));
+
+end check_thread_hm_validity;
+
+
+theorem check_partitions_criticality
+
+   foreach vp in virtual_processor_set do
+
+      check ((property_exists (vp, "ARINC653::Criticality")) or
+             (property_exists (vp, "POK::Criticality")));
+end check_partitions_criticality;
+
+
+
+theorem check_virtual_buses_implementation
+
+   foreach vb in virtual_bus_set do
+
+      check (property_exists (vb, "Implemented_As"));
+end check_virtual_buses_implementation;
+

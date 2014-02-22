@@ -1,0 +1,73 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Thu Apr 30 14:07:20 2009 
+%
+
+
+\chapter{Annexes}
+
+   \section{Terms}
+   \begin{itemize}
+      \item[$\bullet$] \textbf{AADL}: AADL stands for Architecture Analysis and
+         Design Language. It provides modeling facilities to represent a system
+         with their properties and requirements.
+
+      \item[$\bullet$] \textbf{Leon3}: A processor architecture developped by
+         the European Space Agency.
+
+      \item[$\bullet$] \textbf{Ocarina}:
+         AADL compiler developed by TELECOM ParisTech. It is used by the POK
+         project to automatically generate configuration, deployment and
+         application code.
+
+      \item[$\bullet$] \textbf{PowerPC}:
+         Architecture popular in the embedded domain.
+
+      \item[$\bullet$] \textbf{QEMU}:
+         A general-purpose emulator that runs on various platforms and emulates
+         different processors (such as \intel x86 or \powerpc).
+   \end{itemize}
+
+
+   \section{Resources}
+   \label{annex-url}
+   \begin{itemize}
+      \item[$\bullet$] POK website: \textit{http://pok.gunnm.org}
+      \item[$\bullet$] Ocarina website: \textit{http://aadl.telecom-paristech.fr}
+      \item[$\bullet$] QEMU website: \textit{http://www.qemu.com}
+      \item[$\bullet$] Cheddar:
+      \textit{http://beru.univ-brest.fr/~singhoff/cheddar/}
+      \item[$\bullet$] MacPorts: \textit{http://www.macports.org}
+   \end{itemize}
+
+   \section{POK property set for the \aadl}
+   \lstinputlisting{pok_properties.aadl}
+
+   \section{AADL library}
+   This is not C code but an \aadl library that can be used with your own
+   models. When you use this library, you don't have to specify all your
+   components and properties, just use predefined components to generate your
+   application.
+
+   \lstinputlisting{aadl-library.aadl}
+
+   \section{ARINC653 property set for the \aadl}
+   \lstinputlisting{arinc653_properties.aadl}
+
+   \section{Network example, modeling of device drivers}
+   \label{annex-device-driver}
+   \lstinputlisting{sample-network-rtl8029.aadl}
+   \lstinputlisting{sample-network-runtime.aadl}
+   \lstinputlisting{sample-network-main.aadl}
+

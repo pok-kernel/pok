@@ -1,0 +1,166 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Dec  3 10:21:25 2009 
+--
+package subprograms
+public
+
+with Types;
+
+subprogram spg_warningannunciationmanager
+properties
+   source_name => "user_warning_annunciation_manager";
+   source_language => C;
+   Source_Text => ("../../../wam_code.o");
+   Source_Code_Size => 4 KByte;
+   Source_Data_Size => 1 KByte;
+end spg_warningannunciationmanager;
+
+subprogram spg_displaymanager
+features
+   request: out parameter types::PageRequestCmd;
+   page: in parameter types::PageContent;
+properties
+   source_name => "user_display_manager";
+   source_language => C;
+   Source_Text => ("../../../dm_code.o");
+   Source_Code_Size => 40 KByte;
+   Source_Data_Size => 20 KByte;
+end spg_displaymanager;
+
+subprogram spg_pagecontentmanager
+properties
+   source_name => "user_page_content_manager";
+   source_language => C;
+   Source_Text => ("../../../pcm_code.o");
+   Source_Code_Size => 8 KByte;
+   Source_Data_Size => 20 KByte;
+end spg_pagecontentmanager;
+
+subprogram spg_navigationsensorprocessing
+properties
+   source_name => "user_navigation_sensor_processing";
+   source_language => C;
+   Source_Text => ("../../../fm_code.o");
+   Source_Code_Size => 2 KByte;
+   Source_Data_Size => 1 KByte;
+end spg_navigationsensorprocessing;
+
+subprogram spg_integratednavigation
+properties
+   source_name => "user_integrated_navigation";
+   source_language => C;
+   Source_Text => ("../../../fm_code.o");
+   Source_Code_Size => 5 KByte;
+   Source_Data_Size => 2 KByte;
+end spg_integratednavigation;
+
+subprogram spg_guidanceprocessing
+properties
+   source_name => "user_guidance_processing";
+   source_language => C;
+   Source_Text => ("../../../fm_code.o");
+   Source_Code_Size => 4 KByte;
+   Source_Data_Size => 1 KByte;
+end spg_guidanceprocessing;
+
+subprogram spg_flightplanprocessing
+properties
+   source_name => "user_flight_plan_processing";
+   source_language => C;
+   Source_Text => ("../../../fm_code.o");
+   Source_Code_Size => 2 KByte;
+   Source_Data_Size => 8 KByte;
+end spg_flightplanprocessing;
+
+subprogram spg_aircraftperformancecalculation
+properties
+   source_name => "user_aircraft_performance_calculation";
+   source_language => C;
+   Source_Text => ("../../../fm_code.o");
+   Source_Code_Size => 4 KByte;
+   Source_Data_Size => 2 KByte;
+end spg_aircraftperformancecalculation;
+
+subprogram spg_periodicio
+features
+--   fromOutside: feature group types::FMInData;
+
+   fromOutside_fuelFlow : in parameter types::FuelFlowData;
+   fromOutside_navSignal : in parameter types::navSignalData;
+   fuelFlow: out parameter types::FuelFlowData;
+   navSignal: out parameter types::NavSignalData;
+   guidanceOut: in parameter types::GuidanceData;
+   fpDataOut: in parameter types::FPData;
+   navDataOut: in parameter types::NavData; 
+   toOutside_guidanceOut: out parameter types::GuidanceData;
+   toOutside_fpDataOut: out parameter types::FPData;
+   toOutside_navDataOut: out parameter types::NavData;
+   New_Page_Request_From_PCM: in parameter types::PageRequestCmd;
+   New_Page_Request_To_PageFeed: out parameter types::PageRequestCmd;
+   New_Page_Request_From_PageFeed: in parameter types::PageRequestCmd;
+   New_Page_Request_To_FD: out parameter types::PageRequestCmd;
+   New_Page_Content_from_FD: in parameter types::PageContent;
+   New_Page_Content_To_PageFeed: out parameter types::PageContent;
+   New_Page_Content_From_PageFeed: in parameter types::PageContent;
+   New_Page_Content_To_PCM: out parameter types::PageContent;
+properties
+   source_name => "user_periodic_io";
+   source_language => C;
+   Source_Text => ("../../../fm_code.o");
+   Source_Code_Size => 12 KByte;
+   Source_Data_Size => 26 KByte;
+end spg_periodicio;
+
+subprogram spg_handlepagerequest
+properties
+   source_name => "user_handle_page_request";
+   source_language => C;
+   Source_Text => ("../../../fm_code.o");
+   Source_Code_Size => 10 KByte;
+   Source_Data_Size => 5 KByte;
+end spg_handlepagerequest;
+
+subprogram spg_flightmanager
+properties
+   source_name => "user_flight_manager";
+   source_language => C;
+   Source_Text => ("../../../fd_code.o");
+   Source_Code_Size => 15 KByte;
+   Source_Data_Size => 6 KByte;
+end spg_flightmanager;
+
+subprogram spg_flightdirector
+properties
+   source_name => "user_flight_director";
+   source_language => C;
+   Source_Text => ("../../../fd_code.o");
+   Source_Code_Size => 8 KByte;
+   Source_Data_Size => 2 KByte;
+end spg_flightdirector;
+
+subprogram mfd_driver
+features
+   DisplayToDM_Request  : out parameter types::PageRequestCmd;
+   DisplayToDM_Page     : in parameter types::PageContent;
+properties
+   source_name => "user_mfd_driver";
+   source_language => C;
+   Source_Text => ("../../../mfd_code.o");
+   Source_Code_Size => 8 KByte;
+   Source_Data_Size => 2 KByte;
+end mfd_driver;
+
+
+end subprograms;

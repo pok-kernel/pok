@@ -1,0 +1,131 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2011 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package case_study_osal
+
+public
+
+with Data_Model;
+with rtl8029;
+with POK;
+with case_study_osal_software;
+with runtime;
+
+
+data integer
+properties
+  Data_Model::Data_Representation => integer;
+end integer;
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+   POK::Recovery_Errors       => (Numeric_Error, Illegal_Request);
+   POK::Recovery_Actions      => (Partition_Restart, Partition_Restart);
+   POK::Additional_Features   => (console, libc_stdio);
+end partition;
+
+virtual processor implementation partition.common
+properties
+   POK::Timeslice          => 500 ms;
+   POK::Recovery_Errors    => (Partition_Init, Partition_Scheduling);
+   POK::Recovery_Actions   => (Partition_Stop, Partition_Stop);
+end partition.common;
+
+processor pok_kernel
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   POK::Recovery_Errors => (Hardware_Fault);
+   POK::Recovery_Actions => (Kernel_Restart);
+end pok_kernel;
+
+processor implementation pok_kernel.i
+subcomponents
+   partition_app  : virtual processor partition.common {POK::Additional_Features => (libc_stdlib, io, pci, libc_stdio, console);};
+   partition_drv  : virtual processor partition.common {POK::Additional_Features => (libc_stdlib, io, pci, libc_stdio, console);};
+properties
+   POK::Major_Frame => 1000ms;
+   POK::Scheduler => static;
+   POK::Slots => (500ms, 500ms);
+   POK::Slots_Allocation => ( reference (partition_app), 
+                              reference (partition_drv));
+   POK::Recovery_Errors => (Kernel_Init, Kernel_Scheduling);
+   POK::Recovery_Actions => (Kernel_Stop, Kernel_Stop);
+   POK::Additional_Features   => (console, libc_stdio, libc);
+end pok_kernel.i;
+
+memory segment
+properties
+   Byte_Count => 80000;
+end segment;
+
+memory implementation segment.i
+end segment.i;
+
+memory ram
+end ram;
+
+memory implementation ram.i
+subcomponents
+   seg1: memory segment.i;
+   seg2: memory segment.i;
+end ram.i;
+
+system osal
+end osal;
+
+system implementation osal.i
+subcomponents
+   sender_cpu     : processor pok_kernel.i;
+   sender         : process   case_study_osal_software::snd_prs.i;
+   sender_netif   : device    rtl8029::rtl8029.i {POK::Hw_Addr => "00:1F:C6:BF:74:06";};
+   sender_mem     : memory    ram.i;
+
+   receiver       : process   case_study_osal_software::recv_prs.i;
+   receiver_netif : device    rtl8029::rtl8029.i {POK::Hw_Addr => "00:0F:FE:5F:7B:2F";};
+   receiver_cpu   : processor pok_kernel.i;
+   receiver_mem   : memory    ram.i;
+
+   ethernet_bus   : bus runtime::ethernet.unsecure;
+connections
+   port sender.pdataout -> sender_netif.incoming;
+   port sender_netif.outgoing -> receiver_netif.incoming;
+   port receiver_netif.outgoing -> receiver.pdatain;
+   bus access ethernet_bus -> sender_netif.ethernet_access;
+   bus access ethernet_bus -> receiver_netif.ethernet_access;
+properties
+   actual_processor_binding => 
+      (reference (receiver_cpu.partition_app)) applies to receiver;
+   actual_processor_binding => 
+      (reference (receiver_cpu.partition_drv)) applies to receiver_netif;
+   actual_processor_binding => 
+      (reference (sender_cpu.partition_app)) applies to sender;
+   actual_processor_binding => 
+      (reference (sender_cpu.partition_drv)) applies to sender_netif;
+
+   actual_memory_binding => 
+      (reference (sender_mem.seg1)) applies to sender;
+   actual_memory_binding => 
+      (reference (sender_mem.seg2)) applies to sender_netif;
+   actual_memory_binding => 
+      (reference (receiver_mem.seg1)) applies to receiver;
+   actual_memory_binding => 
+      (reference (receiver_mem.seg2)) applies to receiver_netif;
+end osal.i;
+
+end case_study_osal;

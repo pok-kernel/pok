@@ -1,0 +1,107 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Mon Jul 20 09:51:54 2009 
+--
+package pok_testevents
+
+public
+
+with Data_Model;
+with POK;
+
+data myint
+properties
+   Data_Model::Data_Representation => integer;
+end myint;
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libc_stdio);
+end partition;
+
+virtual processor implementation partition.impl
+end partition.impl;
+
+processor ppc
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   part1 : virtual processor partition.impl;
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   POK::Major_Frame => 1000 ms;
+   POK::Slots => (500 ms);
+   POK::Slots_Allocation => ( reference (part1));
+	POK::Scheduler => static;
+end ppc.impl;
+
+process myprocess1
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end myprocess1;
+
+process implementation myprocess1.impl
+subcomponents
+   thr1 : thread mythread1.impl;
+   thr2 : thread mythread2.impl;
+connections
+   port thr1.output -> thr2.input;
+end myprocess1.impl;
+
+thread mythread1
+features
+   output : out event port;
+end mythread1;
+
+thread mythread2
+features
+   input : in event port
+      {Compute_Entrypoint => classifier (pok_testevents::spg_receive_event);};
+end mythread2;
+
+thread implementation mythread1.impl
+properties
+   dispatch_protocol => periodic;
+   period            => 1000 ms;
+end mythread1.impl;
+
+thread implementation mythread2.impl
+properties
+   dispatch_protocol => periodic;
+   period            => 1000 ms;
+end mythread2.impl;
+
+subprogram spg_receive_event
+properties
+   POK::Source_Location => "../../../receive.o";
+   source_language => C;
+   source_name => "user_receive";
+end spg_receive_event;
+
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu   : processor ppc.impl;
+   part1 : process myprocess1.impl;
+properties
+   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
+end node.impl;
+
+end pok_testevents;

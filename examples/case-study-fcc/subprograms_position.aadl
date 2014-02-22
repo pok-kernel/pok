@@ -1,0 +1,51 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package subprograms_position
+
+public
+
+with types;
+
+subprogram common
+properties
+   Source_language => C;
+   Source_Text => ("../../../position.o");
+   Source_Code_Size  => 3 Kbyte;
+   Source_Data_Size  => 0 Kbyte;
+end common;
+
+
+
+subprogram negociation
+features
+   positionin        : in parameter types::position;
+   positionout       : out parameter types::position;
+   positionrealin    : in parameter types::position;
+   positionrealout   : out parameter types::position;
+   errorraised       : out parameter types::boolean;
+properties
+   Source_Name => "user_negociation";
+end negociation;
+
+subprogram device_emulation
+features
+   position_asked : in parameter types::position;
+   position_real  : out parameter types::position;
+properties
+   Source_Name => "user_device_emulation";
+end device_emulation;
+
+end subprograms_position;

@@ -1,0 +1,4 @@
+<Mapping_Rules>
+ <thread pokname="task1" aadlprocessor="cpu" aadlprocess="pr2" aadlvirtualprocessor="partition_secure" cheddarname="partition_secure.thr"/>
+ <thread pokname="task4" aadlprocessor="cpu" aadlprocess="pr1" aadlvirtualprocessor="partition_common" cheddarname="partition_common.thr"/>
+</Mapping_Rules>

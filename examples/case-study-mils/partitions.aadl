@@ -1,0 +1,91 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package partitions
+public
+
+with types;
+with threads;
+with layers;
+
+process partition_secret_send
+features
+	valueout : out data port types::integer
+		{Allowed_Connection_Binding_Class => (classifier (layers::secret.i));};
+end partition_secret_send;
+
+process implementation partition_secret_send.i
+subcomponents
+	thr : thread threads::thr_send_int.i;
+connections
+	port thr.outvalue -> valueout;
+end partition_secret_send.i;
+
+process partition_topsecret_send
+features
+	valueout : out data port types::integer
+		{Allowed_Connection_Binding_Class => (classifier (layers::topsecret.i));};
+end partition_topsecret_send;
+
+process implementation partition_topsecret_send.i
+subcomponents
+	thr : thread threads::thr_send_int.i;
+connections
+	port thr.outvalue -> valueout;
+end partition_topsecret_send.i;
+
+process partition_unclassified_send
+features
+	valueout : out data port types::integer
+		{Allowed_Connection_Binding_Class => (classifier (layers::unclassified.i));};
+end partition_unclassified_send;
+
+process implementation partition_unclassified_send.i
+subcomponents
+	thr : thread threads::thr_send_int.i;
+connections
+	port thr.outvalue -> valueout;
+end partition_unclassified_send.i;
+
+process partition_unclassified_receive
+features
+   valuein : in data port types::integer
+		{Allowed_Connection_Binding_Class => (classifier (layers::unclassified.i));};
+end partition_unclassified_receive;
+
+process implementation partition_unclassified_receive.i
+subcomponents
+   thr : thread threads::thr_receive_int.i;
+connections
+   port valuein -> thr.invalue;
+end partition_unclassified_receive.i;
+
+process partition_secret_and_topsecret_receive
+features
+   valueone : in data port types::integer
+		{Allowed_Connection_Binding_Class => (classifier (layers::topsecret.i));};
+   valuetwo : in data port types::integer
+		{Allowed_Connection_Binding_Class => (classifier (layers::secret.i));};
+end partition_secret_and_topsecret_receive;
+
+process implementation partition_secret_and_topsecret_receive.i
+subcomponents
+   thr : thread threads::thr_receive_two_int.i;
+connections
+   port valueone -> thr.invalue1;
+   port valuetwo -> thr.invalue2;
+end partition_secret_and_topsecret_receive.i;
+
+end partitions;

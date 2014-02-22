@@ -1,0 +1,230 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Sat May 30 21:25:52 2009 
+--
+package aerotech09
+
+public
+
+with Data_Model;
+with POK;
+with ARINC653;
+
+
+data integer
+properties
+  Data_Model::Data_Representation => integer;
+end integer;
+
+subprogram spg_send_temperature
+features
+   output : out parameter integer;
+properties
+   source_name => "user_send_temperature";
+   source_language => C;
+   Source_Text => "../../../send_temperature.o";
+end spg_send_temperature;
+
+subprogram spg_receive_temperature
+features
+   input : in parameter integer;
+properties
+   Source_Text => "../../../receive_temperature.o";
+   source_language => C;
+   source_name => "user_receive_temperature";
+end spg_receive_temperature;
+
+subprogram spg_send_order
+features
+   output : out parameter integer;
+properties
+   source_name => "user_send_order";
+   source_language => C;
+   Source_Text => "../../../send_order.o";
+end spg_send_order;
+
+subprogram spg_receive_order
+features
+   input : in parameter integer;
+properties
+   Source_Text => "../../../receive_order.o";
+   source_language => C;
+   source_name => "user_receive_order";
+end spg_receive_order;
+
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libc_stdio);
+end partition;
+
+virtual processor implementation partition.i
+end partition.i;
+
+processor pok
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   POK::Scheduler => Static;
+end pok;
+
+processor implementation pok.impl
+subcomponents
+   partition_one : virtual processor partition.i;
+   partition_two : virtual processor partition.i;
+properties
+   ARINC653::Module_Major_Frame => 2000ms;
+   ARINC653::Partition_Slots => (1000ms, 1000ms);
+   ARINC653::Slots_Allocation => ( reference (partition_one), reference (partition_two));
+end pok.impl;
+
+thread receive_temperature
+features
+   tdatain : in data port integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time => 0 ms .. 1 ms;
+   Period => 500 Ms;
+end receive_temperature;
+
+thread send_temperature
+features
+   tdataout : out data port integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 500 Ms;
+   Compute_Execution_Time => 0 ms .. 1 ms;
+end send_temperature;
+
+thread implementation send_temperature.i
+calls 
+   call1 : { pspg : subprogram spg_send_temperature;};
+connections
+   parameter pspg.output -> tdataout;
+end send_temperature.i;
+
+thread implementation receive_temperature.i
+calls 
+   call1 : { pspg : subprogram spg_receive_temperature;};
+connections
+   parameter tdatain -> pspg.input;
+end receive_temperature.i;
+
+
+thread receive_order
+features
+   tdatain : in event data port integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time => 0 ms .. 1 ms;
+   Period => 500 Ms;
+end receive_order;
+
+thread send_order
+features
+   tdataout : out event data port integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 500 Ms;
+   Compute_Execution_Time => 0 ms .. 1 ms;
+end send_order;
+
+thread implementation send_order.i
+calls 
+   call1 : { pspg : subprogram spg_send_order;};
+connections
+   parameter pspg.output -> tdataout;
+end send_order.i;
+
+thread implementation receive_order.i
+calls 
+   call1 : { pspg : subprogram spg_receive_order;};
+connections
+   parameter tdatain -> pspg.input;
+end receive_order.i;
+
+
+
+process partition2_process
+features
+   orderout : out event data port integer;
+	temperaturein : in data port integer;
+end partition2_process;
+
+process partition1_process
+features
+   orderin : in event data port integer;
+	temperatureout : out data port integer;
+end partition1_process;
+
+process implementation partition2_process.i
+subcomponents
+   receiver : thread receive_temperature.i;
+   printer : thread send_order.i;
+connections
+   port temperaturein -> receiver.tdatain; 
+   port printer.tdataout -> orderout;
+end partition2_process.i;
+
+process implementation partition1_process.i
+subcomponents
+   temperature : thread send_temperature.i;
+   order : thread receive_order.i;
+connections
+   port temperature.tdataout -> temperatureout;
+	port orderin -> order.tdatain;
+end partition1_process.i;
+
+memory partition_memory
+properties
+   Byte_Count => 140000;
+end partition_memory;
+
+memory implementation partition_memory.i
+end partition_memory.i;
+
+memory main_memory
+end main_memory;
+
+memory implementation main_memory.i
+subcomponents
+	segment1 : memory partition_memory.i;
+	segment2 : memory partition_memory.i;
+end main_memory.i;
+
+system arincsystem
+end arincsystem;
+
+system implementation arincsystem.i
+subcomponents
+   cpu : processor pok.impl;
+   pr1 : process partition1_process.i;
+   pr2 : process partition2_process.i;
+	mem : memory main_memory.i;
+connections
+	port pr1.temperatureout -> pr2.temperaturein;
+	port pr2.orderout -> pr1.orderin;
+properties
+   actual_processor_binding => 
+      (reference (cpu.partition_one)) applies to pr2;
+   actual_processor_binding => 
+      (reference (cpu.partition_two)) applies to pr1;
+	actual_memory_binding =>
+		(reference (mem.segment1)) applies to pr1;
+	actual_memory_binding =>
+		(reference (mem.segment2)) applies to pr2;
+end arincsystem.i;
+
+end aerotech09;

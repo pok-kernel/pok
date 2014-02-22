@@ -1,0 +1,92 @@
+--
+--                              POK header
+--
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part
+--  of a file for your own project.
+--
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team
+--
+--  Created by julien on Mon May  4 12:37:45 2009
+--
+package runtime
+public
+   with POK;
+   with layers;
+   with types;
+
+   virtual processor partition
+   properties
+      POK::Scheduler => RR;
+      POK::Additional_Features => (libc_stdio, console);
+   end partition;
+
+   virtual processor implementation partition.i
+   end partition.i;
+
+   processor pok_kernel
+   properties
+      POK::Architecture => x86;
+      POK::BSP => x86_qemu;
+   end pok_kernel;
+
+   device separation_netif
+   features
+      the_bus                 : requires bus access separation_bus.i;
+      outgoing_topsecret      : out data port types::integer;
+      incoming_topsecret      : in data port types::integer;
+      outgoing_secret         : out data port types::integer;
+      incoming_secret         : in data port types::integer;
+      outgoing_unclassified   : out data port types::integer;
+      incoming_unclassified   : in data port types::integer;
+   properties
+      Initialize_Entrypoint => classifier (rtl8029::init);
+      POK::Device_Name => "rtl8029";
+   end separation_netif;
+
+   device implementation separation_netif.i
+   end separation_netif.i;
+
+   processor implementation pok_kernel.impl
+   subcomponents
+      runtime_secret       : virtual processor partition.i
+                  {
+                     Provided_Virtual_Bus_Class => (classifier (layers::secret));
+                     POK::Criticality => 10;
+                  };
+      runtime_topsecret    : virtual processor partition.i
+                  {  Provided_Virtual_Bus_Class => (classifier (layers::top_secret));
+                     POK::Criticality => 5;
+                  };
+      runtime_unclassified : virtual processor partition.i
+                  {
+                     Provided_Virtual_Bus_Class => (classifier (layers::unclassified));
+                     POK::Criticality => 1;
+                  };
+      runtime_netif : virtual processor partition.i
+                  {Provided_Virtual_Bus_Class => (classifier (layers::unclassified), classifier (layers::top_secret), classifier (layers::secret));
+                   POK::Additional_Features => (libc_stdlib, pci, io);
+                   POK::Criticality => 10;};
+   properties
+      POK::Major_Frame => 2000ms;
+      POK::Scheduler => static;
+      POK::Slots => (500ms, 500ms, 500ms, 500ms);
+      POK::Slots_Allocation => ( reference (runtime_secret), reference (runtime_topsecret), reference (runtime_unclassified), reference (runtime_netif));
+   end pok_kernel.impl;
+
+   bus separation_bus
+   end separation_bus;
+
+   bus implementation separation_bus.i
+   subcomponents
+      layer_topsecret      : virtual bus layers::top_secret;
+      layer_secret         : virtual bus layers::secret;
+      layer_unclassified   : virtual bus layers::unclassified;
+   end separation_bus.i;
+end runtime;
+
+

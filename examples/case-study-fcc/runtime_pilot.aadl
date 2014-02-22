@@ -1,0 +1,41 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package runtime_pilot
+public
+
+with runtime;
+with pok;
+
+processor kernel extends runtime::pok_kernel
+end kernel;
+
+processor implementation kernel.i
+subcomponents
+   partition_netif         : virtual processor runtime::partition.i;
+   partition_inceptor      : virtual processor runtime::partition.i;
+   partition_af            : virtual processor runtime::partition.i;
+   partition_aislc         : virtual processor runtime::partition.i;
+   partition_pfc           : virtual processor runtime::partition.i;
+   partition_reu           : virtual processor runtime::partition.i;
+   partition_errordisplay  : virtual processor runtime::partition.i;
+properties
+   POK::Major_Frame => 1000ms;
+   POK::Scheduler => static;
+   POK::Slots => (500ms, 500ms, 500ms, 500ms, 500ms, 500ms, 500ms);
+   POK::Slots_Allocation => (reference (partition_netif), reference (partition_inceptor), reference (partition_af), reference (partition_aislc), reference (partition_pfc), reference (partition_reu), reference (partition_errordisplay));
+end kernel.i;
+
+end runtime_pilot;

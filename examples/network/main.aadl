@@ -1,0 +1,85 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Mon May  4 12:37:45 2009 
+--
+package model
+public
+   with runtime;
+   with partitions;
+   with memories;
+   with POK;
+
+   system main
+   end main;
+
+   system implementation main.i
+   subcomponents
+      node1_partition_topsecret        : process partitions::process_sender.i;
+      node1_partition_secret           : process partitions::process_sender.i;
+      node1_partition_unclassified     : process partitions::process_sender.i;
+      node2_partition_topsecret        : process partitions::process_receiver.i;
+      node2_partition_secret           : process partitions::process_receiver.i;
+      node2_partition_unclassified     : process partitions::process_receiver.i;
+      node1_memory                     : memory memories::main_memory.i;
+      node2_memory                     : memory memories::main_memory.i;
+      node1_netif                      : device runtime::separation_netif.i
+                                          {POK::Hw_Addr => "00:1F:C6:BF:74:06";
+                                           Implemented_As => classifier (rtl8029::driver_rtl8029.i);
+                                          };
+      node2_netif                      : device runtime::separation_netif.i
+                                          {POK::Hw_Addr => "00:0F:FE:5F:7B:2F";
+                                           Implemented_As => classifier (rtl8029::driver_rtl8029.i);
+                                          };
+      node1                            : processor runtime::pok_kernel.impl;
+      node2                            : processor runtime::pok_kernel.impl;
+      rtbus                            : bus runtime::separation_bus.i;
+   connections
+      -- Ports of partitions of the first node are connected to the device of this node
+      port node1_partition_topsecret.outgoing      -> node1_netif.incoming_topsecret;
+      port node1_partition_secret.outgoing         -> node1_netif.incoming_secret;
+      port node1_partition_unclassified.outgoing   -> node1_netif.incoming_unclassified;
+
+      -- Ports of partitions of the second node are connected to the device of this second node
+      port node2_netif.outgoing_topsecret -> node2_partition_topsecret.incoming;
+      port node2_netif.outgoing_secret -> node2_partition_secret.incoming;
+      port node2_netif.outgoing_unclassified -> node2_partition_unclassified.incoming;
+
+      port node1_netif.outgoing_topsecret    -> node2_netif.incoming_topsecret
+         {Actual_Connection_Binding => (reference (rtbus.layer_topsecret));};
+      port node1_netif.outgoing_secret    -> node2_netif.incoming_secret
+         {Actual_Connection_Binding => (reference (rtbus.layer_secret));};
+      port node1_netif.outgoing_unclassified    -> node2_netif.incoming_unclassified
+         {Actual_Connection_Binding => (reference (rtbus.layer_unclassified));};
+      bus access rtbus -> node1_netif.the_bus;
+      bus access rtbus -> node2_netif.the_bus;
+   properties
+      Actual_Processor_Binding   => (reference (node1.runtime_topsecret))    applies to node1_partition_topsecret;
+      Actual_Processor_Binding   => (reference (node1.runtime_secret))       applies to node1_partition_secret;
+      Actual_Processor_Binding   => (reference (node1.runtime_unclassified)) applies to node1_partition_unclassified;
+      Actual_Processor_Binding   => (reference (node2.runtime_topsecret))    applies to node2_partition_topsecret;
+      Actual_Processor_Binding   => (reference (node2.runtime_secret))       applies to node2_partition_secret;
+      Actual_Processor_Binding   => (reference (node2.runtime_unclassified)) applies to node2_partition_unclassified;
+      Actual_Processor_Binding   => (reference (node1.runtime_netif))        applies to node1_netif;
+      Actual_Processor_Binding   => (reference (node2.runtime_netif))        applies to node2_netif;
+      Actual_Memory_Binding      => (reference (node1_memory.topsecret))     applies to node1_partition_topsecret;
+      Actual_Memory_Binding      => (reference (node1_memory.secret))        applies to node1_partition_secret;
+      Actual_Memory_Binding      => (reference (node1_memory.unclassified))  applies to node1_partition_unclassified;
+      Actual_Memory_Binding      => (reference (node2_memory.topsecret))     applies to node2_partition_topsecret;
+      Actual_Memory_Binding      => (reference (node2_memory.secret))        applies to node2_partition_secret;
+      Actual_Memory_Binding      => (reference (node2_memory.unclassified))  applies to node2_partition_unclassified;
+      Actual_Memory_Binding      => (reference (node2_memory.driver))        applies to node2_netif;
+      Actual_Memory_Binding      => (reference (node1_memory.driver))        applies to node1_netif;
+   end main.i;
+
+end model;

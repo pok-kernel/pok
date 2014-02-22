@@ -1,0 +1,82 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+-- Generatic threads
+
+package threads
+public
+
+with types;
+
+thread thr_receive_int
+features
+   invalue : in data port types::integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time => 0 ms .. 1 ms;
+   Period => 1000 Ms;
+   Source_Code_Size  => 3 Kbyte;
+   Source_Data_Size  => 0 Kbyte;
+   Source_Stack_Size  => 3000 Kbyte;
+end thr_receive_int;
+
+thread implementation thr_receive_int.i
+calls
+   call1 : { pspg : subprogram subprograms::print_integer;};
+connections
+   port invalue -> pspg.valuetoprint;
+end thr_receive_int.i;
+
+thread thr_send_int
+features
+   outvalue : out data port types::integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time => 0 ms .. 1 ms;
+   Period => 1000 Ms;
+   Source_Code_Size  => 3 Kbyte;
+   Source_Data_Size  => 0 Kbyte;
+   Source_Stack_Size  => 3000 Kbyte;
+end thr_send_int;
+
+thread implementation thr_send_int.i
+calls
+   call1 : { pspg : subprogram subprograms::produce_integer;};
+connections
+   parameter pspg.valueproduced -> outvalue;
+end thr_send_int.i;
+
+thread thr_receive_two_int
+features
+   invalue1 : in data port types::integer;
+   invalue2 : in data port types::integer;
+properties
+   Dispatch_Protocol => Periodic;
+   Compute_Execution_Time => 0 ms .. 1 ms;
+   Period => 1000 Ms;
+   Source_Code_Size  => 3 Kbyte;
+   Source_Data_Size  => 0 Kbyte;
+   Source_Stack_Size  => 3000 Kbyte;
+end thr_receive_two_int;
+
+thread implementation thr_receive_two_int.i
+calls 
+   call1 : { pspg : subprogram subprograms::print_two_integer;};
+connections
+   parameter invalue1 -> pspg.firstvaluetoprint;
+   parameter invalue2 -> pspg.secondvaluetoprint;
+end thr_receive_two_int.i;
+
+end threads;

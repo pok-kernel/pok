@@ -1,0 +1,60 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Mon May  4 12:37:45 2009 
+--
+package threads
+public
+   with types;
+   with subprograms;
+
+   thread receive_value
+   features
+      incoming_value : in data port types::integer;
+   properties
+      Dispatch_Protocol => Periodic;
+      Compute_Execution_Time => 0 ms .. 1 ms;
+      Period => 1000 Ms;
+      Source_Code_Size  => 3 Kbyte;
+      Source_Data_Size  => 0 Kbyte;
+      Source_Stack_Size  => 3000 Kbyte;
+   end receive_value;
+
+   thread implementation receive_value.impl
+   calls 
+      call1 : { pspg : subprogram subprograms::receive_value;};
+   connections
+      parameter incoming_value -> pspg.incoming;
+   end receive_value.impl;
+
+   thread send_value
+   features
+      outgoing_value : out data port types::integer;
+   properties
+      Dispatch_Protocol => Periodic;
+      Period => 1000 Ms;
+      Compute_Execution_Time => 0 ms .. 1 ms;
+   end send_value;
+
+   thread implementation send_value.impl
+   calls 
+      call1 : { pspg : subprogram subprograms::send_value;};
+   connections
+      parameter pspg.outgoing -> outgoing_value;
+   properties
+      Source_Code_Size  => 10000 Kbyte;
+      Source_Data_Size  => 10000 Kbyte;
+      Source_Stack_Size  => 3000 Kbyte;
+   end send_value.impl;
+
+end threads;

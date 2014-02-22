@@ -1,0 +1,27 @@
+README for ARINC653 testsuite
+=============================
+
+To perform a test, issue ./test.sh test-name
+
+Each test is located in a directory.
+
+For each file, we define a file that describes what is
+needed to run the test. At this time, the test is described
+like that:
+	* run:yes (or run:no)
+	* model:mymodel.aadl
+
+For each test, we take the AADL model that is sufficient 
+to make this test. Then, we automatically generate the code
+that configures POK and integrates the test as application code.
+
+The COMPLETE file indicates which tests must run at this time.
+The file TODO indicates which test must be completed and integrated
+in the testsuite.
+
+By default, the testsuite shows nothing, no compile information, etc.
+If you need to see compilation output, invoke the testsuite like this:
+make REDIRECT_OUTPUT=file
+It will redirect all output in this file.
+You can also use make REDIRECT_OUTPUT=/dev/stdout to redirect
+to the standard output.

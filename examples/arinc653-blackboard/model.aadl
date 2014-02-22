@@ -1,0 +1,129 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package test
+public
+
+with Data_Model;
+with POK;
+
+data myint
+properties
+  Data_Model::Data_Representation => integer;
+end myint;
+
+virtual processor partition
+end partition;
+
+virtual processor implementation partition.impl
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libc_stdio, console);
+end partition.impl;
+
+processor ppc
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   part1 : virtual processor partition.impl;
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   POK::Major_Frame => 1000 ms;
+   POK::Scheduler => static;
+   POK::Slots => (1000 ms);
+   POK::Slots_Allocation => (reference (part1));
+end ppc.impl;
+
+process myprocess1
+end myprocess1;
+
+process implementation myprocess1.impl
+subcomponents
+   thr1 : thread mythread1.impl;
+   thr2 : thread mythread2.impl;
+connections
+   port thr1.output -> thr2.input;
+properties
+   POK::Needed_Memory_Size => 200 kbyte;
+end myprocess1.impl;
+
+thread mythread1
+features
+   output : out data port myint;
+properties
+  Priority => 1;
+end mythread1;
+
+thread mythread2
+features
+   input : in data port myint;
+properties
+  Priority => 1;
+end mythread2;
+
+thread implementation mythread1.impl
+calls 
+   call1 : { pspg : subprogram hello_part1;};
+connections
+   parameter pspg.output -> output;
+properties
+   dispatch_protocol => periodic;
+   period            => 1000ms;
+end mythread1.impl;
+
+thread implementation mythread2.impl
+calls 
+   call1 : { pspg : subprogram hello_part2;};
+connections
+   parameter input -> pspg.input;
+properties
+   dispatch_protocol => periodic;
+   period            => 500ms;
+end mythread2.impl;
+
+subprogram hello_part1
+features
+   output : out parameter myint;
+properties
+   source_name => "user_send";
+   source_language => C;
+   POK::Source_Location => "../../../send.o";
+end hello_part1;
+
+subprogram hello_part2
+features
+   input : in parameter myint;
+properties
+   POK::Source_Location => "../../../receive.o";
+   source_language => C;
+   source_name => "user_receive";
+end hello_part2;
+
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu   : processor ppc.impl;
+   part1 : process myprocess1.impl;
+properties
+   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
+end node.impl;
+end test;

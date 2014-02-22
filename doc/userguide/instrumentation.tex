@@ -1,0 +1,49 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by laurent on Wed Oct 14 00:06:24 2009 
+%
+
+
+\chapter{Instrumentation}
+\label{chapter-instrumentation}
+You can automatically instrument POK using the \texttt{--with-instrumentation} option when 
+you configure the build-system (see section \ref{pok-configuration} for more information.
+In consequence, when you use this mode, more output is produced and additional files are automatically created when
+the system stops. This section details the files that are automatically produced in this mode and how to use them.
+
+   \section{Instrumentation purpose}
+   At this time, the instrumentation functionnality was done to observe scheduling of partitions and tasks
+   in the Cheddar scheduling analysis tool. If you want to use this functionnality, you have to install Cheddar (see \ref{annex-url}
+   for information about Cheddar).
+
+   \section{Output files}
+   When you run your system using the \texttt{make run} command and if the instrumentation configuration flag was set, the following files are
+   automatically produced:
+   \begin{itemize}
+      \item
+         \texttt{cheddar-archi.xml}: contains the architecture used with the POK kernel.
+      \item
+         \texttt{cheddar-events.xml}: contains the scheduling events that are registered during POK execution.
+   \end{itemize}
+
+   \section{Use cheddar with produces files}
+   Start Cheddar. Then, load the XML file \texttt{cheddar-archi.xml}. You can also use Cheddar with this file as an argument.
+
+   Then, load the \texttt{cheddar-events.xml} file. For that, use the menu \texttt{Tool}/\texttt{Scheduling}/\texttt{Event Table Service}/\texttt{Import}
+   and choose the generated \texttt{cheddar-events.xml} file.
+
+   Then, to draw the scheduling diagram, choose the menu option \texttt{Tool}/\texttt{Scheduling}/\texttt{Event Table Service}/\texttt{Draw Time Line}.
+
+   Cheddar will directly draw the scheduling diagram that corresponds to the execution.
+

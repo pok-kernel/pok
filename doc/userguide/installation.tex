@@ -1,0 +1,101 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Thu Apr 30 14:07:20 2009 
+%
+
+
+\chapter{Installation}
+   \label{chapter-installation}
+   \section{Supported development platforms}
+   \begin{itemize}
+      \item[$\bullet$] \linux
+      \item[$\bullet$] \macosx
+      \item[$\bullet$] \windows
+   \end{itemize}
+
+   \section{Get more information}
+   The following information are the standard procedures. It may be out of date
+   or miss something. In that case, you will find updated information on the
+   \pok website (\texttt{http://pok.gunnm.org}) and its wiki section.
+
+   In addition, there are some tutorials and information about the installation
+   of required tools.
+
+   \section{Linux/MacOS}
+      \subsection{Pre-requires}
+      \begin{itemize}
+         \item[$\bullet$] The GNU-C Compiler (aka GCC), version 3.x or 4.x
+         \item[$\bullet$] GNU binutils
+         \item[$\bullet$] GNU Zip (aka gzip)
+         \item[$\bullet$] Mtools (MS-DOS disk utilities)
+         \item[$\bullet$] AWK
+         \item[$\bullet$] Perl (with \texttt{XML::XPath::XMLParser} and
+            \texttt{XML::LibXML} modules)
+         \item[$\bullet$] \qemu (for x86 emulation)
+         \item[$\bullet$] \ocarina (for code generation only)
+         \item[$\bullet$] TSIM (for Leon3 emulation)
+      \end{itemize}
+
+      \subsubsection{Note for MacOS users}
+      \pok uses the ELF format to store partitions. Unfortunately, this binary
+      format is not supported by \macosx tools. To use \pok, you must use a
+      development toolchain that supports the ELF format.
+
+      For that, you can easily build an ELF cross compiler using MacPorts. The
+      name of the required packages are \texttt{i386-elf-gcc} and
+      \texttt{i386-elf-binutils}.
+
+      Moreover, \macosx does not provide necessary Perl modules but you can
+      install them with MacPorts. The package names are \texttt{p5-xml-xpath} and
+      \texttt{p5-xml-libxml}.
+
+
+\subsection{Running POK}
+
+Ocarina is needed by POK. A script is provided to automatically install
+the latest build:
+
+\begin{verbatim}
+$ sh ./misc/get_ocarina.sh
+\end{verbatim}
+
+You can then try to build and run some of the POK examples located in the
+`example' directory.
+
+\begin{verbatim}
+$ cd examples/partitions-threads
+$ make
+$ make -C generated-code run
+\end{verbatim}
+
+A whole chapter of this documentation is dedicated to those examples and their
+purpose.
+
+
+   \section{Windows}
+      \subsection{Pre-requires}
+      There is many pre-requires to run \pok on Windows. To make a better user
+      experience, we provide cross-development tools to build and use POK.
+
+      For cross-development tools can be retrieved from the website of the
+      project. Then, unzip the tools in a directory called \texttt{crosstools},
+      at the root directory of the project.
+
+      Once you have this directory, run the file \texttt{configure.bat} located
+      in this directory. Is everything is wrong, a warning will be displayed on
+      the screen.
+
+      For code generation, you can install \ocarina for Windows. All
+      installation instructions are available on Ocarina website.
+

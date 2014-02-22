@@ -1,0 +1,95 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Mon May 18 18:44:51 2009 
+--
+
+package rtl8029
+
+--  Be careful when you modify this file, it is used
+--  in the annexes of the documentation
+
+public
+with POK;
+with types;
+
+   data anydata
+   end anydata;
+
+   subprogram init
+   properties
+      source_name => "rtl8029_init";
+      source_language => C;
+   end init;
+
+   subprogram poll
+   properties
+      source_name => "rtl8029_polling";
+      source_language => C;
+   end poll;
+
+
+   thread driver_rtl8029_thread
+   features
+      outgoing_topsecret      : out data port types::integer;
+      incoming_topsecret      : in data port types::integer;
+      outgoing_secret         : out data port types::integer;
+      incoming_secret         : in data port types::integer;
+      outgoing_unclassified   : out data port types::integer;
+      incoming_unclassified   : in data port types::integer;
+   properties
+      Dispatch_Protocol => Periodic;
+      Compute_Execution_Time => 0 ms .. 1 ms;
+      Period => 1000 Ms;
+   end driver_rtl8029_thread;
+
+   thread driver_rtl8029_thread_poller
+   properties
+      Dispatch_Protocol => Periodic;
+      Compute_Execution_Time => 0 ms .. 1 ms;
+      Period => 100 Ms;
+   end driver_rtl8029_thread_poller;
+
+   thread implementation driver_rtl8029_thread.i
+   connections
+      port incoming_unclassified -> outgoing_unclassified;
+      port incoming_secret -> outgoing_secret;
+      port incoming_topsecret -> outgoing_topsecret;
+   end driver_rtl8029_thread.i;
+
+   thread implementation driver_rtl8029_thread_poller.i
+   calls 
+      call1 : { pspg : subprogram poll;};
+   end driver_rtl8029_thread_poller.i;
+
+   process driver_rtl8029_process
+   end driver_rtl8029_process;
+
+   process implementation driver_rtl8029_process.i
+   subcomponents
+      thr : thread driver_rtl8029_thread.i;
+      poller   : thread driver_rtl8029_thread_poller.i;
+   properties
+     POK::Needed_Memory_Size => 160 Kbyte;
+   end driver_rtl8029_process.i;
+
+
+   abstract driver_rtl8029
+   end driver_rtl8029;
+
+   abstract implementation driver_rtl8029.i
+   subcomponents
+      p : process driver_rtl8029_process.i;
+   end driver_rtl8029.i;
+
+end rtl8029;

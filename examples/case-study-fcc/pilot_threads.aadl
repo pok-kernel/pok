@@ -1,0 +1,126 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package pilot_threads
+public
+
+with types;
+with subprograms_pilot;
+with threads;
+
+thread inceptor_simulation extends threads::common_thread
+features
+   volts       : in data port types::integer;
+   force       : out data port types::integer;
+   position    : out data port types::integer;
+end inceptor_simulation;
+
+thread implementation inceptor_simulation.i
+calls 
+   call1 : { pspg : subprogram subprograms_pilot::inceptor_simulation;};
+connections
+   parameter volts         -> pspg.volts;
+   parameter pspg.force    -> force;
+   parameter pspg.position -> position;
+end inceptor_simulation.i;
+
+
+thread af_partition extends threads::common_thread
+features
+   backdrive   : out data port types::position;
+   error       : out event data port types::boolean;
+end af_partition;
+
+thread implementation af_partition.i
+calls 
+   call1 : { pspg : subprogram subprograms_pilot::af;};
+connections
+   parameter pspg.backdrive   -> backdrive;
+   parameter pspg.error       -> error;
+end af_partition.i;
+
+thread aislc_partition extends threads::common_thread
+features
+   positionask       : in data port types::position;
+   voltsask          : out data port types::integer;
+   measuredforce     : in data port types::integer;
+   measuredposition  : in data port types::position;
+   stickposition     : out data port types::position;
+   error             : out event data port types::boolean;
+end aislc_partition;
+
+thread implementation aislc_partition.i
+calls 
+   call1 : { pspg : subprogram subprograms_pilot::aislc;};
+connections
+   parameter positionask         -> pspg.positionask;
+   parameter pspg.voltsask       -> voltsask;
+   parameter measuredforce       -> pspg.measuredforce;
+   parameter measuredposition    -> pspg.measuredposition;
+   parameter pspg.stickposition  -> stickposition;
+   parameter pspg.error          -> error;
+end aislc_partition.i;
+
+thread pfc_partition extends threads::common_thread
+features
+   stickposition              : in data port types::position;
+   error                      : out event data port types::boolean;
+   surfacepositionask         : out data port types::position;
+   surfacepositionfeedback    : in data port types::position;
+end pfc_partition;
+
+thread implementation pfc_partition.i
+calls 
+   call1 : { pspg : subprogram subprograms_pilot::pfc;};
+connections
+   parameter stickposition             -> pspg.stickposition;
+   parameter pspg.error                -> error;
+   parameter pspg.surfacepositionask   -> surfacepositionask;
+   parameter surfacepositionfeedback   -> pspg.surfacepositionfeedback;
+end pfc_partition.i;
+
+thread reu_errornotification extends threads::common_thread
+features
+   pfcerror          : in event data port types::boolean;
+   aislcerror        : in event data port types::boolean;
+   aferror           : in event data port types::boolean;
+   error             : out event data port types::boolean;
+   externalerror     : in event data port types::boolean;
+end reu_errornotification;
+
+thread implementation reu_errornotification.i
+calls 
+   call1 : { pspg : subprogram subprograms_pilot::reu;};
+connections
+   parameter pfcerror         -> pspg.pfcerror; 
+   parameter aislcerror       -> pspg.aislcerror;
+   parameter aferror          -> pspg.aferror;
+   parameter externalerror    -> pspg.externalerror;
+   parameter pspg.error       -> error;
+end reu_errornotification.i;
+
+thread warning_display extends threads::common_thread
+features
+   error : in event data port types::boolean;
+end warning_display;
+
+thread implementation warning_display.i
+calls 
+   call1 : { pspg : subprogram subprograms_pilot::warning_display;};
+connections
+   parameter error -> pspg.error;
+end warning_display.i;
+
+end pilot_threads;

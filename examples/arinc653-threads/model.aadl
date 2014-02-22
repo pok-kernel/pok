@@ -1,0 +1,199 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package test
+public
+
+
+with Data_Model;
+with POK;
+with ARINC653;
+
+virtual bus security_layer
+end security_layer;
+
+virtual bus implementation security_layer.secret
+properties
+   POK::Security_Level => 2;
+end security_layer.secret;
+
+virtual bus implementation security_layer.topsecret
+properties
+   POK::Security_Level => 5;
+end security_layer.topsecret;
+
+virtual processor partition
+properties
+   ARINC653::HM_Errors => (Partition_Config, Partition_Init, Partition_Handler, Partition_Scheduling);
+   ARINC653::HM_Partition_Recovery_Actions => (Warm_Restart, Warm_Restart, Warm_Restart, Warm_Restart);
+   POK::Additional_Features => (libc_stdio, console);
+end partition;
+
+virtual processor implementation partition.impl
+end partition.impl;
+
+processor ppc
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   part1 : virtual processor partition.impl
+      {POK::Criticality => 1;
+       Provided_Virtual_Bus_Class => (classifier (test::security_layer.secret));};
+   part2 : virtual processor partition.impl
+      {POK::Criticality => 2;
+       Provided_Virtual_Bus_Class => (classifier (test::security_layer.topsecret));};
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   ARINC653::Module_Major_Frame => 1000ms;
+   ARINC653::Partition_Slots => (500ms, 500ms);
+   ARINC653::Slots_Allocation => (reference (part1), reference (part2));
+   ARINC653::HM_Errors => (Module_Config, Module_Init, Module_Scheduling);
+   ARINC653::HM_Module_Recovery_Actions => (Reset, Reset, Reset);
+end ppc.impl;
+
+process myprocess
+end myprocess;
+
+process implementation myprocess.impl1
+subcomponents
+   thr1 : thread mythread.impl1;
+end myprocess.impl1;
+
+process implementation myprocess.impl2
+subcomponents
+   thr2 : thread mythread.impl2;
+end myprocess.impl2;
+
+thread mythread
+properties
+   Source_Stack_Size => 30 Kbyte;
+end mythread;
+
+thread implementation mythread.impl1
+calls 
+   call1 : { pspg : subprogram hello_part1;};
+properties
+   Priority => 1;
+   Initialize_Entrypoint => classifier (test::thread_starting);
+   dispatch_protocol => periodic;
+   period            => 1000ms;
+   deadline          => 500ms;
+   compute_execution_time => 0ms .. 1ms;
+   Source_Code_Size  => 4 Kbyte;
+   Source_Stack_Size => 4 Kbyte;
+   Source_Data_Size  => 4 Kbyte;
+   ARINC653::HM_Errors => (Deadline_Miss,Application_Error,Numeric_Error,Illegal_Request,Stack_Overflow,Memory_Violation,Hardware_Fault,Power_Fail);
+   ARINC653::HM_Process_Recovery_Actions => (Ignore, Ignore, Ignore, Ignore, Ignore, Ignore, Ignore, Ignore);
+end mythread.impl1;
+
+thread implementation mythread.impl2
+calls 
+   call1 : { pspg : subprogram hello_part2;};
+properties
+   Priority => 1;
+   compute_execution_time => 0ms .. 1ms;
+   dispatch_Protocol => periodic;
+   period            => 1000ms;
+   deadline          => 600ms;
+   Source_Code_Size  => 4 Kbyte;
+   Source_Stack_Size => 4 Kbyte;
+   Source_Data_Size  => 4 Kbyte;
+   ARINC653::HM_Errors => (Deadline_Miss,Application_Error,Numeric_Error,Illegal_Request,Stack_Overflow,Memory_Violation,Hardware_Fault,Power_Fail);
+   ARINC653::HM_Process_Recovery_Actions => (Ignore, Ignore, Ignore, Ignore, Ignore, Ignore, Ignore, Ignore);
+end mythread.impl2;
+
+subprogram thread_starting
+properties
+   source_name => "user_thread_starting";
+   source_language => C;
+   Source_Text => ("../../../threadstart.o");
+   Source_Code_Size  => 2 Kbyte;
+   Source_Data_Size  => 2 Kbyte;
+end thread_starting;
+
+subprogram hello_part1
+properties
+   source_name => "user_hello_part1";
+   source_language => C;
+   Source_Text => ("../../../hello1.o");
+   Source_Code_Size  => 2 Kbyte;
+   Source_Data_Size  => 2 Kbyte;
+end hello_part1;
+
+subprogram hello_part2
+properties
+   Source_Text => ("../../../hello2.o");
+   source_language => C;
+   source_name => "user_hello_part2";
+   Source_Code_Size  => 2 Kbyte;
+   Source_Data_Size  => 2 Kbyte;
+end hello_part2;
+
+
+memory partitionmemory
+properties
+   Byte_Count => 80000;
+   ARINC653::Memory_Type => (code_memory);
+   ARINC653::Access_Type => read;
+end partitionmemory;
+
+memory mainmemory
+end mainmemory;
+
+memory implementation mainmemory.impl
+subcomponents
+   part1: memory partitionmemory 
+               {ARINC653::Memory_Type => (code_memory);
+                ARINC653::Access_Type => read;};
+   part2: memory partitionmemory
+               {ARINC653::Memory_Type => (data_memory);
+               ARINC653::Access_Type => write;};
+end mainmemory.impl;
+
+
+bus separation_bus
+end separation_bus;
+
+bus implementation separation_bus.i
+subcomponents
+   layer_topsecret      : virtual bus security_layer.secret;
+   layer_secret         : virtual bus security_layer.topsecret;
+end separation_bus.i;
+
+
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu   : processor ppc.impl;
+   part1 : process myprocess.impl1;
+   part2 : process myprocess.impl2;
+   mem : memory mainmemory.impl;
+   rtbus : bus separation_bus.i;
+properties
+   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
+   Actual_Processor_Binding => (reference (cpu.part2)) applies to part2;
+   actual_memory_binding =>
+      (reference (mem.part1)) applies to part1;
+   actual_memory_binding =>
+      (reference (mem.part2)) applies to part2;
+end node.impl;
+end test;

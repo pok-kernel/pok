@@ -1,0 +1,160 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Thu Apr 30 14:07:20 2009 
+%
+
+
+\chapter{POK API}
+   \label{chapter-api}
+
+   \section{Core C}
+
+   \subsection{Error values}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/errno.h}
+
+   \subsection{Memory Allocation}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/core/allocator.h}
+
+   \subsection{Threads}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/core/thread.h}
+
+   \subsection{Error handling}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/core/error.h}
+
+   \subsection{Inter-partitions communication}
+
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/middleware/port.h}
+
+   \subsection{Intra-partitions communications}
+      \subsubsection{Configuration}
+
+      \subsubsection{Blackboards}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/middleware/blackboard.h}
+
+      \subsubsection{Buffers}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/middleware/buffer.h}
+
+
+      \subsubsection{Events}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/core/event.h}
+
+      \subsubsection{Semaphores}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/core/semaphore.h}
+
+   \subsection{C-library}
+
+      \subsubsection{Standard Input/Output}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/libc/stdio.h}
+
+      \subsubsection{Standard Lib}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/libc/stdlib.h}
+
+      \subsubsection{String functions}
+      \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/libc/string.h}
+
+   \subsection{Math functions}
+
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/libm.h}
+
+   \subsection{Protocol functions}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/protocols/protocols.h}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/protocols/ceasar.h}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/protocols/des.h}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/protocols/ssl.h}
+
+   \section{ARINC653 C}
+   \label{api-libpok-arinc653-c}
+   An ARINC653 layer is available for partitions. This section presents the C
+   layer, an Ada layer is also available and described in section
+   \ref{api-libpok-arinc653-ada}.
+
+   \subsection{APEX types and constants}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/types.h}
+
+   \subsection{Partition management}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/partition.h}
+
+   \subsection{Time management}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/time.h}
+
+   \subsection{Error handling}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/error.h}
+
+   \subsection{Process management}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/process.h}
+
+   \subsection{Blackboard service (intra-partition communication)}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/blackboard.h}
+
+   \subsection{Buffer service (intra-partition communication)}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/buffer.h}
+
+   \subsection{Event service (intra-partition communication)}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/error.h}
+
+   \subsection{Queuing ports service (inter-partition communication)}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/queuing.h}
+
+   \subsection{Sampling ports service (inter-partition communication)}
+   \lstinputlisting[language=c,numberstyle=\tiny]{include-libpok/arinc653/sampling.h}
+
+
+   \section{ARINC653 Ada}
+   \label{api-libpok-arinc653-ada}
+
+   Since partitions can also be written in Ada, an ARINC653 Ada layer - APEX -
+   is available. It is just a binding to the C implementation which files can
+   be found in \texttt{libpok/ada/arinc653}.
+
+   Although the binding is complete, \emph{Health monitoring}, \emph{Module
+     schedules} and a few other functions are not yet available in the C API.
+
+   Simply use \texttt{with APEX.xxx} in your source to use the \texttt{xxx}
+   ARINC module.
+
+   \subsection{APEX types and constants}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex.ads}
+
+   \subsection{Blackboards}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-blackboards.ads}
+
+   \subsection{Buffers}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-buffers.ads}
+
+   \subsection{Events}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-events.ads}
+
+   \subsection{Health monitoring}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-health_monitoring.ads}
+
+   \subsection{Module schedules}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-module_schedules.ads}
+
+   \subsection{Partitions}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-partitions.ads}
+
+   \subsection{Processes}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-processes.ads}
+
+   \subsection{Queuing ports}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-queuing_ports.ads}
+
+   \subsection{Sampling ports}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-sampling_ports.ads}
+
+   \subsection{Semaphores}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-semaphores.ads}
+
+   \subsection{Timing}
+   \lstinputlisting[language=Ada,numberstyle=\tiny]{../../libpok/ada/arinc653/apex-timing.ads}

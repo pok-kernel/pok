@@ -1,0 +1,92 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009 
+--
+
+
+package test
+public
+
+
+with Data_Model;
+with POK;
+
+virtual processor partition
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libc_stdio);
+end partition;
+
+virtual processor implementation partition.impl
+end partition.impl;
+
+processor ppc
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   part1 : virtual processor partition.impl;
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+   POK::Major_Frame => 500ms;
+   POK::Scheduler => static;
+   POK::Slots => (500ms);
+   POK::Slots_Allocation => ( reference (part1));
+end ppc.impl;
+
+process myprocess
+end myprocess;
+
+process implementation myprocess.impl1
+subcomponents
+   thr1 : thread mythread.impl1;
+properties
+   POK::Needed_Memory_Size => 150 Kbyte;
+end myprocess.impl1;
+
+thread mythread
+properties
+   Source_Stack_Size => 30 Kbyte;
+end mythread;
+
+thread implementation mythread.impl1
+calls 
+   call1 : { pspg : subprogram hello_part1;};
+properties
+   dispatch_protocol => periodic;
+   period            => 2 ms;
+   deadline          => 2 ms;
+   compute_execution_time => 1ms .. 1ms;
+end mythread.impl1;
+
+subprogram hello_part1
+properties
+   source_name => "user_hello_part1";
+   source_language => C;
+   POK::Source_Location => "../../../appcode.o";
+end hello_part1;
+
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu   : processor ppc.impl;
+   part1 : process myprocess.impl1;
+properties
+   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
+end node.impl;
+end test;

@@ -1,0 +1,168 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Thu Apr 30 14:07:20 2009 
+%
+
+
+\documentclass[oneside]{book}
+\usepackage{xspace}
+\usepackage{epsfig}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{pslatex}
+\usepackage{epsfig}
+\usepackage{url}
+\usepackage[english]{babel}
+\usepackage{color}
+
+\usepackage{rotating}
+
+\newcommand{\Concept}[1]{#1\xspace}
+\newcommand{\aadl}{\Concept{AADL}}
+\newcommand{\ada}{\Concept{Ada}}
+\newcommand{\arinc}{\Concept{ARINC653}}
+\newcommand{\scade}{\Concept{SCADE}}
+\newcommand{\simulink}{\Concept{Simulink}}
+\newcommand{\leon}{\Concept{Leon3}}
+\newcommand{\powerpc}{\Concept{PowerPC}}
+\newcommand{\qemu}{\Concept{QEMU}}
+\newcommand{\pok}{\Concept{POK}}
+\newcommand{\macosx}{\Concept{Mac OS X}}
+\newcommand{\windows}{\Concept{Windows}}
+\newcommand{\linux}{\Concept{Linux}}
+\newcommand{\intel}{\textsc{Intel}}
+\newcommand{\ocarina}{\textit{Ocarina}\xspace}
+\newcommand{\susp}{.\xspace}
+
+\definecolor{kword}{rgb}{0.09, 0.48, 0.73}
+\definecolor{comments}{rgb}{0.09, 0.48, 0.21}
+\definecolor{ids}{rgb}{0.00, 0.50, 0.45}
+
+
+\lstdefinelanguage{aadl}
+{morekeywords={aadlboolean,aadlinteger,aadlreal,aadlstring,access,all,and,
+        annex,applies,binding,bus,calls,classifier,connections,constant,
+        data,delta,device,end,enumeration,event,extends,false,features,flow,
+        flows,group,implementation,in,inherit,initial,inverse,is,list,memory,
+        mode,modes,none,not,of,or,out,package,parameter,path,port,private,
+        process,processor,virtual,properties,property,provides,public,range,
+        reference,refined,refines,requires,server,set,sink,source,
+        subcomponents,subprogram,system,thread,to,true,type,units,value},
+morecomment=[l]{--}}
+
+% Layout for listings
+
+\lstset{language=aadl,
+        basicstyle=\scriptsize\sffamily,
+        aboveskip=.1cm, % \smallskipamount, % \bigskipamount,
+        belowskip=.1cm, % \smallskipamount, % \bigskipamount,
+        abovecaptionskip=.1cm, % \smallskipamount, % \medskipamount,
+        belowcaptionskip=.1cm, % \smallskipamount, % \bigskipamount,
+        xleftmargin=.0cm,
+%        numbersep=-10pt,
+        captionpos=b,
+        numbers=right,
+        tabsize=3}
+
+\lstset{
+  language=C,
+  basicstyle=\footnotesize\tt,
+  commentstyle=\color{comments},
+  keywordstyle=\color{kword}\bfseries,
+  stringstyle=\color{red},
+  showstringspaces=false,
+  identifierstyle=\color{ids},
+  numbers=left,
+  frame=single
+}
+
+
+\lstset{
+  language=Ada,
+  basicstyle=\footnotesize\tt,
+  commentstyle=\color{comments},
+  keywordstyle=\color{kword}\bfseries,
+  stringstyle=\color{red},
+  showstringspaces=false,
+  identifierstyle=\color{ids},
+  numbers=left,
+  frame=single
+}
+
+
+
+
+\newcommand{\onehugefig}[3]{%
+  \begin{figure}[htbp]
+    \centerline{\epsfig{file=#1.pdf,width=.60\textwidth}}
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}
+
+\newcommand{\onefullfig}[3]{%
+  \begin{figure}[htbp]
+    \centerline{\epsfig{file=#1.pdf,width=.45\textwidth}}
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}
+
+
+
+\newcommand{\onemedfig}[3]{%
+  \begin{figure}[htbp]
+    \centerline{\epsfig{file=#1.pdf,width=.35\textwidth}}
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}
+
+
+\begin{document}
+
+\title{POK User Guide}
+
+\author{POK Team}
+
+\date{\today}
+
+
+\maketitle
+
+\tableofcontents
+
+\listoffigures
+
+\input{introduction.tex}
+
+\input{installation.tex}
+
+\input{gettingstarted.tex}
+
+\input{model-based.tex}
+
+\input{configuration.tex}
+
+\input{examples.tex}
+
+\input{architecture.tex}
+
+\input{api.tex}
+
+\input{instrumentation.tex}
+
+\input{annexes.tex}
+
+\end{document}

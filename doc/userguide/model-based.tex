@@ -1,0 +1,337 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Thu Apr 30 14:07:20 2009 
+%
+
+
+\chapter{Automatic configuration and configuration with AADL models}
+   \label{chapter-automatic-configuration}
+
+   \section{Proposed development process}
+   Using \aadl models can help system designers and developers in the
+   implementation of partitioned architectures. \pok can be configured
+   automatically using \aadl models. In fact, the \aadl is very efficient for
+   the design of real-time embedded systems: designers specify their
+   architecture with respect to their specificites and requirements. Then, the
+   \ocarina toolsuite analyzes the architecture and automatically generates
+   code for \pok.
+
+   The code generation process automatically configures the kernel and
+   the partitions. The developpers should provide the application-level code.
+   This application-level code can be traditional code (Ada, C) or 
+   application models (Simulink, Scade, etc.).
+
+   Our code generator was integrated in the \ocarina \aadl toolsuite. It is a
+   popular toolsuite for \aadl models handling. It provides several
+   functionnalities, such as models analysis, verification and code generation.
+   In the context of \pok, we rely on these functionnalities to verify and
+   automatically implement the system.
+
+   \onehugefig{imgs/mde-process}{Model-Based development
+   process}{figure:mde-process}
+
+   The development process is illustrated in the figure
+   \ref{figure:mde-process}: the developper provides AADL models, the code
+   generator creates code that configures kernel and libpok layers. Compilation
+   and integration is automatically achieved by the toolchain and creates final
+   binary runnable on embedded hardware.
+
+
+   \section{Use the pok toolchain for model analysis, validation, code generation, compilation and execution (the \texttt{pok-toolchain.pl} script)}
+   We provide a toolchain that provides the following functionnalities:
+   \begin{enumerate}
+      \item
+         \textbf{Model analysis}: check that your \aadl model is correct.
+      \item
+         \textbf{Model validation}: validate the requirements specified in the model
+      \item
+         \textbf{Code generation}: automatically generate the code for its execution with
+         \pok
+      \item
+         \textbf{Compilation}: automatically compile and create binaries
+   \end{enumerate}
+
+
+      \subsection{Use the \texttt{pok-toolchain.pl} script}
+      The toolchain is implemented in a script called \texttt{pok-toolchain.pl}.
+      This script is used to perform the different actions of the development
+      process. This script has the following options:
+      \begin{itemize}
+         \item
+            \texttt{\-\-models=} is a \textbf{REQUIRED} option. It specifies the
+            \aadl models you use for this system. For example, you can specify
+            \texttt{\-\-models=model1.aadl,model2.aadl}. This is the list of
+            your models.
+         \item
+            \texttt{\-\-no\-generate}: do not generate the code. By default, the
+            toolchain generates the code from \aadl models.
+         \item
+            \texttt{\-\-no\-run}: do not run the generated systems. By default,
+            the toolchain generates code and run generated systems.
+         \item
+            \texttt{\-\-no\-check}: do not validate the architecture.
+         \item
+            \texttt{\-\-root=system\_name}: Specify the root system of your
+            architecture. If your models contain several \texttt{system}
+            components, you need to specify what is the \aadl root
+            \texttt{system} component.
+         \item
+            \texttt{\-\-arinc653}: use \arinc code generation patterns.
+      \end{itemize}
+
+      \subsection{Example of use}
+      The following line will generate \arinc-compliant code from
+      \texttt{model1.aadl} model.
+      \begin{verbatim}
+      pok-toolchain.pl --models=model1.aadl --arinc653
+      \end{verbatim}
+
+      The following line will generate code and compile it, but will not run generated system.
+      \begin{verbatim}
+      pok-toolchain.pl --models=model1.aadl --no-run
+      \end{verbatim}
+
+   \section{Model validation}
+   Our toolchain automatically validates models requirements before generate
+   code. It was made to help system designer in the verification of its
+   architecture.
+
+   Our validation process is based on \ocarina and the REAL language, which is a
+   constraint language for the \aadl. Its quite similar than OCL language
+   (designed for UML), except that is specific to \aadl and thus, makes easier
+   the validation of \aadl model. You can have additional information about
+   \ocarina and REAL on \textit{http://www.aadl.telecom-paristech.fr}. With
+   REAL, the user defines one or several \textit{theorems} that express what we
+   want to check.
+
+   There is a list of the theorems used in the \pok toolchain and what we
+   verify:
+   \begin{enumerate}
+      \item
+         \textbf{MILS requirements enforcements}: we check that each partition
+         has one security level and connected partitions share the same security
+         levels. For that, the underlying runtime and the connections should
+         support appropriate security levels.
+      \item
+         \textbf{Bell-Lapadula and Biba security policies}: for connected
+         partitions, we check the Bell-Lapadula and Biba security policies (no
+         read-up/write-down, \ldots). With that, we ensure that the architecture
+         is compliant with strict security guidelines.
+      \item
+         \textbf{Memory requirements}: we check that required size by a
+         partition is less important than the size of its bounded memory
+         component. In other words, we check that the memory segment can store
+         the content of the partition. We also check that the requirements
+         described on partitions are correct regarding their content (threads,
+         \texttt{subprograms} size, \ldots).
+      \item
+         \textbf{Scheduling requirements (Major Time Frame)}: for each
+         \texttt{processor} component, we check that the major time frame is
+         equal to the sum of partitions slots. We also check that each partition
+         has at least one time frame to execute their threads.
+      \item
+         \textbf{Architecture correctness}: we check that models contain memory
+         components with the appropriate properties. We also check that
+         \texttt{process} components are bound to \texttt{virtual processor}
+         components.
+   \end{enumerate}
+
+   \section{\pok properties for the \aadl}
+   The \aadl can use user-defined property sets to add specific properties on
+   \aadl components. On our side, we define our own \aadl properties, added to
+   \aadl components to describe some specific behavior.
+
+   The \pok property set for the \aadl can be found in the annex section.
+
+
+   In addition, \pok and its associated \aadl toolsuite (\ocarina) supports the
+   \arinc annex of the \aadl. So, you can use models that enforces the \arinc
+   annex with \pok. The \arinc property set for the \aadl is included in the
+   annex section of this document.
+
+   \section{Modeling patterns}
+   This section describes the code generation patterns used to generate code.
+   So, it explain the mapping between \aadl models and generated code. To
+   understand this section, you have to know the \aadl. You can find tutorials
+   in the internet about this modeling language (Wikipedia can be a good
+   starting point).
+
+      \subsection{Kernel}
+      The kernel is mapped with the \aadl \texttt{processor} component. If the
+      architecture is a partitioned architecture, it contains partitions runtime
+      (\aadl \texttt{virtual processor} components).
+
+         \subsubsection{Scheduling}
+         The scheduling requirements are specified in \texttt{process}
+         components properties. The \texttt{POK::Slots} and
+         \texttt{POK::Slots\_Allocation} properties indicate the different time
+         slots for partitions execution (in case of a partitioned architecture).
+
+         In addition, the \texttt{POK::Scheduler} is used to describe the
+         scheduler of the processor. If we implement an \arinc architecture, the
+         scheduler would be static.
+
+      \subsection{Device drivers}
+         In POK, device drivers are executed in partitions. It means that you
+         must embedds your code in partitions and drivers are isolated in terms
+         of time and space. Consequently, drivers rely on the kernel to gain
+         access to hardware resources (I/O, DMA and so on).
+
+         To do that, AADL components are considered as partitions. So, when your
+         model contains an AADL device, the underlying code generator consider
+         that it is a partition. So, you have to \textbf{associate} device
+         components with \texttt{virtual processor} components to indicate the
+         partition runtime of your driver.
+
+         However, the device driver cannot describe the actual implementation of
+         the driver. For that, we use the \texttt{Implemented\_As} property.
+         This property points to an abstract component that contains the
+         implementation of our driver. Annexes of the current document provide
+         an example of the modeling of a driver (see section
+         \label{annex-network-example}): the \texttt{driver\_rtl8029}
+         \texttt{abstract} component models the driver by defining a process
+         that contains threads. These threads handle the device and perform
+         function calls to access to hardware resources.
+
+         However, for each device, POK must know which device you are actually
+         using. So, you have to specify the \texttt{POK::Device\_Name} property.
+         It is just a string that indicate which device driver you are using
+         with this device component.
+
+         In addition, for network device that represent ethernet buses, you must
+         specify the hardware address (also known as the MAC address). For that,
+         we have the property \texttt{POK::Hw\_Addr}. This property must be
+         associated with a device component.
+
+         \paragraph{Supported device drivers\\}
+         At this time, we only support one device driver : the realtek 8029
+         ethernet controller. This device is simulated by QEMU and thus, can be
+         easily tested and simulated on every computer that uses QEMU.
+
+         However, implementing other device driver can be easily achieved, by
+         changing the \texttt{Device\_Name} property in the model and adding
+         some functions in the \texttt{libpok} layer of POK.
+
+         \paragraph{Case study that defines a device driver\\}
+         You can find an example of an implementation of a device driver in the
+         \texttt{examples/network} directory of each POK release. It defines two
+         ARINC653 module that communicate across an ethernet network. Each
+         module contains one partition that communicate over the network. You
+         can have more information by browsing the \texttt{examples/network}
+         directory.
+
+
+      \subsection{Partitions}
+         In case of a partitioned architecture, we need to describe partitions
+         in your \aadl model. In that case, partitions are mapped with two \aadl
+         components: \texttt{process} and \texttt{virtual processor}.
+
+         The \texttt{virtual processor} models the runtime of the partition (its
+         scheduler, needed functionalities and so on).
+
+
+         We associate the \texttt{virtual processor} component (partition
+         runtime) and its \texttt{process} component (partition address space)
+         with the \texttt{Actual\_Processor\_Binding} property.
+         
+         \subsubsection{Scheduling}
+         The scheduling policy of the partition is specified with the
+         \texttt{POK::Scheduler} property in the \texttt{virtual processor}
+         component (partition runtime).
+
+         \subsubsection{Memory requirements}
+         You can specify the memory requirements in two ways.
+
+         First, with the \texttt{POK::Needed\_Memory\_Size} property on the
+         process (partition address space). It will indicate the needed memory
+         size for the process.
+
+         You can also specify memory requirements with \aadl \texttt{memory}
+         components. You bind a \texttt{memory} component to a partition process
+         component with the \texttt{Actual\_Memory\_Binding} property. In that
+         case, the properties (\texttt{Word\_Size}, \texttt{Word\_Count},
+         \ldots) of the memory component will be used to generate its address
+         space.
+
+         \subsubsection{Additional features}
+         You can specify which features are needed inside the partition (libc,
+         libmath and so on). In that case, you have to specify them with the
+         \texttt{POK::Additional\_Features} property.
+
+      \subsection{Threads (ARINC653 processes)}
+      Threads are contained in a partition. Thus, these components are contained
+      in a \texttt{process} component (which models a partition). 
+
+      There is the supported properties for threads declaration:
+      \begin{itemize}
+         \item
+            \texttt{Source\_Stack\_Size}: the stack size of the thread
+         \item
+            \texttt{Period}: the actual period of the thread (execution rate)
+         \item
+            \texttt{Deadline}: the actual deadline of the thread (when the job
+            should finish)
+         \item
+            \texttt{Compute\_Exeution\_Time}: the execution time needed to execute
+            the application code of the threads.
+      \end{itemize}
+
+      \subsection{Inter-partitions channels}
+         \subsubsection{Queuing ports}
+         Queuing ports are mapped using \aadl event data ports connected between
+         \aadl processes. This ports are also connected to \texttt{thread}
+         components to send/receive data.
+
+         \subsubsection{Sampling ports}
+         Queuing ports are mapped using \aadl data ports connected between
+         \aadl processes. This ports are also connected to \texttt{thread}
+         components to send/receive data.
+
+      \subsection{Intra-partitions channels}
+         \subsubsection{Buffers}
+         Buffers are mapped using \aadl event data ports connected between \aadl
+         threads. This ports must not be connected outside the process.
+
+         \subsubsection{Blackboards}
+         Buffers are mapped using \aadl data ports connected between \aadl
+         threads. This ports must not be connected outside the process.
+
+         \subsubsection{Events}
+         Buffers are mapped using \aadl event ports connected between \aadl
+         threads. This ports must not be connected outside the process.
+
+         \subsubsection{Semaphores}
+         Semaphores are mapped using a shared \aadl data component between
+         several \aadl \texttt{thread} components. The shared \texttt{data}
+         component must use a concurrency protocol by defining the
+         \texttt{Concurrency\_Control\_Protocol} property.
+
+      \subsection{Protocols}
+      You can describe which protocol you want to use in your system using a
+      protocol layer. You specify the protocol layer using \texttt{virtual bus}
+      components.
+
+      FIXME -- complete once the work around virtual bus is finalized.
+
+   \section{POK AADL library}
+   POK provides an \aadl library for rapid prototyping of partitioned
+   embedded architectures. This library contains predefines components
+   associated with relevant properties to generate a partitioned architecture.
+
+   The file that contains this \aadl library is located in
+   \texttt{misc/aadl-library.aadl}.
+
+   \section{Examples}
+   Examples of \aadl models can be found in the \texttt{examples} directory of
+   the \pok archive.

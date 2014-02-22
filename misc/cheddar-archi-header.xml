@@ -1,0 +1,87 @@
+<?xml version="1.0" standalone="yes"?>  
+<?xml-stylesheet type="text/xsl" href="cheddar_project.xsl"?>
+<!DOCTYPE cheddar [  
+<!ELEMENT name (#PCDATA) > 
+<!ELEMENT scheduler (#PCDATA) > 
+<!ELEMENT parameter (#PCDATA) > 
+<!ELEMENT context_switch_overhead (#PCDATA) > 
+<!ELEMENT network_link (#PCDATA) > 
+<!ELEMENT offset (#PCDATA) > 
+<!ELEMENT period (#PCDATA) > 
+<!ELEMENT capacity (#PCDATA) > 
+<!ELEMENT deadline (#PCDATA) > 
+<!ELEMENT context_switch_overhead (#PCDATA) > 
+<!ELEMENT start_time (#PCDATA) > 
+<!ELEMENT blocking_time (#PCDATA) > 
+<!ELEMENT policy (#PCDATA) > 
+<!ELEMENT priority (#PCDATA) > 
+<!ELEMENT criticality (#PCDATA) > 
+<!ELEMENT cpu_name (#PCDATA) > 
+<!ELEMENT address_space_name (#PCDATA) > 
+<!ELEMENT jitter (#PCDATA) > 
+<!ELEMENT seed (#PCDATA) > 
+<!ELEMENT predictable_seed (#PCDATA) > 
+<!ELEMENT activation_rule (#PCDATA) > 
+<!ELEMENT state (#PCDATA) > 
+<!ELEMENT protocol (#PCDATA) > 
+<!ELEMENT size (#PCDATA) > 
+<!ELEMENT qs (#PCDATA) > 
+<!ELEMENT time (#PCDATA) > 
+<!ELEMENT buffer_user (#PCDATA) >  
+<!ELEMENT resource_user (#PCDATA) >  
+<!ELEMENT event_analyzer (#PCDATA) >  
+<!ELEMENT type (#PCDATA) >  
+<!ELEMENT text_memory_size (#PCDATA) >  
+<!ELEMENT heap_memory_size (#PCDATA) >  
+<!ELEMENT stack_memory_size (#PCDATA) >  
+<!ELEMENT data_memory_size (#PCDATA) >  
+<!ELEMENT cheddar (processors, (address_spaces)?, (tasks)?, ((event_analyzers)?|(networks)?|(buffers)?|(resources)?|(messages)?),(dependencies)?  )  >   
+<!ELEMENT processors (processor)+ >  
+<!ELEMENT processor (name|scheduler|network_link) >  
+<!ELEMENT address_spaces (address_space)+ >  
+<!ELEMENT address_space (name|text_memory_size|data_memory_size|stack_memory_size|heap_memory_size|(scheduler)?) >  
+<!ELEMENT networks (network)+ >  
+<!ELEMENT network (name|type) >  
+<!ELEMENT tasks (task)+>  
+<!ELEMENT task (name|cpu_name|address_space_name|capacity|start_time|(context_switch_overhead)?|(stack_memory_size)?|(text_memory_size)?|(period)?|(deadline)?|(parameters)?|(offsets)?|(jitter)?|(policy)?|(criticality)?|(priority)?|(predictable_seed)?|(blocking_time)?|(seed)?
+|(activation_rule)?) >  
+<!ELEMENT offsets (offset)+ >  
+<!ELEMENT parameters (parameter)+ >  
+<!ELEMENT messages (message)+ >  
+<!ELEMENT message (name|size|(period)?|(deadline)?|(jitter)?) >  
+<!ELEMENT buffers (buffer)+ >  
+<!ELEMENT buffer (cpu_name|address_space_name|qs|name|size|(buffer_used_by)?) >  
+<!ELEMENT buffer_used_by (buffer_user)+ >  
+<!ELEMENT resources (resource)+ >  
+<!ELEMENT resource (cpu_name|address_space_name|name|protocol|(state)?|(resource_used_by)?) >  
+<!ELEMENT resource_used_by (resource_user)+ >  
+<!ELEMENT dependencies (dependency)+ >  
+<!ELEMENT event_analyzers (event_analyzer)+ >  
+<!ELEMENT dependency (#PCDATA)  >  
+<!ATTLIST scheduler 
+        quantum CDATA  "0"  
+        is_preemptive CDATA  "PREEMPTIVE"  
+        automaton_name CDATA  ""  
+        parametric_file_name CDATA "" >  
+<!ATTLIST event_analyzer  
+        parametric_file_name CDATA "" >  
+<!ATTLIST task  
+        task_type CDATA  "APERIODIC_TYPE"  
+        x CDATA "0"  
+        y CDATA "0" > 
+<!ATTLIST buffer  
+        x CDATA "0" 
+        y CDATA "0" > 
+<!ATTLIST message  
+        x CDATA "0" 
+        y CDATA "0" > 
+<!ATTLIST buffer_user 
+        buffer_role CDATA  "producer" >  
+<!ATTLIST dependency 
+        from_type CDATA "task" 
+        to_type CDATA "task" > 
+<!ATTLIST parameter 
+        parameter_type CDATA  "integer" >  
+] >  
+
+

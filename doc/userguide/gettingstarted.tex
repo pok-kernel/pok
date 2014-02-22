@@ -1,0 +1,198 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by julien on Mon Aug 17 17:12:24 2009 
+%
+
+
+\chapter{Getting started}
+
+   \section{First experience with POK}
+   To build and run your first system with POK, you must have the \ocarina code
+   generator\footnote{Available at http://aadl.telecom-paristech.fr} and all the
+   software required by POK (a list is available in the chapter
+   \ref{chapter-installation}).
+
+   Then, perform the following actions :
+   \begin{enumerate}
+      \item
+         Issue \texttt{make configure} at the top directory of POK. Is something
+         is missing, install it !
+      \item
+         Enter the directory \texttt{examples/partitions-threads} by typing
+         this command in a terminal:
+         \begin{verbatim}
+         cd examples/partitions-threads
+         \end{verbatim}
+      \item
+         Invoke \texttt{make}. It will generate configuration and application
+         code with \ocarina.
+      \item
+         Invoke \texttt{make run} in the \texttt{generated-code} directory. You
+         can do that with the following commands
+         \begin{verbatim}
+         make -C generated-code run
+         \end{verbatim}
+         Using this command, \textit{qemu} is launched and your system is being
+         executed.
+   \end{enumerate}
+
+   Now, the next sections will explain how to configure the kernel and the
+   partition layer for your own projects.
+
+   \section{Development cycle}
+   POK has a dedicated development cycle which avoid the compilation of the
+   kernel. The development process automatically compiles the kernel, the
+   partitions with the application code and assemble them into a bootable
+   binary (you can see the illustration of this development process in figure
+   \ref{figure:partitioned-architecture-build}.
+
+   Due to the tedious configuration efforts of each layer, a tool that automatically
+   configures the kernel and the partitions from \aadl descriptions is available
+   (the \ocarina code generator). You can
+   also configure each part by yourself by writing C configuration code.
+
+   \section{Configure POK: the \texttt{conf-env.pl} script}
+   \label{pok-configuration}
+   POK distribution can be configured so reach different goals. The basic
+   configuration is automatically performed. However, in some cases, you want to
+   use some additional options.
+
+   At first, the configuration of POK is made with the \texttt{conf-env.pl}
+   script, located in the \texttt{misc} directory. So, issue
+   \texttt{./misc/conf-env.pl} to use the default configuration. The
+   configuration is automatically produced by this script and written in the
+   \texttt{misc/mk/config.mk} file.
+
+   Then, the \texttt{conf-env.pl} script can be used with additional switches
+   to enable some options of POK. There is a list of these switches:
+   \begin{itemize}
+      \item
+         \texttt{--help} : print help menu
+      \item
+         \texttt{--with-xcov} : use xcov from the coverage\footnote{see
+         \texttt{http://forge.open-do.org/projects/couverture/}} project. With
+         this option, when you invoke \texttt{make run} after building a system,
+         the emulator will be stopped after 40 seconds of execution and analyses
+         the code coverage of the system.
+      \item
+         \texttt{--with-floppy} : add an additional rule so that you can
+         automatically install the POK binary into a bootable floppy. In
+         consequence, you can invoke \texttt{make install} in the generated
+         directory to  create this floppy disk image.
+      \item
+         \texttt{--with-instrumentation} : automatically insrument kernel and
+         partition code and produce additional output to trace system activity.
+         This functionnality produces additional files to trace and analze POK
+         behavior with third-party tools such as Cheddar\ref{annex-url}.
+   \end{itemize}
+
+   \section{Automatic and manual configuration}
+   The automatic code generation finely configure the kernel and enable only
+   required functionnalities. If is especially efficient for embedded systems
+   when you have to avoid useless features and reduce the memory footprint.
+   In addition, it avoids all potential errors introduced by the code produced
+   by human developers. The automatic configuration process is detailed in
+   chapter \ref{chapter-automatic-configuration}.
+
+   On the other hand, you can also configure the kernel and the partitions by
+   yourself. In this case, the configuration will be very difficult since POK
+   has many configuration directives. This configuration process is detailed in
+   the next section.
+
+   \section{Kernel configuration with ARINC653 XML files}
+   You can also configure the kernel with an ARINC653 XML file. The tool is
+   available in POK releases in the \texttt{misc/} directory. More information
+   can be found in section \ref{section-arinc653-xml-configuration}.
+
+   \section{How to write my manual code ?}
+   At this time, if you try to write the configuration code by yourself, you
+   have to read the configuration directives of POK. The fact is that you need
+   to write the configuration code by yourself and make your own build system
+   that supports POK (the automatic configuration process output code and
+   automatically create the build system for you).
+
+   In that case, the best is to start from a working example. Try to take the
+   generated code from the \texttt{examples} directory. It could be efficient
+   since they are many examples that use various services of the runtime.
+
+   Finally, the \pok team plans to release a tool that would help the developper
+   in the configuration of the kernel and partitions. Such a tool would be
+   graphic (like the well-known \texttt{make menuconfig} of the \linux kernel)
+   and would propose to configure kernel and partitions.
+
+\clearpage
+
+   \section{Using Ada for partitions}
+   Both C and Ada can be used for partitions. Ada will nevertheless require
+   some tuning to run into POK, only a GCC toolchain that handles Ada is
+   needed.
+
+   Since POK partitions are loaded by executing their main function, one of
+   the Ada packages must export a function as \texttt{main}. Moreover, the
+   runtime should be disabled using \texttt{pragma No\_Run\_Time}.
+
+   The following piece of code is an example of how to proceed:
+
+   \begin{lstlisting}[language=Ada]
+-- main.ads
+pragma No_Run_Time;
+with Interfaces.C;
+
+package Main is
+   procedure Main;
+   pragma Export (C, Main, "main");
+end Main;
+
+
+-- main.adb
+package body Main is
+   procedure Printf (String : in Interfaces.C.char_array);
+   pragma Import (C, Printf, "printf");
+
+   procedure Main is
+   begin
+      Printf ("Hello world!");
+   end Main;
+end Main;
+   \end{lstlisting}
+
+   An ARINC653 layer is also available in \texttt{libpok/ada/arinc653} and
+   should be used the same way as described above.
+
+\clearpage
+
+   \section{Run POK on Leon3}
+   To build and run POK on Leon3, you must have the TSIM simulator\footnote{Evaluation version available at ftp://ftp.gaisler.com/gaisler.com/tsim/}.
+
+   Then, perform the following actions :
+   \begin{enumerate}
+      \item
+        Add tsim-leon3 directory to you PATH environment variable.
+      \item
+         Issue \texttt{make configure} at the top directory of POK.
+      \item
+         Enter the directory \texttt{examples/partitions-scheduling} by typing
+         this command in a terminal:
+         \begin{verbatim}
+         cd examples/partitions-scheduling
+         \end{verbatim}
+      \item
+         Invoke \texttt{make ARCH=sparc BSP=leon3}. It will generate configuration and application
+         code with \ocarina.
+      \item
+         Invoke \texttt{make ARCH=sparc BSP=leon3 run}.
+         Using this command, \textit{TSIM} is launched and your system is being
+         executed.
+   \end{enumerate}
+

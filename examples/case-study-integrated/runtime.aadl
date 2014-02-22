@@ -1,0 +1,51 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Thu Dec  3 10:21:25 2009 
+--
+package platform
+public
+
+with ARINC653;
+with POK;
+with partitions;
+
+processor partitioned
+end partitioned;
+
+processor implementation partitioned.x86
+subcomponents
+   part1 : virtual processor partitions::runtime.warningannunciationmanager
+      {POK::Additional_Features => (console);};
+   part2 : virtual processor partitions::runtime.displaymanager
+      {POK::Additional_Features => (console);};
+   part3 : virtual processor partitions::runtime.pagecontentmanager
+      {POK::Additional_Features => (console);};
+   part4 : virtual processor partitions::runtime.flightmanager
+      {POK::Additional_Features => (console);};
+   part5 : virtual processor partitions::runtime.flightdirector
+      {POK::Additional_Features => (console);};
+   part6 : virtual processor partitions::runtime.mfd
+      {POK::Additional_Features => (console);};
+properties
+   ARINC653::Module_Major_Frame  => 100ms;
+   ARINC653::Partition_Slots     => (20ms, 20ms, 20ms, 20ms, 20ms, 20ms);
+   ARINC653::Slots_Allocation    => ( reference (part1), reference (part2), reference (part3), reference (part4), reference (part5), reference (part6));
+   --  At this time, we schedule each partition during 20ms.
+   --  The model may not be schedulable. We have to analyze partitions scheduling to make
+   --  sure that everything is schedulable.
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+end partitioned.x86;
+
+end platform;

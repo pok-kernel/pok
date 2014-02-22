@@ -1,0 +1,91 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+package main
+
+public
+
+with POK;
+with types;
+with runtime_sender;
+with runtime_receiver;
+with rtl8029;
+with partitions;
+with memories;
+with runtime;
+
+system mils_architecture_sample
+end mils_architecture_sample;
+
+system implementation mils_architecture_sample.i
+subcomponents
+
+--  First, specify sender things.
+   sender_processor                 : processor runtime_sender::kernel_sender.i;
+   sender_netif                     : device rtl8029::rtl8029.i {POK::Hw_Addr => "00:1F:C6:BF:74:06";};
+   sender_partition_secret          : process partitions::partition_secret_send.i;
+   sender_partition_topsecret       : process partitions::partition_topsecret_send.i;
+   sender_partition_unclassified    : process partitions::partition_unclassified_send.i;
+   sender_ram                       : memory  memories::ram.sender;
+
+-- Here, receiver components.
+   receiver_processor                     : processor runtime_receiver::kernel_receiver.i;
+   receiver_netif                         : device rtl8029::rtl8029.i {POK::Hw_Addr => "00:0F:FE:5F:7B:2F";};
+   receiver_partition_topsecretandsecret  : process partitions::partition_secret_and_topsecret_receive.i;
+   receiver_partition_unclassified        : process partitions::partition_unclassified_receive.i;
+   receiver_ram                           : memory memories::ram.receiver;
+
+   ethernet_bus      : bus runtime::ethernet.unsecure;
+
+connections
+--  Connections INSIDE the sender node
+   port sender_partition_secret.valueout        -> sender_netif.incoming_secret;
+   port sender_partition_topsecret.valueout     -> sender_netif.incoming_topsecret;
+   port sender_partition_unclassified.valueout  -> sender_netif.incoming_unclassified;
+
+--  Connections INSIDE the receiver node
+   port receiver_netif.outgoing_topsecret       -> receiver_partition_topsecretandsecret.valueone;
+   port receiver_netif.outgoing_secret          -> receiver_partition_topsecretandsecret.valuetwo;
+   port receiver_netif.outgoing_unclassified    -> receiver_partition_unclassified.valuein;
+
+--  Connections across nodes
+   port sender_netif.outgoing_topsecret         -> receiver_netif.incoming_topsecret      {Actual_Connection_Binding => (reference (ethernet_bus));};
+   port sender_netif.outgoing_secret            -> receiver_netif.incoming_secret         {Actual_Connection_Binding => (reference (ethernet_bus));};
+   port sender_netif.outgoing_unclassified      -> receiver_netif.incoming_unclassified   {Actual_Connection_Binding => (reference (ethernet_bus));};
+
+-- Bus accesses
+   bus access ethernet_bus -> sender_netif.ethernet_access;
+   bus access ethernet_bus -> receiver_netif.ethernet_access;
+properties
+-- Properties for the sender
+   Actual_Processor_Binding => (reference (sender_processor.partition_secret))            applies to sender_partition_secret;
+   Actual_Processor_Binding => (reference (sender_processor.partition_topsecret))         applies to sender_partition_topsecret;
+   Actual_Processor_Binding => (reference (sender_processor.partition_unclassified))      applies to sender_partition_unclassified;
+   Actual_Processor_Binding => (reference (sender_processor.partition_network))           applies to sender_netif;
+   Actual_Memory_Binding    => (reference (sender_ram.driver))                            applies to sender_netif;
+   Actual_Memory_Binding    => (reference (sender_ram.unclassified))                      applies to sender_partition_unclassified;
+   Actual_Memory_Binding    => (reference (sender_ram.topsecret))                         applies to sender_partition_topsecret;
+   Actual_Memory_Binding    => (reference (sender_ram.secret))                            applies to sender_partition_secret;
+
+-- Properties for the receiver
+   Actual_Processor_Binding => (reference (receiver_processor.partition_topsecretandsecret)) applies to receiver_partition_topsecretandsecret;
+   Actual_Processor_Binding => (reference (receiver_processor.partition_unclassified))       applies to receiver_partition_unclassified;
+   Actual_Processor_Binding => (reference (receiver_processor.partition_network))            applies to receiver_netif;
+   Actual_Memory_Binding    => (reference (receiver_ram.driver))                             applies to receiver_netif;
+   Actual_Memory_Binding    => (reference (receiver_ram.unclassified))                       applies to receiver_partition_unclassified;
+   Actual_Memory_Binding    => (reference (receiver_ram.topsecretandsecret))                 applies to receiver_partition_topsecretandsecret;
+end mils_architecture_sample.i;
+
+end main;

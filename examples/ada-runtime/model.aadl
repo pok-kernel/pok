@@ -1,0 +1,89 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Fri Jan 30 23:48:21 2009 
+--
+package adaruntime
+
+public
+
+with Data_Model;
+with POK;
+
+virtual processor mypartition
+properties
+   POK::Scheduler => RR;
+   POK::Additional_Features => (libmath, libc_stdlib, libc_stdio, console);
+end mypartition;
+
+virtual processor implementation mypartition.impl
+end mypartition.impl;
+
+subprogram compute_spg
+properties
+   source_name => "compute";
+   source_language => Ada;
+   POK::Source_Location => "../../../compute.o";
+end compute_spg;
+
+processor ppc
+properties
+   POK::Architecture => x86;
+   POK::BSP => x86_qemu;
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   partition: virtual processor mypartition.impl;
+properties
+   POK::Major_Frame => 1000ms;
+   POK::Scheduler => static;
+   POK::Slots => (1000ms);
+   POK::Slots_Allocation => (reference (partition));
+end ppc.impl;
+
+thread mythread
+properties
+   Dispatch_Protocol => Periodic;
+   Period => 1000 Ms;
+   Recover_Execution_Time => 10 ms .. 20 ms;
+end mythread;
+
+thread implementation mythread.impl
+calls 
+   call1 : { pspg : subprogram compute_spg;};
+end mythread.impl;
+
+process partition_process
+properties
+   POK::Needed_Memory_Size => 120 Kbyte;
+end partition_process;
+
+process implementation partition_process.impl
+subcomponents
+   thr : thread mythread.impl;
+end partition_process.impl;
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu : processor ppc.impl;
+   pr1 : process partition_process.impl;
+properties
+   actual_processor_binding => 
+      (reference (cpu.partition)) applies to pr1;
+end node.impl;
+
+end adaruntime;

@@ -1,0 +1,40 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part 
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team 
+--
+--  Created by julien on Tue Sep 22 13:45:12 2009 
+--
+--  This file contains the definition of the receiver partition.
+
+package runtime_receiver
+
+public
+with runtime;
+with POK;
+
+processor kernel_receiver extends runtime::pok_kernel
+end kernel_receiver;
+
+processor implementation kernel_receiver.i
+subcomponents
+   partition_topsecretandsecret  : virtual processor runtime::partition_runtime.topsecret;
+   partition_unclassified        : virtual processor runtime::partition_runtime.unclassified;
+   partition_network             : virtual processor runtime::partition_runtime.unclassified {POK::Additional_Features => (libc_stdlib, io, pci, libc_stdio);};
+properties
+   POK::Major_Frame => 2000ms;
+   POK::Scheduler => static;
+   POK::Slots => (1000ms, 500ms, 500ms);
+   POK::Slots_Allocation => ( reference (partition_topsecretandsecret), reference (partition_unclassified), reference (partition_network));
+
+end kernel_receiver.i;
+
+end runtime_receiver;

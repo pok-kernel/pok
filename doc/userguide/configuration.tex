@@ -1,0 +1,690 @@
+%
+%                              POK header
+% 
+% The following file is a part of the POK project. Any modification should
+% be made according to the POK licence. You CANNOT use this file or a part
+% of a file for your own project.
+%
+% For more information on the POK licence, please see our LICENCE FILE
+%
+% Please follow the coding guidelines described in doc/CODING_GUIDELINES
+%
+%                                      Copyright (c) 2007-2009 POK team 
+%
+% Created by laurent on Wed Aug 12 06:12:26 2009 
+%
+
+
+\chapter{Configuration directives}
+
+This chapter details the different configuration directives for kernel and
+partitions. The configuration of kernel and partitions is made using C code. You
+must write it carefully since a mistake can have significant impacts in terms of
+safety or security.
+
+Most of the time, the C configuration code will be macros in global variables.
+The purpose of this chapter is to detail each variable. If you use generated
+code, the configuration code is mostly generated in \texttt{deployment.c} and
+\texttt{deployment.h} files.
+
+\section{Automatic configuration from ARINC653 XML files}
+\label{section-arinc653-xml-configuration}
+You can automatically generate the configuration of your kernel using ARINC653
+XML deployment files. For that, we designed a tool that analyzes ARINC653 XML
+files and automatically produce the C configuration code (\texttt{deployment.h}
+and \texttt{deployment.c}).
+
+However, the configuration produced is not as complete as the one generated from
+AADL models. Indeed, ARINC653 XML files do not contain enough information to
+generate the whole configuration and is not sufficient to generate the
+configuration of partitions. However, this is a good way to have basic
+configuration files that can be improved by manual editing.
+
+The tool is located in the \texttt{misc} directory of POK releases. You can use
+it as it:
+\begin{verbatim}
+misc/arinc653-xml-conf.pl arinc653-configuration-file.xml
+\end{verbatim}
+
+When it is invoked, this program automatically produces two files:
+\texttt{deployment.h} and \texttt{deployment.c}. These files must be compiled
+with the kernel for its automatic configuration.
+
+
+\section{Common configuration}
+The following macros can be defined for both partitions and kernel:
+\begin{itemize}
+   \item
+      \texttt{POK\_GENERATED\_CODE}: specify that the code compiled has been
+      generated from AADL so that we can restrict and avoid the use of some
+      functions. This maccro is automatically added by \ocarina when it generates
+      code from \aadl models.
+\end{itemize}
+
+\section{Kernel configuration}
+   \subsection{Services activation}
+   You can define which capabilities you want in the kernel by defining
+   some macros. Depending on which maccro you define, it will add services and
+   capabilities in your kernel. It was made to make a very tight kernel and
+   ease verification/certification efforts.
+
+   When you use code generation capabilities, these declarations are
+   automatically created in the \texttt{deployment.h} file.
+
+   \begin{itemize}
+      \item
+         \texttt{POK\_NEEDS\_PARTITIONS} maccro indicates that you need partitioning
+         services. It implies that you define configuration macros and
+         variables for the partitioning service.
+      \item
+         \texttt{POK\_NEEDS\_SCHED} maccro specifies that you need the
+         scheduler.
+      \item
+         \texttt{POK\_NEEDS\_PCI} maccro specifies that kernel will include
+         services to use PCI devices.
+      \item
+         \texttt{POK\_NEEDS\_IO} maccro specifies that input/output service must
+         be activated so that some partitions will be allowed to perform i/o.
+      \item
+         \texttt{POK\_NEEDS\_DEBUG} maccro specifies that debugging information
+         are activated. Additional output will be produced.
+      \item
+         \texttt{POK\_NEEDS\_LOCKOBJECTS} maccro specifies that you need the
+         lockobject service. It must be defined if you use mutexes or
+         semaphores.
+      \item
+         \texttt{POK\_NEEDS\_THREADS} maccro that thread service must be
+         activated.
+      \item
+         \texttt{POK\_NEEDS\_GETTICK} maccro that time service must be activated
+         (interrupt frame on timer interrupt is installed and clock is available).
+      \item
+         \texttt{POK\_NEEDS\_SCHED\_RR} : the Round Robin scheduling policy is
+         included in the kernel.
+      \item
+         \texttt{POK\_NEEDS\_SCHED\_RMS} : the Rate Monotonic Scheduling
+         scheduling policy is included in the kernel.
+      \item
+         \texttt{POK\_NEEDS\_SCHED\_EDF} : the Earliest Deadline First
+         scheduling policy is included in the kernel.
+      \item
+         \texttt{POK\_NEEDS\_SCHED\_LLF} : the Last Laxity First scheduling
+         protocol is included in the kernel.
+      \item
+         \texttt{POK\_NEEDS\_SCHED\_STATIC} : the static scheduling protocol is
+         included in the kernel.
+      \item
+         \texttt{POK\_NEEDS\_PORTS\_SAMPLING} : the sampling ports service for
+         inter-partitions communication is included.
+      \item
+         \texttt{POK\_NEEDS\_PORTS\_QUEUEING} : the queueing ports service for
+         inter-partitions communication is included.
+   \end{itemize}
+
+   \subsection{General configuration}
+      \subsubsection{Number of threads}
+      The \texttt{POK\_CONFIG\_NB\_THREADS} maccro specifies the number of
+      threads in the system. This represents how many threads can be handled in
+      the kernel.
+
+      The values must be computed like this : number of threads in your system 
+      + 2. In fact, in this maccro, you must add 2 additional threads : the
+      kernel thread and the idle thread.
+
+      \subsubsection{Number of lockobjects}
+      The \texttt{POK\_CONFIG\_NB\_LOCKOBJECTS} maccro specifies the number of
+      lockobjects the kernel would manage. It is the sum of potential
+      semaphores, mutexes or ARINC653 events.
+
+
+   \subsection{Partitions configuration}
+
+      \subsection{Number of partitions}
+      The \texttt{POK\_CONFIG\_NB\_PARTITIONS} maccro specifies the number of
+      partitions handled in the kernel.
+
+
+      \subsubsection{Threads allocation across partitions}
+      The \texttt{POK\_CONFIG\_PARTITIONS\_NTHREADS} maccro specifies how many
+      threads would resides in partitions. This declaration is an array, each
+      value of the array corresponds to the number of threads inside a
+      partition.
+
+      An example is given below. In this example, we consider that we have 4
+      partitions. The first, second and third partitions handle two threads while
+      the last partition has 4 threads.
+
+      \subsubsection{Number of nodes}
+      The \texttt{POK\_CONFIG\_NB\_NODES} specifies the number of nodes in the
+      distributed system if you use a such architecture. It is useful if you
+      have more than one node and use network capabilities.
+
+\begin{verbatim}
+      #define POK_CONFIG_PARTITIONS_NTHREADS {2,2,2,4}
+\end{verbatim}
+
+
+      \subsubsection{Lockobjects allocation across partitions}
+      The \texttt{POK\_CONFIG\_PARTITIONS\_NLOCKOBJECTS} specifies the number of
+      lock objects for each partition. This declaration is an array, each value
+      $n$ specifies how many lock objects we have for partition $n$.
+
+      There is an example of the use of this configuration directive. Here, the
+      first partition will have one lockobject while the second partition will
+      have three lockobjects.
+
+\begin{verbatim}
+#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS {1,3}
+\end{verbatim}
+
+
+      \subsubsection{Scheduler of each partition (level 1 of scheduling)}
+      The \texttt{POK\_CONFIG\_PARTITIONS\_SCHEDULER} specifies the scheduler
+      used in each partition. This declaration is an array, each value $n$
+      corresponds to the scheduler used for partition $n$.
+
+      There is an example below. Here, the four partitions used the
+      \textit{Round-Robin} scheduler.
+
+\begin{verbatim}
+#define POK_CONFIG_PARTITIONS_SCHEDULER {POK_SCHED_RR,POK_SCHED_RR,POK_SCHED_RR,POK_SCHED_RR}
+\end{verbatim}
+
+
+      \subsubsection{Scheduler of partitions (level 0 of scheduling)}
+      The scheduling of partitions is specified with several macros.
+
+      The \texttt{POK\_CONFIG\_SCHEDULING\_NBSLOTS} specifies the number of time
+      frames allocated for partitions execution.
+
+      The \texttt{POK\_CONFIG\_SCHEDULING\_SLOTS} specifies the size (in
+      milliseconds) of each slot.
+
+      The \texttt{POK\_CONFIG\_SCHEDULING\_SLOTS\_ALLOCATION} specified the
+      allocation of each slot. In other words, which partition is scheduling at
+      which slot. The declaration is an array and the value $n$ specifies which
+      partition uses the slot $n$.
+
+      The \texttt{POK\_CONFIG\_MAJOR\_FRAME} specifies the major frame, the time
+      when inter-partitions ports are flushed. It corresponds to the end of a
+      scheduling cycle.
+
+      An example is provided below. Here, we have four partitions. We declare 4
+      slots of 500ms. The first slot is for the first partition, the second slot
+      for the second partition and so on. The major frame (time when scheduling
+      slots are repeated) is 2s (2000ms).
+
+\begin{verbatim}
+#define POK_CONFIG_SCHEDULING_SLOTS {500,500,500,500}
+
+#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0,1,2,3}
+
+#define POK_CONFIG_SCHEDULING_NBSLOTS 4
+
+#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 2000
+\end{verbatim}
+
+
+      \subsubsection{Partitions size}
+      The \texttt{POK\_CONFIG\_PARTITIONS\_SIZE} maccro specifies an array with
+      partitions size in bytes. The declaration is an array, each value $n$
+      represent the size of partition $n$.
+
+      There is an example of a such declaration below. Here, we have 4
+      partitions. The three first partition have a size of 80000 bytes while the
+      last one has a size of 85000 bytes.
+
+\begin{verbatim}
+#define POK_CONFIG_PARTITIONS_SIZE {80000,80000,80000,85000}
+\end{verbatim}
+
+
+   \subsection{Inter-partitions ports communication}
+   For inter-partitions communication, we introduce several concepts:
+   \begin{itemize}
+      \item
+         The \textbf{node identifier} is a unique number for each node.
+      \item
+         The \textbf{global port identifier} is a unique number for each port in
+         the whole distributed system. This unique identifier identifies each
+         port of each node.
+      \item
+         The \textbf{local port identifier} is a unique number for each port on
+         the local node \textbf{only}. It identifies each inter-partition
+         communication port on the local kernel.
+   \end{itemize}
+
+   So, for each node, you must specify in the kernel:
+   \begin{itemize}
+      \item
+         The node identifier of the current node
+      \item
+         The number of nodes in the distributed system
+      \item
+         The number of inter-partitions ports in the distributed system
+      \item
+         The number of inter-partitions ports on the local node
+      \item
+         All identifiers of global ports
+      \item
+         All identifiers of local ports
+      \item
+         The association between global ports and nodes
+      \item
+         The association between global ports and local ports
+      \item
+         The association between local ports and global ports
+   \end{itemize}
+
+   \subsubsection{Current node identifier}
+   The identifier of the current node is specified with the
+   \texttt{POK\_CONFIG\_LOCAL\_NODE} maccro.
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.h} file.
+
+   \subsubsection{Number of global ports}
+   The number of global ports in the distributed system is specified
+   with the \texttt{POK\_CONFIG\_NB\_GLOBAL\_PORTS}. It indicates the number of
+   global ports in the system.
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.h} file.
+
+   \subsubsection{Number of local ports}
+   The number of local ports in the current node is specified
+   using the \texttt{POK\_CONFIG\_NB\_PORTS} maccro. It specifies the number of
+   ports on the local node.
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.h} file.
+
+   \subsubsection{Local ports identifiers}
+   The local ports identifiers are specified in an enum with the identifier
+   \texttt{pok\_port\_local\_identifier\_t}. In this enum, you must ALWAYS
+   add an identifier for an invalid identifier called
+   \texttt{invalid\_identifier}.
+   Note that this enum declaration specifies the local ports of the current node
+   and consequently, it is dependent on each node communication requirements.
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.h} file.
+
+   There is an example of a such enum
+   declaration:
+   \begin{verbatim}
+   typedef enum
+   {
+     node1_partition_secret_outgoing = 0,
+     node1_partition_topsecret_outgoing = 1,
+     node1_partition_unclassified_outgoing = 2,
+     invalid_local_port = 3
+   } pok_port_local_identifier_t;
+   \end{verbatim}
+
+   \subsubsection{Global ports identifiers}
+   The global ports identifiers is specified using an enum called
+   \texttt{pok\_port\_identifier\_t}. This enum declaration must be \textbf{THE SAME}
+   on all node of the distributed system.
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.h} file.
+
+   There is an example of a such enum declaration:
+   \begin{verbatim}
+typedef enum
+{
+  node1_partition_secret_outgoing_global = 0,
+  node1_partition_topsecret_outgoing_global = 1,
+  node1_partition_unclassified_outgoing_global = 2,
+  node2_partition_secret_incoming_global = 3,
+  node2_partition_topsecret_incoming_global = 4,
+  node2_partition_unclassified_incoming_global = 5
+} pok_port_identifier_t;
+   \end{verbatim}
+
+   \subsubsection{Node identifiers}
+   The node identifiers are specified by declaring the
+   \texttt{pok\_node\_identifier\_t} type. It contains the value of each node
+   identifier. Please also note that the \texttt{POK\_CONFIG\_LOCAL\_NODE} value
+   must be in this enum declaration. This enum declaration is \textbf{THE SAME} on
+   all nodes of the distributed system.
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.h} file.
+
+   There is an example of a such declaration
+   \begin{verbatim}
+   typedef enum
+   {
+     node1 = 0,
+     node2 = 1
+   } pok_node_identifier_t;
+   \end{verbatim}
+
+   \subsubsection{Associate local ports with global ports}
+   We specify the global port of each local port with the
+   \texttt{pok\_ports\_identifiers} array. An example is given below:
+
+   \begin{verbatim}
+   uint8_t pok_ports_identifiers[POK_CONFIG_NB_PORTS] =
+            {node1_partition_secret_outgoing,
+            node1_partition_topsecret_outgoing,
+            node1_partition_unclassified_outgoing};
+   \end{verbatim}
+
+   Here, the first local port of the current node corresponds to the
+   \texttt{node1\_partition\_secret\_outgoing} global port. 
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.c} file.
+
+
+   \subsubsection{Specify local ports routing (local ports to global ports)}
+   For each local port, we specify the number of destinations. Since there can
+   be more than one recipient to a sending port, we specify how many ports
+   should receive data. We specify that with the
+   \texttt{pok\_ports\_nb\_destinations} array.
+
+   Then, we specify the local port routing policy with the
+   \texttt{pok\_ports\_destinations} array. In this array, each value is a
+   pointer to another array that contains the recipient global port values.
+
+   An example is given below. Here, the first local port has one recipient. The
+   recipient list is specified with the first elements of the
+   \texttt{pok\_ports\_destinations} array, which is the
+   \texttt{node1\_partition\_secret\_outgoing\_deployment\_destinations} array.
+   Thus, we can see that the recipient port identifier is
+   \texttt{node2\_partition\_secret\_incoming\_global}.
+
+   \begin{verbatim}
+   uint8_t node1_partition_secret_outgoing_deployment_destinations[1] =
+      {node2_partition_secret_incoming_global};
+   uint8_t node1_partition_secret_partport[1] =
+      {node1_partition_secret_outgoing};
+   uint8_t node1_partition_topsecret_outgoing_deployment_destinations[1] =
+      {node2_partition_topsecret_incoming_global};
+   uint8_t node1_partition_unclassified_outgoing_deployment_destinations[1] =
+      {node2_partition_unclassified_incoming_global};
+
+   uint8_t pok_ports_nb_destinations[POK_CONFIG_NB_PORTS] = {1,1,1};
+
+   uint8_t* pok_ports_destinations[POK_CONFIG_NB_PORTS] =
+      {node1_partition_secret_outgoing_deployment_destinations,
+       node1_partition_topsecret_outgoing_deployment_destinations,
+       node1_partition_unclassified_outgoing_deployment_destinations};
+   \end{verbatim}
+
+
+   \subsubsection{Convert local port to global ports}
+   The association (conversion) between each local and global ports is given
+   with the \texttt{pok\_local\_ports\_to\_global\_ports} array. For each local
+   port identifier, we specify the associated global port value.
+
+   An example is given below. Here, the first local port corresponds to the
+   global port identifier \texttt{node1\_partition\_secret\_outgoing\_global}.
+
+   \begin{verbatim}
+   uint8_t pok_local_ports_to_global_ports[POK_CONFIG_NB_PORTS] =
+      {node1_partition_secret_outgoing_global,
+       node1_partition_topsecret_outgoing_global,
+       node1_partition_unclassified_outgoing_global};
+   \end{verbatim}
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.c} file.
+
+
+   \subsubsection{Convert global port to local port}
+   It is sometimes needed to convert a global port value to a local port. You
+   can have this information with the \texttt{pok\_global\_ports\_to\_local\_ports}.
+   
+   The definition of this array is different on all nodes. It specifies the
+   local port identifier on the current node with each global port. If the
+   global port is not on the current node, we specify the \texttt{invalid\_port}
+   value.
+
+   An example is given below. We can see that the three last ports are not
+   located on the current node.
+
+   \begin{verbatim}
+   uint8_t pok_global_ports_to_local_ports[POK_CONFIG_NB_GLOBAL_PORTS] =
+   {node1_partition_secret_outgoing,
+    node1_partition_topsecret_outgoing,
+    node1_partition_unclassified_outgoing,
+    invalid_local_port,
+    invalid_local_port,
+    invalid_local_port};
+   \end{verbatim}
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.c} file.
+
+   \subsubsection{Location of each global port}
+   The location of each global port is specified with the
+   \texttt{pok\_ports\_nodes} array. It indicates, for each port, the associated
+   node identifier.
+
+   In the following example, it shows that the three first global ports are
+   located on the node 0 and the other on the node 1.
+
+   \begin{verbatim}
+   uint8_t pok_ports_nodes[POK_CONFIG_NB_GLOBAL_PORTS] =
+      {0,0,0,1,1,1};
+   \end{verbatim}
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.c} file.
+
+
+   \subsubsection{Specify the port type}
+   The kernel must know the kind of each port (queuing or sampling). We specify
+   that requirement with the \texttt{pok\_ports\_kind} array. There is an
+   example of a such declaration below.
+
+   \begin{verbatim}
+   pok_port_kind_t pok_ports_kind[POK_CONFIG_NB_PORTS] =
+   {POK_PORT_KIND_SAMPLING,POK_PORT_KIND_SAMPLING,POK_PORT_KIND_SAMPLING};
+   \end{verbatim}
+
+   Here, the three local ports are sampling ports. You can have three kind of
+   ports:
+   \begin{enumerate}
+      \item
+         \textbf{Sampling ports} (\texttt{POK\_PORT\_KIND\_SAMPLING}) : stores data but does not queue them.
+      \item
+         \textbf{Queuing ports} (\texttt{POK\_PORT\_KIND\_QUEUEING}) : queues every new instance of the data.
+      \item 
+         \textbf{Virtual ports} (\texttt{POK\_PORT\_KIND\_VIRTUAL}) : this port is not stored in the kernel and this
+         is a virtual port. This port belongs to another machine. We add it only
+         to create the routing policy in the distributed network. You cannot
+         write or read data on/from virtual ports, only get the port identifier
+         associated with them.
+   \end{enumerate}
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.c} file.
+
+
+   \subsubsection{Specify ports names}
+   When the developer calls ports instanciation, he can specify a port name. For
+   that reason, the kernel must know the name associated with each port.
+
+   This information is provided by the \texttt{pok\_ports\_names} declaration.
+   It contains the name of each local port.
+
+   There is an example of a such declaration.
+   \begin{verbatim}
+   char* pok_ports_names[POK_CONFIG_NB_PORTS] =
+      {"node1_partition_secret_outgoing",
+       "node1_partition_topsecret_outgoing",
+       "node1_partition_unclassified_outgoing"};
+   \end{verbatim}
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.c} file.
+
+   \subsubsection{Specify port usage for each partition}
+   The inter-partition ports are dedicated to some partitions. Consequently, we
+   have to specify in the configuration code which partition is allowed to
+   read/write which port. 
+
+   We do that with two arrays : \texttt{pok\_ports\_nb\_ports\_by\_partition} and 
+   \texttt{pok\_ports\_by\_partition}.
+
+   The  \texttt{pok\_ports\_nb\_ports\_by\_partition} indicates for each
+   partition, the number of ports allocated. In the same manner, the
+   \texttt{pok\_ports\_by\_partition} indicate an array that contains the global
+   ports identifiers allowed for this partition.
+
+   An example is provided. In this example, we see that the first partition has
+   one port and the identifier of this port is
+   \texttt{node1\_partition\_secret\_outgoing}.
+
+   \begin{verbatim}
+   uint8_t node1_partition_secret_partport[1] =
+      {node1_partition_secret_outgoing};
+
+   uint8_t node1_partition_topsecret_partport[1] =
+      {node1_partition_topsecret_outgoing};
+
+   uint8_t node1_partition_unclassified_partport[1] =
+      {node1_partition_unclassified_outgoing};
+
+
+   uint8_t pok_ports_nb_ports_by_partition[POK_CONFIG_NB_PARTITIONS] =
+      {1,1,1};
+
+   uint8_t* pok_ports_by_partition[POK_CONFIG_NB_PARTITIONS] =
+      {node1_partition_secret_partport,
+       node1_partition_topsecret_partport,
+       node1_partition_unclassified_partport};
+   \end{verbatim}
+
+   When you use code generation, this declaration is
+   automatically created in the \texttt{deployment.c} file.
+
+\section{Libpok (partition runtime)}
+   \section{Configuration}
+   You define the configuration policy by defining some C-style macros. There
+   are the list of useful macros:
+   \begin{itemize}
+      \item
+         \texttt{POK\_CONFIG\_NB\_THREADS}: specify the number of threads
+         contained in the partition.
+      \item
+         \texttt{POK\_CONFIG\_NB\_BUFFERS}:
+         Specify the number of buffers
+         used in the libpok (intra-partition communication).
+      \item
+         \texttt{POK\_CONFIG\_NB\_SEMAPHORES}: Specify the number of semaphores
+         used in the libpok (intra-partition communication).
+      \item
+         \texttt{POK\_CONFIG\_NB\_BLACKBOARDS}: Specify the number of blackboard
+         we use for intra-partition communications.
+      \item
+         \texttt{POK\_CONFIG\_NB\_EVENTS}: Specify the number of events we use
+         for intra-partition communications.
+      \item
+         \texttt{POK\_CONFIG\_ALLOCATOR\_NB\_SPACES}: Indicate the number of
+         spaces we should reserve in the memory allocator. Since the memory
+         allocator tries to reach determinism, the number of space is fixed. So,
+         you have to specify how many spaces you want by defining this maccro.
+      \item
+         \texttt{POK\_CONFIG\_ALLOCATOR\_MEMORY\_SIZE}: Indicate which amount of
+         memory must be reserved for the memory allocator.
+      \item
+         \texttt{POK\_HW\_ADDR}:
+         Define the hardware address of the ethernet card. This maccro is useful
+         if the partition implements a device driver for a network device. In
+         POK and its libpok layer, we use it for the RTL8029 device driver.
+   \end{itemize}
+
+   \section{Services activation}
+   To activate \textit{libpok} services, you must define some macros. By
+   default, you don't have any services. You activate service by defining
+   macros. Thus, it ensures that each partition contains only required services
+   and avoid any memory overhead in partitions. 
+
+   These macros have the form \texttt{POK\_NEEDS\_...}. There is a list of
+   these macros:
+   \begin{itemize}
+      \item
+         \texttt{POK\_NEEDS\_RTL8029}: activate the functions of the device
+         driver that support the \textit{Realtek} 8029 ethernet card.
+      \item
+         \texttt{POK\_NEEDS\_STDLIB}: activate services of the standard
+         library (everything you can find in
+         \texttt{libpok/include/libc/stdlib.h}).
+      \item
+         \texttt{POK\_NEEDS\_STDIO}: activate the services of the standard
+         Input/Output library (printf, etc.). You can find available functions
+         in \texttt{libpok/include/libc/stdio.h}).
+      \item
+         \texttt{POK\_NEEDS\_IO}: needs functions to perform I/O. These
+         functions are just system calls and ask the kernel to perform them. The
+         partition \textbf{CANNOT} make any I/O by itself.
+      \item
+         \texttt{POK\_NEEDS\_TIME}: activate functions that handle time.
+      \item
+         \texttt{POK\_NEEDS\_THREADS}: activate functions relative to threads.
+      \item
+         \texttt{POK\_NEEDS\_PORTS\_VIRTUAL}: activate functions for virtual
+         ports management. Virtual ports are handled by the kernel. So,
+         activated functions in the libpok are just system call to the kernel to
+         get the port routing policy. Since virtual ports represent ports that
+         are located on other nodes, this maccro should be used only by
+         partitions that actually implement network device drivers.
+      \item
+         \texttt{POK\_NEEDS\_PORTS\_SAMPLING}: activate interfacing functions with the
+         kernel to use sampling ports.
+      \item
+         \texttt{POK\_NEEDS\_PORTS\_QUEUEING}: activate interfacing functions
+         with the kernel to use queueing ports.
+      \item
+         \texttt{POK\_NEEDS\_ALLOCATOR} : activate the memory allocator of the
+         partition. This service can be configured with
+         \texttt{POK\_CONFIG\_ALLOCATOR...} macros.
+      \item
+         \texttt{POK\_NEEDS\_ARINC653\_PROCESS}: activate the process service of
+         the ARINC653 layer.
+      \item
+         \texttt{POK\_NEEDS\_ARINC653\_BLACKBOARD}: activate the blackboard
+         service of the ARINC653 layer
+      \item
+         \texttt{POK\_NEEDS\_ARINC653\_BUFFER}:
+         activate the buffer service of the ARINC653 layer.
+      \item
+         \texttt{POK\_NEEDS\_ARINC653\_SEMAPHORE}:
+         activate the semaphore service of the ARINC653 layer.
+      \item
+         \texttt{POK\_NEEDS\_ARINC653\_QUEUEING}:
+         activate the queueing service of the ARINC653 layer.
+      \item
+         \texttt{POK\_NEEDS\_ARINC653\_SAMPLING}:
+         activate the sampling ports service of the ARINC653 layer.
+      \item
+         \texttt{POK\_NEEDS\_ARINC653\_ERROR}:
+         activate the error service of the ARINC653 layer (health monitoring
+         functions)
+      \item
+         \texttt{POK\_NEEDS\_BLACKBOARDS}:
+         activate the blackboard service of POK (intra-partition communication)
+      \item
+         \texttt{POK\_NEEDS\_SEMAPHORES}:
+         activate the semaphore service of POK (intra-partition communication)
+      \item
+         \texttt{POK\_NEEDS\_BUFFERS}:
+         activate the buffer service of POK (intra-partition communication)
+      \item
+         \texttt{POK\_NEEDS\_ERROR\_HANDLING}:
+         activate the error handling service in POK.
+      \item
+         \texttt{POK\_NEEDS\_DEBUG}:
+         activate debug mode.
+      \item
+         \texttt{POK\_NEEDS\_LIBMATH}:
+         activate the libmath, functions that are available in regular service
+         by passing the \texttt{-lm} flag to the compiler. See
+         \texttt{libpok/include/libm.h} file for the list of functions.
+   \end{itemize}

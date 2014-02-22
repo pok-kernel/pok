@@ -1,0 +1,25 @@
+<?xml version="1.0" standalone="yes"?>  
+<?xml-stylesheet type="text/xsl" href="event_table.xsl"?>
+<!DOCTYPE event_table [  
+<!ELEMENT start_of_task_capacity (#PCDATA) >  
+<!ELEMENT end_of_task_capacity (#PCDATA) >  
+<!ELEMENT write_to_buffer (#PCDATA) >  
+<!ELEMENT read_from_buffer (#PCDATA) >  
+<!ELEMENT running_task (#PCDATA) >  
+<!ELEMENT task_activation (#PCDATA) >  
+<!ELEMENT send_message (#PCDATA) >  
+<!ELEMENT receive_message (#PCDATA) >  
+<!ELEMENT allocate_resource (#PCDATA) >  
+<!ELEMENT release_resource (#PCDATA) >  
+<!ELEMENT wait_for_resource (#PCDATA) >  
+<!ELEMENT context_switch_overhead (#PCDATA) >  
+<!ELEMENT name (#PCDATA) >  
+<!--
+  Fix bux for XML parsing
+<!ELEMENT processor (#PCDATA) >  
+-->
+<!ELEMENT processor (name|(start_of_task_capacity)?|(end_of_task_capacity)?|(write_to_buffer)?|(read_from_buffer)?|(running_task)?|(task_activation)?|(send_message)?|(receive_message)?|(allocate_resource)?|(release_resource)?|(wait_for_resource)?|(context_switch_overhead)? ) >  ] >  
+
+<event_table>
+<processor>
+   <name>pokkernel</name>

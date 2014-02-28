@@ -30,7 +30,7 @@ $(LO_TARGET): $(LO_DEPS) $(LO_OBJS)
 
 %.a: $(LO_DEPS)
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[AR] $@ "
-	$(AR) $@ $(LO_DEPS)
+	$(AR) rcs $@ $(LO_DEPS)
 	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK "; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi
 
 %.o: %.S

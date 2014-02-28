@@ -96,7 +96,7 @@ subcomponents
    partition_common : virtual processor partition.common;
 properties
    ARINC653::Module_Major_Frame => 1000ms;
-   ARINC653::Partition_Slots => (1000ms, 1000ms);
+   ARINC653::Partition_Slots => (500ms, 500ms);
    ARINC653::Slots_Allocation => ( reference (partition_secure), reference (partition_common));
 end ppc.impl;
 

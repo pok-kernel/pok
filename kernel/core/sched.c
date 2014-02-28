@@ -203,7 +203,7 @@ uint32_t	pok_elect_thread(uint8_t new_partition_id)
      {
        thread->state = POK_STATE_RUNNABLE;
        thread->remaining_time_capacity =  thread->time_capacity;
-       thread->next_activation = thread->period + POK_GETTICK();
+       thread->next_activation = thread->next_activation + thread->period; 
      }
    }
 

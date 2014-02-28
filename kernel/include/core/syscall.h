@@ -42,7 +42,7 @@ typedef enum
    POK_SYSCALL_THREAD_STOPSELF                     =  57,
    POK_SYSCALL_THREAD_ID                           =  58,
    POK_SYSCALL_THREAD_STATUS                       =  59,
-   POK_SYSCALL_THREAD_SET_PRIORITY		   =  60,
+   POK_SYSCALL_THREAD_SET_PRIORITY								 =  60,
    POK_SYSCALL_THREAD_RESUME                       =  61,
    POK_SYSCALL_THREAD_SUSPEND_TARGET               =  62,
    //POK_SYSCALL_THREAD_DEADLINE                     =  63,

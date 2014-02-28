@@ -27,7 +27,6 @@
 #include "event.h"
 #include "gdt.h"
 
-
 pok_ret_t pok_arch_init ()
 {
   pok_gdt_init ();

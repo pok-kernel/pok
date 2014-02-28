@@ -41,9 +41,9 @@ subcomponents
 properties
    POK::Architecture => x86;
    POK::BSP => x86_qemu;
-   POK::Major_Frame => 1000ms;
+   POK::Major_Frame => 20ms;
    POK::Scheduler => static;
-   POK::Slots => (500ms, 500ms);
+   POK::Slots => (10ms, 10ms);
    POK::Slots_Allocation => ( reference (part1), reference (part2));
 end ppc.impl;
 
@@ -75,8 +75,8 @@ calls
 properties
    Initialize_Entrypoint => classifier (test::thread_starting);
    dispatch_protocol => periodic;
-   period            => 5000 ms;
-   deadline          => 5000 ms;
+   period            => 1 ms;
+   deadline          => 1 ms;
    compute_execution_time => 1ms .. 2ms;
 end mythread.impl1;
 
@@ -84,10 +84,9 @@ thread implementation mythread.impl2
 calls 
    call1 : { pspg : subprogram hello_part2;};
 properties
-   compute_execution_time => 4ms .. 10ms;
    dispatch_Protocol => periodic;
-   period            => 5000ms;
-   deadline          => 5000ms;
+   period            => 1ms;
+   deadline          => 1ms;
 end mythread.impl2;
 
 subprogram thread_starting

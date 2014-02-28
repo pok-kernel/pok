@@ -35,11 +35,10 @@ test:
 
 #8-> CUT HERE
 commit: testrelease
-	echo "There is the list of modified files"
-	svn status|grep -v '^?'
+	echo "Please make sure you have commited on your changes on your current GIT repository"
 	sleep 10
 	$(SH) ./misc/send-release.sh
-	svn ci
+	git push
 	$(MAKE) distclean
 
 headers:

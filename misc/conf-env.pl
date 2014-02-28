@@ -108,7 +108,6 @@ $tools_arch{"sparc"} =
 
 my %tools_flags =
 (
- "AR" =>  ["rcs"],
  "RM" =>  ["-r", "-f"],
  );
 

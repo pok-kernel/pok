@@ -16,7 +16,9 @@ run:
 	$(MAKE) $@ -C generated-code
 
 run-gdb:
-	$(MAKE) run QEMU_MISC="$(QEMU_MISC) -S -s " -C generated-code
+	$(MAKE) run QEMU_MISC="$(QEMU_MISC) -d pcall,int -S -s -no-reboot -no-quit" -C generated-code
+	#-d int,cpu,pcall,cpu_reset,exec
+	#$(MAKE) run QEMU_MISC="$(QEMU_MISC) -S -s " -C generated-code
 
 test: $(TESTS)
 

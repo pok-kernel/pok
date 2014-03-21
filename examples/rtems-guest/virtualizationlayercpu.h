@@ -1,11 +1,16 @@
-/* Author:    Philipp Eppelt - philipp.eppelt@mailbox.tu-dresden.de
+/*
  *
  * COPYRIGHT (c) 2013 Philipp Eppelt.
+ *    philipp.eppelt@mailbox.tu-dresden.de
  *
- * Purpose:   CPU part of the virtualization layer.
- * Licencse:  see RTEMS License.
+ *  Purpose:   CPU part of the virtualization layer.
+ *
+ *  The license and distribution terms for this file may be
+ *  found in the file LICENSE in this distribution or at
+ *  http://www.rtems.com/license/LICENSE.
  */
 
+#if defined(RTEMS_PARAVIRT)
 
 #ifndef RTEMS_VIRT_LAYER_CPU_H
 #define RTEMS_VIRT_LAYER_CPU_H
@@ -28,7 +33,7 @@ _CPU_Virtual_Irq_detach( int vector );
 
 /**
  * \brief Enables interrupt delivery or sets it to the specified level.
- * 
+ *
  * Use this function in collaboration with _CPU_Virtual_Interrupts_disable and
  * use its returned _level as argument to this function to assure proper
  * behaviour.
@@ -46,7 +51,7 @@ _CPU_Virtual_Interrupts_disable( int _level );
 /**
  * \brief Enables and directly disables interrupt delivery.
  */
-void 
+void
 _CPU_Virtual_Interrupts_flash( int _level );
 
 /**
@@ -56,6 +61,10 @@ int
 _CPU_Virtual_Interrupts_get_level( int _level );
 
 
+void
+_CPU_Virtual_Interrupts_open(void);
+void
+_CPU_Virtual_Interrupts_close( void );
 
 /* Idle Thread */
 
@@ -64,7 +73,7 @@ _CPU_Virtual_Interrupts_get_level( int _level );
  */
 
 void
-_CPU_Virtual_idle_thread( void );
+_CPU_Virtual_Idle_thread( void );
 
 
 /* Error handling */
@@ -73,8 +82,10 @@ _CPU_Virtual_idle_thread( void );
  * \brief Handlers execution errors.
  */
 void
-_CPU_Virtual_exec_stop_error( int _error );
+_CPU_Virtual_Stop_with_error( int _error );
 
 #endif /* ASM */
 
 #endif /* RTEMS_VIRT_LAYER_CPU_H */
+
+#endif /*RTEMS_PARAVIRT*/

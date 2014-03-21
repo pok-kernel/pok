@@ -1,9 +1,13 @@
-/* Author:    Philipp Eppelt - philipp.eppelt@mailbox.tu-dresden.de
+/* 
  *
- * COPYRIGHT (c) 2013 Philipp Eppelt.
+ *  COPYRIGHT (c) 2013 Philipp Eppelt.
+ *    philipp.eppelt@mailbox.tu-dresden.de
  *
- * Purpose:   BSP part of the virtualization layer.
- * Licencse:  see RTEMS License.
+ *  Purpose:   BSP part of the virtualization layer.
+ *
+ *  The license and distribution terms for this file may be
+ *  found in the file LICENSE in this distribution or at
+ *  http://www.rtems.com/license/LICENSE.
  */
 
 #ifndef RTEMS_VIRT_LAYER_BSP_H
@@ -47,6 +51,7 @@ _BSP_Virtual_Clock_read(void);
  */
 int
 _BSP_Virtual_faulthandler(void);
+
 
 /* Startup functions 
  */

@@ -214,7 +214,7 @@ _CPU_Virtual_Interrupts_get_level( int _level )
  */
 
 void
-_CPU_Virtual_idle_thread( void )
+_CPU_Virtual_Idle_thread( void )
 {
   while(1);
 }
@@ -224,7 +224,7 @@ _CPU_Virtual_idle_thread( void )
 /* Error handling */
 
 void
-_CPU_Virtual_exec_stop_error( int _error )
+_CPU_Virtual_Stop_with_error( int _error )
 {
   printf( "!!! An ERROR occured: %i\n", _error );
 }

@@ -43,7 +43,7 @@ subcomponents
   part1 : virtual processor partition.impl;
 properties
   POK::Architecture => x86;
-  POK::BSP => x86_qemu;
+  POK::BSP => x86_qemu_vmm;
   POK::Major_Frame => 1000ms;
   POK::Scheduler => static;
   POK::Slots => (500ms);

@@ -35,20 +35,24 @@ void register_handler()
     printf( "Couldn't register handler\n");
 }
 
+
+/* this shows, that the handler registration doesn't work propperly.
+ * If we don't try to register the handler, the program executes propperly.
+ */
+
 static int flag = 0;
 int user_hello( void )
 {
   printf( "Hello POK world!\n");
-  asm volatile ("cli\t\n");
-  printf( "Uhuu interrupts disabled\n");
-  if (flag < 2)
-  {
-    register_handler();
-    flag++;
-  }
+//  if (flag < 1)
+//  {
+//    register_handler();
+//    flag++;
+//  }
   pok_time_t tmp = 0;
   uint8_t _level = 0;
 
+  printf( "Forever spin\n");
   for( ;; )
   {
     pok_time_get (&tmp);

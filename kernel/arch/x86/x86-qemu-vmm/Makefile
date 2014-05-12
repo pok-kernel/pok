@@ -3,7 +3,7 @@ TOPDIR=		../../../../
 include $(TOPDIR)/misc/mk/config.mk
 -include $(TOPDIR)/misc/mk/common-$(ARCH).mk
 
-LO_TARGET=	x86-qemu.lo
+LO_TARGET=	x86-qemu-vmm.lo
 
 LO_OBJS=	cons.o \
 			entry.o \

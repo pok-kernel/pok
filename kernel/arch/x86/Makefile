@@ -28,12 +28,14 @@ $(BSP)/$(BSP).lo::
 
 clean: common-clean
 	$(MAKE) -C x86-qemu clean
+	$(MAKE) -C x86-qemu-vmm clean
 ifdef BSP
 	$(CD) $(BSP) && $(MAKE) clean
 endif
 
 distclean: clean
 	$(MAKE) -C x86-qemu distclean
+	$(MAKE) -C x86-qemu-vmm distclean
 	$(RM) .depend.mk
 ifdef BSP
 	$(CD) $(BSP) && $(MAKE) distclean

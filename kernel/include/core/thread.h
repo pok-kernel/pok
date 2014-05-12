@@ -108,8 +108,8 @@ pok_ret_t      pok_thread_suspend_target (const uint32_t id);
 
 #ifdef POK_NEEDS_PARTITIONS
 pok_ret_t		pok_partition_thread_create (uint32_t* thread_id,
-																						const pok_thread_attr_t* attr,
-																						const uint8_t  partition_id);
+					    const pok_thread_attr_t* attr,
+					    const uint8_t  partition_id);
 #endif
 
 extern pok_thread_t              pok_threads[POK_CONFIG_NB_THREADS];

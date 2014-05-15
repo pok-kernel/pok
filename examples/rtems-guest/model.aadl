@@ -27,7 +27,7 @@ with POK;
 virtual processor partition
 properties
   POK::Scheduler => RR;
-  POK::Additional_Features => (libc, libc_string, libc_stdio, libc_stdlib, console, pci, io);
+  POK::Additional_Features => (x86_vmm, libc, libc_string, libc_stdio, libc_stdlib, console, pci, io);
 end partition;
 
 

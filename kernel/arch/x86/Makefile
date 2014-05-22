@@ -41,6 +41,7 @@ distclean: clean
 	$(MAKE) -C x86-qemu distclean
 	$(MAKE) -C x86-qemu-vmm distclean
 	$(RM) .depend.mk
+	$(RM) *.o
 ifdef BSP
 	$(CD) $(BSP) && $(MAKE) distclean
 endif

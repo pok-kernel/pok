@@ -32,6 +32,7 @@ distclean:
 	$(CD) blowfish && $(MAKE) distclean
 	$(CD) des && $(MAKE) distclean
 	$(RM) .depend.mk
+	$(RM) *.lo
 
 depend:
 	$(if $(LO_OBJS), $(CC) $(CFLAGS) -MM $(wildcard *.c) $(wildcard *.S) > .depend.mk,)

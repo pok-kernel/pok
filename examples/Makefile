@@ -31,6 +31,8 @@ SUBDIRS= \
 	network					\
 	partitions-scheduling			\
 	partitions-threads			\
+	rtems-guest				\
+	myHelloWorld				\
 
 #	mutexes				\ ### deprecated Makefile
 #	mutexes-timed			\ ### deprecated Makefile

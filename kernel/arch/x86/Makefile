@@ -19,8 +19,7 @@ LO_OBJS=	arch.o		\
 ifeq ($(BSP),x86-qemu-vmm)
 
 LO_OBJS+= interrupt_prologue.o
-BSPFLAG=x86_qemu_vmm
-CFLAGS += -D$(BSPFLAG)
+
 endif
 LO_DEPS=	$(BSP)/$(BSP).lo
 

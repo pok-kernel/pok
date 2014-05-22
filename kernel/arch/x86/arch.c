@@ -58,7 +58,7 @@ pok_ret_t pok_arch_idle()
 }
 
 
-#ifdef x86_qemu_vmm
+#ifdef POK_NEEDS_X86_VMM
 extern void pok_irq_prologue_0(void);
 extern void pok_irq_prologue_1(void);
 extern void pok_irq_prologue_2(void);
@@ -132,7 +132,7 @@ pok_ret_t pok_arch_event_register  (uint8_t vector,
 
   return (POK_ERRNO_OK);
 }
-#endif
+#endif /* POK_NEEDS_X86_VMM */
 
 uint32_t    pok_thread_stack_addr   (const uint8_t    partition_id,
                                      const uint32_t   local_thread_id)

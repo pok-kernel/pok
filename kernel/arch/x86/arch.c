@@ -58,6 +58,7 @@ pok_ret_t pok_arch_idle()
 }
 
 
+#ifdef x86_qemu_vmm
 extern void pok_irq_prologue_0(void);
 extern void pok_irq_prologue_1(void);
 extern void pok_irq_prologue_2(void);
@@ -118,6 +119,20 @@ pok_ret_t pok_arch_event_register  (uint8_t vector,
     return (POK_ERRNO_OK);
   }
 }
+
+#else
+pok_ret_t pok_arch_event_register  (uint8_t vector,
+                                    void (*handler)(void))
+{
+  pok_idt_set_gate (vector,
+                   GDT_CORE_CODE_SEGMENT << 3,
+      	     (uint32_t) handler,
+                   IDTE_TRAP,
+                   3);
+
+  return (POK_ERRNO_OK);
+}
+#endif
 
 uint32_t    pok_thread_stack_addr   (const uint8_t    partition_id,
                                      const uint32_t   local_thread_id)

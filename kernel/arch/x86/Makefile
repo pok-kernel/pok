@@ -13,10 +13,15 @@ LO_OBJS=	arch.o		\
 			space.o		\
 			syscalls.o	\
 			interrupt.o	\
-			interrupt_prologue.o	\
 			pci.o		\
 			exceptions.o
 
+ifeq ($(BSP),x86-qemu-vmm)
+
+LO_OBJS+= interrupt_prologue.o
+BSPFLAG=x86_qemu_vmm
+CFLAGS += -D$(BSPFLAG)
+endif
 LO_DEPS=	$(BSP)/$(BSP).lo
 
 all: $(LO_TARGET)

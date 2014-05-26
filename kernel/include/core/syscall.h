@@ -24,6 +24,7 @@ typedef enum
 {
    POK_SYSCALL_CONSWRITE                           =  10,
    POK_SYSCALL_GETTICK                             =  20,
+#ifdef POK_NEEDS_X86_VMM
    /* Register an irq handler from a partition */
    POK_SYSCALL_IRQ_REGISTER_HANDLER		   =  25,
    POK_SYSCALL_IRQ_UNREGISTER_HANDLER		   =  26,
@@ -31,6 +32,7 @@ typedef enum
    POK_SYSCALL_IRQ_PARTITION_ENABLE		   =  27,
    POK_SYSCALL_IRQ_PARTITION_DISABLE		   =  28,
    POK_SYSCALL_IRQ_PARTITION_ACK		   =  29,
+#endif /* POK_NEEDS_X86_VMM */
    POK_SYSCALL_INT_NUMBER                          =  42,
    POK_SYSCALL_THREAD_CREATE                       =  50,
    POK_SYSCALL_THREAD_SLEEP_UNTIL                  =  51,

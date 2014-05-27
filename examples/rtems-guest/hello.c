@@ -15,7 +15,7 @@
  */
 
 #include <libc/stdio.h>
-#include <core/syscall.h>
+#include <core/hypercall.h>
 
 #include "virtualizationlayerbsp.h"
 #include "virtualizationlayercpu.h"
@@ -51,7 +51,7 @@ void interrupt_middleman( unsigned vector, void* frame )
   
   C_dispatch_isr(vector);
   
-  pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ACK, vector );
+  pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_ACK, vector );
   // recover frame, restore registers, place return eip;
   asm volatile( "movl %%esp, %%eax \t\n"
       "1: \t\n"
@@ -133,7 +133,7 @@ _BSP_Virtual_getworkspacearea( void )
 int
 _CPU_Virtual_Irq_request( int vector )
 {
-  pok_ret_t ret = pok_syscall2( POK_SYSCALL_IRQ_REGISTER_HANDLER, vector, (uint32_t)&interrupt_middleman );
+  pok_ret_t ret = pok_hypercall2( POK_HYPERCALL_IRQ_REGISTER_HANDLER, vector, (uint32_t)&interrupt_middleman );
   if( ret != POK_ERRNO_OK )
   {
     printf( "Couldn't register handler\n");
@@ -146,7 +146,7 @@ _CPU_Virtual_Irq_request( int vector )
 void
 _CPU_Virtual_Irq_detach( int vector )
 {
-  pok_syscall1( POK_SYSCALL_IRQ_UNREGISTER_HANDLER, vector);
+  pok_hypercall1( POK_HYPERCALL_IRQ_UNREGISTER_HANDLER, vector);
 }
 
 /**
@@ -158,7 +158,7 @@ _CPU_Virtual_Irq_detach( int vector )
 void
 _CPU_Virtual_Interrupts_enable( int _level )
 {
-  pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ENABLE, _level );
+  pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_ENABLE, _level );
 }
 /**
  * \brief disables interrupts and returns previous level
@@ -166,7 +166,7 @@ _CPU_Virtual_Interrupts_enable( int _level )
 void
 _CPU_Virtual_Interrupts_disable( int _level )
 {
-  pok_syscall1( POK_SYSCALL_IRQ_PARTITION_DISABLE, _level );
+  pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_DISABLE, _level );
 }
 
 /**
@@ -176,8 +176,8 @@ _CPU_Virtual_Interrupts_disable( int _level )
 void 
 _CPU_Virtual_Interrupts_flash( int _level )
 {
-  pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ENABLE, _level );
-  pok_syscall1( POK_SYSCALL_IRQ_PARTITION_DISABLE, _level );
+  pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_ENABLE, _level );
+  pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_DISABLE, _level );
 }
 
 /**
@@ -186,7 +186,7 @@ _CPU_Virtual_Interrupts_flash( int _level )
 void
 _CPU_Virtual_Interrupts_open( void )
 {
-  pok_syscall1( POK_SYSCALL_IRQ_PARTITION_ENABLE, 0 );
+  pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_ENABLE, 0 );
 }
 
 /**
@@ -195,7 +195,7 @@ _CPU_Virtual_Interrupts_open( void )
 void
 _CPU_Virtual_Interrupts_close( void )
 {
-  pok_syscall1( POK_SYSCALL_IRQ_PARTITION_DISABLE, 1 );
+  pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_DISABLE, 1 );
 }
 
 int

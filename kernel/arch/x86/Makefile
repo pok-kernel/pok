@@ -18,7 +18,8 @@ LO_OBJS=	arch.o		\
 
 ifeq ($(BSP),x86-qemu-vmm)
 
-LO_OBJS+= interrupt_prologue.o
+LO_OBJS+= interrupt_prologue.o 	\
+	  hypercall.o
 
 endif
 LO_DEPS=	$(BSP)/$(BSP).lo

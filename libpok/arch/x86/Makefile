@@ -10,6 +10,11 @@ LO_OBJS=	arch.o \
 		pci.o \
 		syscall.o
 
+ifeq ($(BSP),x86-qemu-vmm)
+
+LO_OBJS+=	hypercall.o
+
+endif
 LO_DEPS=	
 
 all: $(LO_TARGET)
@@ -20,6 +25,7 @@ clean: common-clean
 
 distclean: clean
 	$(RM) .depend.mk
+	$(RM) hypercall.o
 
 depend:
 	$(if $(LO_OBJS), $(CC) $(CFLAGS) -MM $(wildcard *.c) $(wildcard *.S) > .depend.mk,)

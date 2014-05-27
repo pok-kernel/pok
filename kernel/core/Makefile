@@ -19,6 +19,9 @@ LO_OBJS=	partition.o \
 			boot.o \
 			cons.o 
 
+ifeq ($(BSP),x86-qemu-vmm)
+LO_OBJS+= hypercall.o
+endif
 LO_DEPS=
 
 all: $(LO_TARGET)

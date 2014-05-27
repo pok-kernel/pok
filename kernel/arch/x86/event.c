@@ -20,6 +20,7 @@
 #include <types.h>
 #include <errno.h>
 #include <core/syscall.h>
+#include <core/hypercall.h>
 
 #include "event.h"
 #include "sysdesc.h"
@@ -36,8 +37,9 @@ pok_ret_t pok_event_init ()
    pok_exception_init ();
 #endif
 
-   pok_syscall_init ();
+   pok_syscall_init ();     //syscall register IDT index POK_SYSCALL_INT_NUMBER, i.e., 42;
 
+   pok_hypercall_init();   //hypercall register IDT index POK_HYPERCALL_INT_NUMBER, i.e,24;
    return (POK_ERRNO_OK);
 }
 

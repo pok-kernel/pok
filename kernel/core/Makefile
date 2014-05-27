@@ -29,7 +29,7 @@ all: $(LO_TARGET)
 .PHONY: clean distclean depend all
 
 clean: common-clean
-
+	$(RM) *.o
 depend:
 	$(if $(LO_OBJS), $(CC) $(CFLAGS) -MM $(wildcard *.c) $(wildcard *.S) > .depend.mk,)
 

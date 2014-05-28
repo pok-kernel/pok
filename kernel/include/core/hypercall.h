@@ -7,7 +7,6 @@
 typedef enum
 {
    POK_HYPERCALL_CONSWRITE		=10,
-   POK_HYPERCALL_INT_NUMBER		=24,
    /* Register an irq handler from a partition */
    POK_HYPERCALL_IRQ_REGISTER_HANDLER		   =  25,
    POK_HYPERCALL_IRQ_UNREGISTER_HANDLER		   =  26,
@@ -15,6 +14,7 @@ typedef enum
    POK_HYPERCALL_IRQ_PARTITION_ENABLE		   =  27,
    POK_HYPERCALL_IRQ_PARTITION_DISABLE		   =  28,
    POK_HYPERCALL_IRQ_PARTITION_ACK		   =  29,
+   POK_HYPERCALL_INT_NUMBER		=45,
 } pok_hypercall_id_t;
 
 typedef struct

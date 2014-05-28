@@ -13,7 +13,7 @@ pok_ret_t pok_do_hypercall (pok_syscall_id_t syscall_id, pok_syscall_args_t* arg
 
    asm volatile ( "movl %1,%%eax \n\t"
                   "movl %2,%%ebx \n\t"
-                  "int  $24 \n\t"
+                  "int  $45 \n\t"
                   "movl %%eax, %0"
                   :"=g"(ret)
                   :"g"(id), "g"(args_addr)

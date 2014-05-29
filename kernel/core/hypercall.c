@@ -69,6 +69,14 @@ pok_ret_t pok_core_hypercall (const pok_hypercall_id_t       hypercall_id,
        return pok_bsp_irq_partition_ack(args->arg1);
        break;
 #endif /* POK_NEEDS_X86_VMM */
+
+#if 1//defined POK_NEEDS_GETTICK
+      case POK_SYSCALL_GETTICK:
+         POK_CHECK_PTR_OR_RETURN(infos->partition, args->arg1 + infos->base_addr)
+         return pok_gettick_by_pointer ((uint64_t*) (args->arg1 + infos->base_addr));
+         break;
+#endif
+	 
     default:
 #ifdef POK_NEEDS_ERROR_HANDLING
          pok_error_declare( POK_ERROR_KIND_ILLEGAL_REQUEST);

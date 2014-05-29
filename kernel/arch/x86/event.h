@@ -73,6 +73,7 @@ pok_ret_t pok_idt_init();
 pok_ret_t pok_exception_init();
 pok_ret_t pok_event_init();
 pok_ret_t pok_syscall_init();
+pok_ret_t pok_hypercall_init();
 
 #endif /* !__POK_X86_EVENT_H__ */
 

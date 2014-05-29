@@ -7,6 +7,7 @@
 typedef enum
 {
    POK_HYPERCALL_CONSWRITE		=10,
+   POK_HYPERCALL_GETTICK                             =  20,
    /* Register an irq handler from a partition */
    POK_HYPERCALL_IRQ_REGISTER_HANDLER		   =  25,
    POK_HYPERCALL_IRQ_UNREGISTER_HANDLER		   =  26,

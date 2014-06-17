@@ -550,4 +550,14 @@ uint32_t pok_sched_get_current(uint32_t *thread_id)
 }
 #endif
 
+#ifdef POK_NEEDS_X86_VMM
+/*
+ * For now, as we do not need schedule of vcpu.
+ */
+int sched_init_vcpu( vcpu_t * v)
+{
+	return 1;
+}
+
+#endif /* POK_NEEDS_X86_VMM */
 #endif /* __POK_NEEDS_SCHED */

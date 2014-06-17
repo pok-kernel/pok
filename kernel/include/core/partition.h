@@ -30,6 +30,7 @@
 #include <core/error.h>
 #include <core/thread.h>
 #include <core/sched.h>
+#include <core/vcpu.h>
 
 
 /**
@@ -114,6 +115,12 @@ typedef struct
   uint16_t		io_min;                        /**< If the partition is allowed to perform I/O, the lower bound of the I/O */
   uint16_t		io_max;                        /**< If the partition is allowed to perform I/O, the uppder bound of the I/O */
 #endif
+
+#ifdef POK_NEEDS_X86_VMM
+  struct vcpu ** vcpu;
+  
+  
+#endif /* POK_NEEDS_X86_VMM */
 
   uint32_t		lock_level;
   pok_start_condition_t	start_condition;

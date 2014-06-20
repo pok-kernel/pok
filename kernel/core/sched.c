@@ -33,6 +33,10 @@
 #include <core/partition.h>
 #endif
 
+#ifdef POK_NEEDS_X86_VMM
+#include <core/vcpu.h>
+#endif
+
 #ifdef POK_NEEDS_MIDDLEWARE
 #include <middleware/port.h>
 #endif
@@ -554,10 +558,41 @@ uint32_t pok_sched_get_current(uint32_t *thread_id)
 /*
  * For now, as we do not need schedule of vcpu.
  */
-int sched_init_vcpu( vcpu_t * v)
+#define switch_kerenl_stack(v) ((void)0)
+#define save_segments(p) ((void)0)
+#define load_segments(n) ((void)0)
+int sched_init_vcpu(vcpu_t *v)
 {
-	return 1;
+  v->sched_info.start_time = POK_GETTICK();
+  return 1;
 }
 
+void sched_ctxt_switch_from_vcpu(vcpu_t *v)
+{
+  // To avoid the compile error, add this statement.
+  save_segments(v);
+  vcpu_t *vcpu;
+  vcpu = v;
+  v = vcpu;
+  return;
+}
+void sched_ctxt_switch_to_vcpu(vcpu_t *v)
+{
+  // To avoid the compile error, add this statement.
+  load_segments(v);
+  vcpu_t *vcpu;
+  vcpu = v;
+  v = vcpu;
+  return;
+}
+
+void sched_tail_vcpu(vcpu_t *v)
+{
+  // To avoid the compile error, add this statement.
+  vcpu_t *vcpu;
+  vcpu = v;
+  v = vcpu;
+  return; 
+}
 #endif /* POK_NEEDS_X86_VMM */
 #endif /* __POK_NEEDS_SCHED */

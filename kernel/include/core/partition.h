@@ -30,7 +30,6 @@
 #include <core/error.h>
 #include <core/thread.h>
 #include <core/sched.h>
-#include <core/vcpu.h>
 
 
 /**
@@ -117,9 +116,9 @@ typedef struct
 #endif
 
 #ifdef POK_NEEDS_X86_VMM
-  struct vcpu ** vcpu;
   
-  
+  struct vcpu * vcpu;
+
 #endif /* POK_NEEDS_X86_VMM */
 
   uint32_t		lock_level;

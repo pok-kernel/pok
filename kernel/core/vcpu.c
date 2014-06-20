@@ -1,8 +1,7 @@
-#ifdef POK_NEEDS_X86_VMM
-
 #include <core/vcpu.h>
+#include <core/sched.h>
 
-struct  vcpu *alloc_vcpu(partition_t * partition, unsigned int vcpu_id)
+struct  vcpu *alloc_vcpu(pok_partition_t * partition, uint8_t vcpu_id)
 {
   struct vcpu *v;
   /*
@@ -17,21 +16,20 @@ struct  vcpu *alloc_vcpu(partition_t * partition, unsigned int vcpu_id)
 
   v->partition=partition;
 
-  if ( sched_init_vcpu(v,partition) == 0)
+  if ( sched_init_vcpu(v) == 0)
   {
-	  destroy_vcpu(v);
-	  return;
+    return 0;
   }
 
   /*
    * set run state;
    */
   v->runstate = POK_STATE_RUNNABLE;
+
   if(vcpu_initialize(v) == 0)
   {
-    destory_vcpu(v);
-    return;
+    return 0;
   }
+  return v;
 }
 
-#endif

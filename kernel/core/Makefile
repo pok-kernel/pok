@@ -20,7 +20,8 @@ LO_OBJS=	partition.o \
 			cons.o 
 
 ifeq ($(BSP),x86-qemu-vmm)
-LO_OBJS+= hypercall.o
+LO_OBJS+= hypercall.o  \
+	  vcpu.o
 endif
 LO_DEPS=
 

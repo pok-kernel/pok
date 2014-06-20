@@ -1,12 +1,16 @@
 #ifdef POK_NEEDS_X86_VMM
 #ifndef __POK_VCPU_H__
-#define __POL_VCPU_H__
+#define __POK_VCPU_H__
 
 #include <types.h>
 #include <errno.h>
+#include <arch/x86/arch_vcpu.h>
+#include <core/partition.h>
+#include <core/sched.h>
+#include <core/thread.h>
 
 
-typedef struct vcpu
+struct vcpu
 {
    /*
     * This number is the id of a vCPU.
@@ -33,18 +37,20 @@ typedef struct vcpu
    vcpu_sched_info_t sched_info;
 
    /*
-    * This struct contains some arch-dependent attributes and operations.
-    */
-   vcpu_arch_t arch;
-
-   /*
     * This bit will be set ture if there is a interrupt pending.
     */
    bool_t pending;
 
-}vcpu_t;
+   /*
+    * This struct contains some arch-dependent attributes and operations.
+    */
+   arch_vcpu_t arch;
 
-struct vcpu *alloc_vcpu( partition_t * partition, unsigned int vcpu_id);
+
+};
+typedef struct vcpu vcpu_t;
+
+struct vcpu *alloc_vcpu(pok_partition_t * partition, uint8_t vcpu_id);
 struct vcpu *alloc_vcpu_struct(void);
 void free_vcpu_struct(struct vcpu *);
 

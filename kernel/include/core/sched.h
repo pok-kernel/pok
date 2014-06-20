@@ -78,6 +78,21 @@ void pok_sched_activate_error_thread (void);
 
 uint32_t pok_sched_get_current(uint32_t *thread_id);
 
+#ifdef POK_NEEDS_X86_VMM
+
+typedef struct
+{
+   uint64_t start_time;
+}vcpu_sched_info_t; 
+
+typedef struct vcpu vcpu_t;
+int sched_init_vcpu(vcpu_t *v);
+void sched_ctxt_switch_from_vcpu(vcpu_t *v);
+void sched_ctxt_switch_to_vcpu(vcpu_t *v);
+void sched_tail_vcpu(vcpu_t *v);
+
+
+#endif /* POK_NEEDS_X86_VMM */
 #endif /* POK_NEEDS.... */
 
 #endif /* !__POK_SCHED_H__ */

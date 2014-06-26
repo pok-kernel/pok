@@ -18,7 +18,6 @@ use strict;
 use Getopt::Long;
 
 my $OCARINA_VERSION = "2.0w";
-my $OCARINA_REVISION = 3458;
 
 my $conf_file = "misc/mk/config.mk";
 my $use_floppy          = 0;
@@ -148,25 +147,21 @@ my %colors =
    sub check_ocarina
    {
       my $line = "";
+	  my $version = "";
       open ( FIC , "ocarina -V 2>/dev/null|") or return 1;
       $line = <FIC>;
       return 1 if (! (defined ($line)));
       chomp ($line);
 
-      my ($version,$svn_rev) =
-         ($line =~ /^[a-zA-Z]+\s([\.0-9a-zA-Z]+).*r([0-9]+)\)$/);
+      ($version) =($line =~ /^[a-zA-Z]+\s([\.0-9a-zA-Z]+)\s.*$/);
      
       if ( "$version" ne "$OCARINA_VERSION")
       {
          print $colors{"RED"}."WARNING: POK required Ocarina version $OCARINA_VERSION, incorrect version \n".$colors{"STD"};
       }
-      elsif ($svn_rev < $OCARINA_REVISION)
-      {
-         print $colors{"RED"}."WARNING: POK required Ocarina revision $OCARINA_REVISION, found $svn_rev\n".$colors{"STD"};
-      }
       else
       {
-         print $colors{"GREEN"}."Ocarina version and revision are good\n".$colors{"STD"};
+         print $colors{"GREEN"}."Ocarina version is good\n".$colors{"STD"};
       }
 
       return 0;

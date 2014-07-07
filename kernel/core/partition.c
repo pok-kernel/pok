@@ -240,8 +240,9 @@ pok_ret_t pok_partition_init ()
 #ifdef POK_NEEDS_INSTRUMENTATION
       pok_instrumentation_partition_archi (i);
 #endif
+#ifdef POK_NEEDS_X86_VMM
       pok_partitions[i].vcpu = alloc_vcpu((pok_partition_t *) &pok_partitions[i],i);
-
+#endif
       pok_partition_setup_main_thread (i);
       pok_partitions[i].current_thread    = pok_partitions[i].thread_main;
    }

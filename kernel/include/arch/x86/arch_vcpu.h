@@ -10,7 +10,8 @@ typedef struct
 {
    interrupt_frame frame;
    unsigned vector;
-}interrupt_storage_t;
+   bool_t pending;
+}irq_desc;
 
 typedef struct trap_info
 {
@@ -48,7 +49,7 @@ typedef struct arch_vcpu
    /*
     * This is a interrupt frame, the interrupt information will be store in this struct;
     */
-   interrupt_storage_t interrupt_storge;
+   irq_desc interrupt_storge;
 
 }arch_vcpu_t;
 

@@ -169,7 +169,6 @@ void name##_handler(interrupt_frame* frame)
 
 #endif
 
-
 struct meta_handler
 {
   unsigned vector;
@@ -178,6 +177,7 @@ struct meta_handler
   int waiting[POK_CONFIG_NB_PARTITIONS+1];
 };
 typedef struct meta_handler meta_handler;
+
 
 void _C_isr_handler( unsigned vector, interrupt_frame *frame );
 

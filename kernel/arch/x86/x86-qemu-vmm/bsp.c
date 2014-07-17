@@ -238,6 +238,39 @@ pok_ret_t pok_bsp_irq_unregister_hw (uint8_t  irq)
   return (POK_ERRNO_OK);
 }
 
+pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector)
+{
+  int i;
+  struct *vcpu;
+  
+  if(vector < 32)
+    return POK_ERRNO_EINVAL; 
+  vcpu = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
+  for (i=0; i<16; i++)
+  {
+    if(vcpu->arch.irqdesc[i].vector == 0)
+    {
+      vcpu->arch.irqdesc[i].vector==vector;
+      return POK_ERRNO_OK;
+    }
+  }
+  return POK_ERRNO_UNAVAILABLE;
+}	
+
+pok_ret_t pok_bsp_irq_unregister_vcpu(uint8_t vector)
+{
+  int i;
+  if(vector < 32)
+    return POK_ERRNO_EINVAL; 
+  vcpu = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
+  for (i=0;i<16;i++)
+  {
+    if(vcpu->arch.irqdesc[i].vector == vector)
+    {
+      memset(v->arch.irqdesc+i, 0, sizeof(irq_desc));
+    }
+  }
+}
 pok_ret_t pok_bsp_irq_register (uint8_t   irq,
                                 void      (*handler)(void))
 {

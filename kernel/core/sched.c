@@ -60,6 +60,11 @@ uint8_t                   pok_current_partition;
 void                      pok_sched_partition_switch();
 #endif
 
+#ifdef POK_NEEDS_X86_VMM
+
+uint8_t                   pok_current_vcpu;
+#endif 
+
 #if defined (POK_NEEDS_PORTS_SAMPLING) || defined (POK_NEEDS_PORTS_QUEUEING)
 void pok_port_flushall (void);
 #endif

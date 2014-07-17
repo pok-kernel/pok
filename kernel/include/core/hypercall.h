@@ -15,7 +15,10 @@ typedef enum
    POK_HYPERCALL_IRQ_PARTITION_ENABLE		   =  27,
    POK_HYPERCALL_IRQ_PARTITION_DISABLE		   =  28,
    POK_HYPERCALL_IRQ_PARTITION_ACK		   =  29,
-   POK_HYPERCALL_INT_NUMBER		=45,
+   POK_HYPERCALL_INT_NUMBER			   =  45,
+   /* Register irq handler for partition */
+   POK_HYPERCALL_IRQ_REGISTER_VCPU 		   =  30,
+   POK_HYPERCALL_IRQ_UNREGISTER_VCPU		   =  31,
 } pok_hypercall_id_t;
 
 typedef struct

@@ -49,11 +49,12 @@ typedef struct arch_vcpu
    /*
     * This is a interrupt frame, the interrupt information will be store in this struct;
     */
-   irq_desc interrupt_storge;
+   irq_desc interrupt_storge[16];
 
 }arch_vcpu_t;
 
-int vcpu_initialize(struct vcpu *);
+pok_ret_t vcpu_initialize(struct vcpu *);
+pok_ret_t vcpu_irq_init();
 
 
 #endif /* __POK_ARCHVCPU_H__ */

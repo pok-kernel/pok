@@ -38,6 +38,8 @@ pok_ret_t pok_bsp_irq_register (uint8_t irq,
 pok_ret_t pok_bsp_irq_register_hw (uint8_t   irq,
 				   void      (*irq_handler)(unsigned, void*));
 pok_ret_t pok_bsp_irq_unregister_hw (uint8_t   irq);
+pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector);
+pok_ret_t pok_bsp_irq_unregister_vcpu(uint8_t vector);
 
 /* only used on x86, if the partition needs interrupt forwarding */
 pok_ret_t pok_bsp_irq_partition_enable (uint8_t level);

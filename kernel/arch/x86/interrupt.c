@@ -16,6 +16,7 @@
 
 
 #include <arch/x86/interrupt.h>
+#include <core/vcpu.h>
 
 void update_tss (interrupt_frame* frame)
 {
@@ -26,4 +27,29 @@ void update_tss (interrupt_frame* frame)
     *esp0 = (uint32_t)frame + sizeof (interrupt_frame);
   }
 }
+#ifdef POK_NEEDS_X86_VMM
 
+void do_IRQ(uint8_t vector)
+{
+  do_IRQ_guest(vector);
+}
+
+void do_IRQ_guest(uint8_t vector)
+{
+  uint8_t i,j;
+  struct vcpu *v;
+  for(i = 0 ; i < POK_CONFIG_NB_PARTITIONS ; i++)
+  {
+    v = pok_partitions[i].vcpu;
+    for (j = 0 ; j< 16; j++)
+    {
+      if(v->arch.irqdesc[i].vector == vector)
+      {
+        v->arch.irqdesc[i].pending = TRUE;
+	v->pending = TRUE;
+      }
+    }
+  }
+}
+
+#endif /* POK_NEEDS_X86_VMM */

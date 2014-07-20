@@ -6,12 +6,12 @@
 #include <../arch/x86/thread.h>
 #include "interrupt.h"
 
-typedef struct
+typedef struct irq_desc
 {
    interrupt_frame frame;
    unsigned vector;
    bool_t pending;
-}irq_desc;
+}irq_desc_t;
 
 typedef struct trap_info
 {
@@ -49,7 +49,7 @@ typedef struct arch_vcpu
    /*
     * This is a interrupt frame, the interrupt information will be store in this struct;
     */
-   irq_desc interrupt_storge[16];
+   struct irq_desc irqdesc[16];
 
 }arch_vcpu_t;
 

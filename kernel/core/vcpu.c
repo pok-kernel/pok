@@ -30,6 +30,8 @@ struct  vcpu *alloc_vcpu(pok_partition_t * partition, uint8_t vcpu_id)
   {
     return 0;
   }
+  /*
+   * add vcpu to list
+   */
   return v;
 }
-

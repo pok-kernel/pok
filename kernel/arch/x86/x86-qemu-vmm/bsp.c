@@ -17,8 +17,10 @@
 
 #include <errno.h>
 #include <arch.h>
+#include <libc.h>
 #include <arch/x86/interrupt.h> /* meta handler */
 #include <core/partition.h>	/* POK_SCHED_CURRENT_PARTITION */
+#include <core/vcpu.h>
 
 #include "cons.h"
 #include "pm.h"
@@ -240,17 +242,17 @@ pok_ret_t pok_bsp_irq_unregister_hw (uint8_t  irq)
 
 pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector)
 {
-  int i;
-  struct *vcpu;
+  uint8_t i;
+  struct vcpu *v;
   
   if(vector < 32)
     return POK_ERRNO_EINVAL; 
-  vcpu = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
+  v = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
   for (i=0; i<16; i++)
   {
-    if(vcpu->arch.irqdesc[i].vector == 0)
+    if(v->arch.irqdesc[i].vector == 0)
     {
-      vcpu->arch.irqdesc[i].vector==vector;
+      v->arch.irqdesc[i].vector=vector;
       return POK_ERRNO_OK;
     }
   }
@@ -260,16 +262,19 @@ pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector)
 pok_ret_t pok_bsp_irq_unregister_vcpu(uint8_t vector)
 {
   int i;
+  struct vcpu *v;
   if(vector < 32)
     return POK_ERRNO_EINVAL; 
-  vcpu = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
+  v = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
   for (i=0;i<16;i++)
   {
-    if(vcpu->arch.irqdesc[i].vector == vector)
+    if(v->arch.irqdesc[i].vector == vector)
     {
-      memset(v->arch.irqdesc+i, 0, sizeof(irq_desc));
+      memset(v->arch.irqdesc+i, 0, sizeof(struct irq_desc));
+      return POK_ERRNO_OK;
     }
   }
+  return POK_ERRNO_EINVAL;
 }
 pok_ret_t pok_bsp_irq_register (uint8_t   irq,
                                 void      (*handler)(void))

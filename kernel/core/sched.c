@@ -569,7 +569,7 @@ uint32_t pok_sched_get_current(uint32_t *thread_id)
 int sched_init_vcpu(vcpu_t *v)
 {
   v->sched_info.start_time = POK_GETTICK();
-  return 1;
+  return POK_ERRNO_OK;
 }
 
 void sched_ctxt_switch_from_vcpu(vcpu_t *v)

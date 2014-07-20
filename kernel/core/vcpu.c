@@ -16,7 +16,7 @@ struct  vcpu *alloc_vcpu(pok_partition_t * partition, uint8_t vcpu_id)
 
   v->partition=partition;
 
-  if ( sched_init_vcpu(v) == 0)
+  if ( sched_init_vcpu(v) != POK_ERRNO_OK )
   {
     return 0;
   }
@@ -26,7 +26,7 @@ struct  vcpu *alloc_vcpu(pok_partition_t * partition, uint8_t vcpu_id)
    */
   v->runstate = POK_STATE_RUNNABLE;
 
-  if(vcpu_initialize(v) == 0)
+  if(vcpu_initialize(v) != POK_ERRNO_OK )
   {
     return 0;
   }

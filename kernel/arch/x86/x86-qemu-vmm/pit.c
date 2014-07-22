@@ -60,7 +60,7 @@ INTERRUPT_HANDLER(pit_interrupt)
    (void) frame;
    pok_pic_eoi (PIT_IRQ);
    do_IRQ(32);
-   pok_sched();
+   CLOCK_HANDLER;
 }
 
 pok_ret_t pok_x86_qemu_timer_init ()

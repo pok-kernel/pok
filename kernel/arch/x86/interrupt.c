@@ -29,11 +29,17 @@ void update_tss (interrupt_frame* frame)
 }
 #ifdef POK_NEEDS_X86_VMM
 
+/*
+ * Deal with the interrupt if the interrupt should be handler by guest
+ */
 void do_IRQ(uint8_t vector)
 {
   do_IRQ_guest(vector);
 }
 
+/*
+ * Decide the interrupt should be send to guest or not
+ */
 void do_IRQ_guest(uint8_t vector)
 {
   uint8_t i,j;
@@ -47,6 +53,7 @@ void do_IRQ_guest(uint8_t vector)
       {
         v->arch.irqdesc[i].pending = TRUE;
 	v->pending = TRUE;
+	v->arch.irqdesc[i].count++;
       }
     }
   }

@@ -59,4 +59,31 @@ void do_IRQ_guest(uint8_t vector)
   }
 }
 
+/*
+ * Check the pending bit when the partition resumes
+ */
+
+void upcall_irq()
+{
+  struct vcpu *v;
+  v = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
+  if(v->pending != 0)
+  {
+    __upcall_irq(v->arch.irqdesc);
+  }
+}
+void __upcall_irq(struct irq_desc *irqdescs)
+{
+  uint8_t i;
+  for(i=0; i<16; i++)
+  {
+    while(irqdescs[i]->count)
+    {
+      handler_irq(irqdescs[i].vector);
+      irqdescs[i]->conut--;
+    }
+  }
+}
+
+
 #endif /* POK_NEEDS_X86_VMM */

@@ -1,0 +1,253 @@
+Archive member included because of file (symbol)
+
+/home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+                              main.o (pok_do_syscall)
+/home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+                              main.o (pok_thread_attr_init)
+/home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+                              main.o (printf)
+
+Allocating common symbols
+Common symbol       size              file
+
+errno               0x4               /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+pok_threads         0x8               main.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                0x0000000000000000                . = 0x0
+                0x0000000000000000                __partition_begin = .
+
+.text           0x0000000000000000      0x954
+ *(.text)
+ .text          0x0000000000000000      0x10b main.o
+                0x0000000000000000                main
+ *fill*         0x000000000000010b        0x5 00
+ .text          0x0000000000000110       0x26 activity.o
+                0x0000000000000110                thr1_job
+ *fill*         0x0000000000000136        0x2 00
+ .text          0x0000000000000138       0x1c subprograms.o
+                0x0000000000000138                test__hello_part1
+ .text          0x0000000000000154        0x0 gtypes.o
+ .text          0x0000000000000154       0x23 ../../../threadstart.o
+                0x0000000000000154                user_thread_starting
+ *fill*         0x0000000000000177        0x1 00
+ .text          0x0000000000000178       0x23 ../../../hello1.o
+                0x0000000000000178                user_hello_part1
+ *fill*         0x000000000000019b        0x1 00
+ .text          0x000000000000019c       0x4d /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+                0x000000000000019c                pok_do_syscall
+                0x00000000000001c4                pok_do_hypercall
+ *fill*         0x00000000000001e9        0x3 00
+ .text          0x00000000000001ec      0x277 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+                0x00000000000001ec                __pok_partition_start
+                0x0000000000000210                pok_thread_create
+                0x0000000000000264                pok_thread_attr_init
+                0x00000000000002c0                pok_thread_period
+                0x0000000000000314                pok_thread_status
+                0x0000000000000368                pok_thread_delayed_start
+                0x00000000000003bc                pok_thread_set_priority
+                0x0000000000000410                pok_thread_resume
+ *fill*         0x0000000000000463        0x1 00
+ .text          0x0000000000000464      0x4f0 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+                0x0000000000000794                vprintf
+                0x00000000000008ef                printf
+                0x0000000000000918                memcpy
+
+.iplt           0x0000000000000960        0x0
+ .iplt          0x0000000000000000        0x0 main.o
+
+.rodata         0x0000000000000960       0x7d
+ *(.rodata)
+ .rodata        0x0000000000000960       0x7d /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+
+.rodata.str1.1  0x00000000000009dd       0x2a
+ .rodata.str1.1
+                0x00000000000009dd        0x7 main.o
+ .rodata.str1.1
+                0x00000000000009e4        0xe ../../../threadstart.o
+ .rodata.str1.1
+                0x00000000000009f2       0x15 ../../../hello1.o
+
+.rodata.str1.4  0x0000000000000a08       0x2c
+ .rodata.str1.4
+                0x0000000000000a08       0x2c main.o
+
+.eh_frame       0x0000000000000a34      0x3ac
+ .eh_frame      0x0000000000000a34       0x38 main.o
+ .eh_frame      0x0000000000000a6c       0x1c activity.o
+                                         0x34 (size before relaxing)
+ .eh_frame      0x0000000000000a88       0x20 subprograms.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x0000000000000aa8       0x20 ../../../threadstart.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x0000000000000ac8       0x20 ../../../hello1.o
+                                         0x38 (size before relaxing)
+ .eh_frame      0x0000000000000ae8       0x48 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+                                         0x78 (size before relaxing)
+ .eh_frame      0x0000000000000b30      0x100 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+                                        0x1c0 (size before relaxing)
+ .eh_frame      0x0000000000000c30      0x1b0 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+                                        0x1e0 (size before relaxing)
+
+.rel.dyn        0x0000000000000de0        0x0
+ .rel.iplt      0x0000000000000000        0x0 main.o
+ .rel.text      0x0000000000000000        0x0 main.o
+
+.data           0x0000000000000de0       0x90
+ *(.data)
+ .data          0x0000000000000de0        0x0 main.o
+ .data          0x0000000000000de0        0x0 activity.o
+ .data          0x0000000000000de0        0x0 subprograms.o
+ .data          0x0000000000000de0        0x0 gtypes.o
+ .data          0x0000000000000de0        0x0 ../../../threadstart.o
+ .data          0x0000000000000de0        0x0 ../../../hello1.o
+ .data          0x0000000000000de0        0x0 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .data          0x0000000000000de0        0x0 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .data          0x0000000000000de0        0x0 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+ *(.bss)
+ .bss           0x0000000000000de0        0x0 main.o
+ .bss           0x0000000000000de0        0x0 activity.o
+ .bss           0x0000000000000de0        0x0 subprograms.o
+ .bss           0x0000000000000de0        0x0 gtypes.o
+ .bss           0x0000000000000de0        0x0 ../../../threadstart.o
+ .bss           0x0000000000000de0        0x0 ../../../hello1.o
+ .bss           0x0000000000000de0        0x0 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .bss           0x0000000000000de0        0x0 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .bss           0x0000000000000de0       0x84 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+ *(COMMON)
+ COMMON         0x0000000000000e64        0x8 main.o
+                0x0000000000000e64                pok_threads
+ COMMON         0x0000000000000e6c        0x4 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+                0x0000000000000e6c                errno
+                0x0000000000000e70                __partition_end = .
+LOAD main.o
+LOAD activity.o
+LOAD subprograms.o
+LOAD gtypes.o
+LOAD ../../../threadstart.o
+LOAD ../../../hello1.o
+LOAD /home/shenyouren/workspace/pok/libpok/libpok.a
+OUTPUT(part1.elf elf32-i386)
+
+.igot.plt       0x0000000000000e70        0x0
+ .igot.plt      0x0000000000000000        0x0 main.o
+
+.debug_info     0x0000000000000000     0x2c21
+ .debug_info    0x0000000000000000      0x3aa main.o
+ .debug_info    0x00000000000003aa      0x182 activity.o
+ .debug_info    0x000000000000052c       0x3b subprograms.o
+ .debug_info    0x0000000000000567       0x41 ../../../threadstart.o
+ .debug_info    0x00000000000005a8       0x41 ../../../hello1.o
+ .debug_info    0x00000000000005e9      0x569 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .debug_info    0x0000000000000b52     0x1535 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .debug_info    0x0000000000002087      0xb9a /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+
+.debug_abbrev   0x0000000000000000      0xce6
+ .debug_abbrev  0x0000000000000000       0xca main.o
+ .debug_abbrev  0x00000000000000ca       0x8e activity.o
+ .debug_abbrev  0x0000000000000158       0x29 subprograms.o
+ .debug_abbrev  0x0000000000000181        0x1 gtypes.o
+ .debug_abbrev  0x0000000000000182       0x32 ../../../threadstart.o
+ .debug_abbrev  0x00000000000001b4       0x32 ../../../hello1.o
+ .debug_abbrev  0x00000000000001e6      0x173 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .debug_abbrev  0x0000000000000359      0x510 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .debug_abbrev  0x0000000000000869      0x47d /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+
+.debug_loc      0x0000000000000000      0xab1
+ .debug_loc     0x0000000000000000       0x56 main.o
+ .debug_loc     0x0000000000000056       0x2c activity.o
+ .debug_loc     0x0000000000000082       0x38 subprograms.o
+ .debug_loc     0x00000000000000ba       0x38 ../../../threadstart.o
+ .debug_loc     0x00000000000000f2       0x38 ../../../hello1.o
+ .debug_loc     0x000000000000012a       0x70 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .debug_loc     0x000000000000019a      0x1c0 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .debug_loc     0x000000000000035a      0x757 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+
+.debug_aranges  0x0000000000000000      0x220
+ .debug_aranges
+                0x0000000000000000       0x20 main.o
+ .debug_aranges
+                0x0000000000000020       0x20 activity.o
+ .debug_aranges
+                0x0000000000000040       0x20 subprograms.o
+ .debug_aranges
+                0x0000000000000060       0x20 ../../../threadstart.o
+ .debug_aranges
+                0x0000000000000080       0x20 ../../../hello1.o
+ .debug_aranges
+                0x00000000000000a0       0x40 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .debug_aranges
+                0x00000000000000e0      0x100 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .debug_aranges
+                0x00000000000001e0       0x40 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+
+.debug_line     0x0000000000000000      0xcd1
+ .debug_line    0x0000000000000000      0x12b main.o
+ .debug_line    0x000000000000012b       0x7f activity.o
+ .debug_line    0x00000000000001aa       0x3e subprograms.o
+ .debug_line    0x00000000000001e8        0x0 gtypes.o
+ .debug_line    0x00000000000001e8       0x49 ../../../threadstart.o
+ .debug_line    0x0000000000000231       0x44 ../../../hello1.o
+ .debug_line    0x0000000000000275      0x176 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .debug_line    0x00000000000003eb      0x5d5 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .debug_line    0x00000000000009c0      0x311 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+
+.debug_str      0x0000000000000000      0xdc1
+ .debug_str     0x0000000000000000      0x803 main.o
+                                        0x840 (size before relaxing)
+ .debug_str     0x0000000000000803       0x29 activity.o
+                                        0x372 (size before relaxing)
+ .debug_str     0x000000000000082c       0x20 subprograms.o
+                                         0x8a (size before relaxing)
+ .debug_str     0x000000000000084c       0x17 ../../../threadstart.o
+                                         0x9b (size before relaxing)
+ .debug_str     0x0000000000000863       0x23 ../../../hello1.o
+                                         0x92 (size before relaxing)
+ .debug_str     0x0000000000000886      0x1b6 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+                                        0xbc8 (size before relaxing)
+ .debug_str     0x0000000000000a3c      0x171 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+                                       0x312e (size before relaxing)
+ .debug_str     0x0000000000000bad      0x214 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+                                        0xbb4 (size before relaxing)
+
+.comment        0x0000000000000000       0x2a
+ .comment       0x0000000000000000       0x2a main.o
+                                         0x2b (size before relaxing)
+ .comment       0x0000000000000000       0x2b activity.o
+ .comment       0x0000000000000000       0x2b subprograms.o
+ .comment       0x0000000000000000       0x2b gtypes.o
+ .comment       0x0000000000000000       0x2b ../../../threadstart.o
+ .comment       0x0000000000000000       0x2b ../../../hello1.o
+ .comment       0x0000000000000000       0xd7 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .comment       0x0000000000000000      0x5e1 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .comment       0x0000000000000000      0x25a /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+
+.note.GNU-stack
+                0x0000000000000000        0x0
+ .note.GNU-stack
+                0x0000000000000000        0x0 main.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 activity.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 subprograms.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 gtypes.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 ../../../threadstart.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 ../../../hello1.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 /home/shenyouren/workspace/pok/libpok/libpok.a(arch.lo)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /home/shenyouren/workspace/pok/libpok/libpok.a(core.lo)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)
+
+.debug_ranges   0x0000000000000000       0x30
+ .debug_ranges  0x0000000000000000       0x30 /home/shenyouren/workspace/pok/libpok/libpok.a(libc.lo)

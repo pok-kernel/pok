@@ -18,6 +18,9 @@
 #include <core/time.h>
 #include <core/thread.h>
 #include <core/hypercall.h>
+
+#define PIT_IRQ 0
+
 static unsigned counter = 0;
 
 void time_handler( unsigned vector, void* frame )
@@ -52,22 +55,24 @@ int user_hello( void )
   pok_time_t tmp = 0;
   uint8_t _level = 0;
 
+  pok_hypercall2(POK_HYPERCALL_IRQ_REGISTER_VCPU , PIT_IRQ);
+
   printf( "Forever spin\n");
   for( ;; )
   {
-    pok_hypercall2(POK_HYPERCALL_GETTICK, (uint32_t)(&tmp),0);
-    if( tmp >= 2000 && tmp <= 3000 )
-    {
-      pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_DISABLE, _level );
-      printf( "Counter: %u\n", counter );
-    }
-    if( tmp >= 6000 && tmp <= 8000 )
-    {
-      pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_ENABLE, _level );
-      printf( "Counter: %u\n", counter );
-    }
-
-    printf( "Clock gettick: %u \n", tmp );
+//    pok_hypercall2(POK_HYPERCALL_GETTICK, (uint32_t)(&tmp),0);
+//    if( tmp >= 2000 && tmp <= 3000 )
+//    {
+//      pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_DISABLE, _level );
+//      printf( "Counter: %u\n", counter );
+//    }
+//    if( tmp >= 6000 && tmp <= 8000 )
+//    {
+//      pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_ENABLE, _level );
+//      printf( "Counter: %u\n", counter );
+//    }
+//
+//    printf( "Clock gettick: %u \n", tmp );
   }
 
   return 0;

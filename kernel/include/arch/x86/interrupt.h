@@ -51,6 +51,8 @@ extern uint32_t pok_tss;
 void update_tss (interrupt_frame* frame);
 void do_IRQ(uint8_t vector);
 void do_IRQ_guest(uint8_t vector);
+void upcall_irq();
+void __upcall_irq();
 
 #define INTERRUPT_HANDLER(name)						\
 void name (void);							\

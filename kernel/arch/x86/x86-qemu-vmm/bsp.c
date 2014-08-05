@@ -258,10 +258,10 @@ pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector,void (*handle_irq)(uint8_t))
     if(v->arch.irqdesc[i].vector == 0)
     {
       v->arch.irqdesc[i].vector=vector;
-      v->arch.irqdesc[i].handler=handler_irq;
       return POK_ERRNO_OK;
     }
   }
+  v->arch.handler=handler_irq;
   return POK_ERRNO_UNAVAILABLE;
 }	
 

@@ -11,7 +11,6 @@ typedef struct irq_desc
    unsigned vector;
    bool_t pending;
    uint8_t counter;
-   uint32_t handler;
 }irq_desc_t;
 
 typedef struct trap_info
@@ -23,10 +22,9 @@ typedef struct trap_info
 
 typedef struct vcpu_context
 {
-  context_t user_regs;
+  interrupt_frame frame;
 //  trap_info_t trap_ctxt[256];
   unsigned long ctrlreg[8];
-//  unsigned long kernel_ss, kernel_sp;
 }vcpu_context_t;
 
 typedef struct vcpu vcpu_t;
@@ -51,6 +49,10 @@ typedef struct arch_vcpu
     * This is a interrupt frame, the interrupt information will be store in this struct;
     */
    struct irq_desc irqdesc[16];
+   /*
+    * Common interrupt hanler for Guest OS;
+    */
+   uint32_t handler;
 
 }arch_vcpu_t;
 

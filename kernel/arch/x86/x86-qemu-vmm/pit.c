@@ -61,6 +61,7 @@ INTERRUPT_HANDLER(pit_interrupt)
    pok_pic_eoi (PIT_IRQ);
    do_IRQ(32);
    CLOCK_HANDLER;
+   upcall_irq(frame);
 }
 
 pok_ret_t pok_x86_qemu_timer_init ()

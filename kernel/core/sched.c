@@ -356,9 +356,6 @@ void pok_sched_thread_switch ()
    printf ("switch to thread %d\n", elected);
    */
    pok_sched_context_switch(elected);
-#ifdef POK_NEEDS_X86_VMM
-   upcall_irq();
-#endif /* POK_NEEDS_PARTITIONS */
 }
 #endif /* POK_NEEDS_PARTITIONS */
 

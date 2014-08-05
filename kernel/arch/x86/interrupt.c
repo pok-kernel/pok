@@ -53,7 +53,7 @@ void do_IRQ_guest(uint8_t vector)
       {
         v->arch.irqdesc[i].pending = TRUE;
 	v->pending = TRUE;
-	v->arch.irqdesc[i].count++;
+	v->arch.irqdesc[i].counter++;
       }
     }
   }
@@ -77,10 +77,10 @@ void __upcall_irq(struct irq_desc *irqdescs)
   uint8_t i;
   for(i=0; i<16; i++)
   {
-    while(irqdescs[i]->count)
+    while(irqdescs[i].counter)
     {
-      handler_irq(irqdescs[i].vector);
-      irqdescs[i]->conut--;
+//      handler_irq(irqdescs[i].vector);
+      irqdescs[i].counter--;
     }
   }
 }

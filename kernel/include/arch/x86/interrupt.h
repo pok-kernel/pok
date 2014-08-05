@@ -171,6 +171,35 @@ void name##_handler(interrupt_frame* frame);				\
       );								\
 void name##_handler(interrupt_frame* frame)
 
+#define INTERRUPT_HANDLER_vmm(name)						\
+int name (void);							\
+void name##_handler(interrupt_frame* frame);				\
+  asm (	    			      			      		\
+      ".global "#name "			\n"				\
+      "\t.type "#name",@function	\n"				\
+      #name":				\n"				\
+      "cli			\n"				\
+      "subl $4, %esp			\n"				\
+      "pusha				\n"				\
+      "push %ds				\n"				\
+      "push %es				\n"				\
+      "push %esp			\n"				\
+      "mov $0x10, %ax			\n"				\
+      "mov %ax, %ds			\n"				\
+      "mov %ax, %es			\n"				\
+      "call " #name"_handler		\n"				\
+      "movl %eax, 30(%esp)         \n" /* return value and set it in eip */  \
+      "call update_tss			\n"				\
+      "addl $4, %esp			\n"				\
+      "pop %es				\n"				\
+      "pop %ds				\n"				\
+      "popa				\n"				\
+      "addl $4, %esp			\n"				\
+      "sti			\n"				\
+      "iret				\n"				\
+      );								\
+void name##_handler(interrupt_frame* frame)
+
 #endif
 
 struct meta_handler

@@ -245,7 +245,7 @@ pok_ret_t pok_bsp_irq_unregister_hw (uint8_t  irq)
  * This irq must register in POK kernel first.
  * The parameter vector is the irq number.
  */
-pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector)
+pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector,void (*handle_irq)(uint8_t))
 {
   uint8_t i;
   struct vcpu *v;
@@ -258,6 +258,7 @@ pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector)
     if(v->arch.irqdesc[i].vector == 0)
     {
       v->arch.irqdesc[i].vector=vector;
+      v->arch.irqdesc[i].handler=handler_irq;
       return POK_ERRNO_OK;
     }
   }

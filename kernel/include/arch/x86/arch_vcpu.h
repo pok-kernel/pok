@@ -11,6 +11,7 @@ typedef struct irq_desc
    unsigned vector;
    bool_t pending;
    uint8_t counter;
+   uint32_t handler;
 }irq_desc_t;
 
 typedef struct trap_info

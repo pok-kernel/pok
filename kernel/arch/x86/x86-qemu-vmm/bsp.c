@@ -244,6 +244,7 @@ pok_ret_t pok_bsp_irq_unregister_hw (uint8_t  irq)
  * Register irq in vCPU.
  * This irq must register in POK kernel first.
  * The parameter vector is the irq number.
+ * The handle_irq is a common Entry from Guest OS.
  */
 pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector,void (*handle_irq)(uint8_t))
 {
@@ -258,10 +259,10 @@ pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector,void (*handle_irq)(uint8_t))
     if(v->arch.irqdesc[i].vector == 0)
     {
       v->arch.irqdesc[i].vector=vector;
+      v->arch.handler=(uint32_t) handle_irq;
       return POK_ERRNO_OK;
     }
   }
-  v->arch.handler=handler_irq;
   return POK_ERRNO_UNAVAILABLE;
 }	
 

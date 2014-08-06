@@ -48,11 +48,13 @@ typedef struct
 
 extern uint32_t pok_tss;
 
+
 void update_tss (interrupt_frame* frame);
 void do_IRQ(uint8_t vector);
 void do_IRQ_guest(uint8_t vector);
-void upcall_irq();
-void __upcall_irq();
+uint32_t upcall_irq(interrupt_frame* frame);
+void __upcall_irq(interrupt_frame* frame,uint8_t vector, uint32_t handler);
+pok_ret_t do_iret(interrupt_frame *frame);
 
 #define INTERRUPT_HANDLER(name)						\
 void name (void);							\
@@ -160,7 +162,7 @@ void name##_handler(interrupt_frame* frame);				\
       "mov %ax, %es			\n"				\
       "call " #name"_handler		\n"				\
       "movl %eax, 40(%esp)         \n" /* return value */  \
-      "call update_tss			\n"				\
+      "1:call update_tss			\n"			\
       "addl $4, %esp			\n"				\
       "pop %es				\n"				\
       "pop %ds				\n"				\
@@ -171,34 +173,6 @@ void name##_handler(interrupt_frame* frame);				\
       );								\
 void name##_handler(interrupt_frame* frame)
 
-#define INTERRUPT_HANDLER_vmm(name)						\
-int name (void);							\
-void name##_handler(interrupt_frame* frame);				\
-  asm (	    			      			      		\
-      ".global "#name "			\n"				\
-      "\t.type "#name",@function	\n"				\
-      #name":				\n"				\
-      "cli			\n"				\
-      "subl $4, %esp			\n"				\
-      "pusha				\n"				\
-      "push %ds				\n"				\
-      "push %es				\n"				\
-      "push %esp			\n"				\
-      "mov $0x10, %ax			\n"				\
-      "mov %ax, %ds			\n"				\
-      "mov %ax, %es			\n"				\
-      "call " #name"_handler		\n"				\
-      "movl %eax, 30(%esp)         \n" /* return value and set it in eip */  \
-      "call update_tss			\n"				\
-      "addl $4, %esp			\n"				\
-      "pop %es				\n"				\
-      "pop %ds				\n"				\
-      "popa				\n"				\
-      "addl $4, %esp			\n"				\
-      "sti			\n"				\
-      "iret				\n"				\
-      );								\
-void name##_handler(interrupt_frame* frame)
 
 #endif
 

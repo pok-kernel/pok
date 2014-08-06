@@ -22,6 +22,7 @@ INTERRUPT_HANDLER_hypercall(hypercall_gate)
    hypercall_info.partition = PARTITION_ID (frame->cs);
    hypercall_info.base_addr  = pok_partitions[hypercall_info.partition].base_addr;
    hypercall_info.thread     = POK_SCHED_CURRENT_THREAD;
+   hypercall_info.frame	     = frame;
 
    hypercall_args = (pok_hypercall_args_t * ) (frame->ebx + hypercall_info.base_addr);
 

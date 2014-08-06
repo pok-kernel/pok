@@ -15,8 +15,10 @@
  */
 
 
-#include <arch/x86/interrupt.h>
+#include <errno.h>
+#include <bsp.h>
 #include <core/vcpu.h>
+#include <arch/x86/interrupt.h>
 
 void update_tss (interrupt_frame* frame)
 {
@@ -63,27 +65,72 @@ void do_IRQ_guest(uint8_t vector)
  * Check the pending bit when the partition resumes
  */
 
-void upcall_irq()
+uint32_t upcall_irq(interrupt_frame* frame)
 {
   struct vcpu *v;
+  uint8_t i;
+  uint32_t _eip;
+  uint32_t user_space_handler;
   v = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
+  _eip = frame->eip;		// if no interrupt happened, return the point of normal program;
+  user_space_handler = v->arch.handler;
+  user_space_handler -= pok_partitions[POK_SCHED_CURRENT_PARTITION].base_addr;
   if(v->pending != 0)
   {
-    __upcall_irq(v->arch.irqdesc);
-  }
-}
-void __upcall_irq(struct irq_desc *irqdescs)
-{
-  uint8_t i;
-  for(i=0; i<16; i++)
-  {
-    while(irqdescs[i].counter)
+    for(i=0;i<15;i++)
     {
-//      handler_irq(irqdescs[i].vector);
-      irqdescs[i].counter--;
+      if(v->arch.irqdesc[i].counter != 0)
+      {
+        save_interrupt_vcpu(v,frame);
+        __upcall_irq(frame, i, (uint32_t) user_space_handler);
+        v->arch.irqdesc[i].counter --;
+	return user_space_handler;  //if any interrupt occours, return the point of interrupt handler;
+      }
     }
   }
+  return _eip;
 }
 
+/*
+ * This function will update the interrupt frame to run the handler of Guest OS
+ */
+void __upcall_irq(interrupt_frame* frame,uint8_t vector, uint32_t handler)
+{
+  frame->eax = vector;        //put the irq number to eax
+  frame->eip = handler;       //Set the eip as handler
+}
 
+/*
+ * This do_iret will check the irq_desc,and according to the irq_desc, construct interrupt frame, then iret to execute handler of Guest OS
+ */
+pok_ret_t do_iret(interrupt_frame *frame)
+{
+  struct vcpu *v;
+  uint8_t i;
+  uint32_t user_space_handler;
+
+  v = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
+
+  user_space_handler = v->arch.handler;
+  user_space_handler -= pok_partitions[POK_SCHED_CURRENT_PARTITION].base_addr;
+  if(v->pending != 0)
+  {
+    for(i=0;i<15;i++)
+    {
+      while(v->arch.irqdesc[i].counter != 0)
+      {
+        __upcall_irq(frame, i, (uint32_t) user_space_handler);
+	v->arch.irqdesc[i].counter--;
+	return POK_ERRNO_OK;
+      }
+    }
+    v->pending = 0;
+  }
+  else if(v->pending == 0)
+  {
+    restore_interrupt_vcpu(v, frame);
+  }
+
+  return POK_ERRNO_OK;
+}
 #endif /* POK_NEEDS_X86_VMM */

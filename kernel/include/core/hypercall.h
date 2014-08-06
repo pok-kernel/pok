@@ -3,6 +3,7 @@
 
 #include <types.h>
 #include <errno.h>
+#include <arch/x86/interrupt.h>
 
 typedef enum
 {
@@ -19,6 +20,9 @@ typedef enum
    /* Register irq handler for partition */
    POK_HYPERCALL_IRQ_REGISTER_VCPU 		   =  30,
    POK_HYPERCALL_IRQ_UNREGISTER_VCPU		   =  31,
+
+   /* Do iret in user space */
+   POK_HYPERCALL_IRQ_DO_IRET                       =  32,
 } pok_hypercall_id_t;
 
 typedef struct
@@ -26,6 +30,7 @@ typedef struct
    pok_partition_id_t	partition;
    uint32_t  		thread;
    uint32_t		base_addr;
+   interrupt_frame*     frame;
 }pok_hypercall_info_t;
 
 typedef struct

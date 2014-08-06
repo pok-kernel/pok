@@ -59,6 +59,8 @@ typedef struct arch_vcpu
 pok_ret_t vcpu_initialize(struct vcpu *);
 pok_ret_t vcpu_irq_init();
 
+void save_interrupt_vcpu(struct vcpu* v, interrupt_frame* frame);
+void restore_interrupt_vcpu(struct vcpu* v, interrupt_frame* frame);
 
 #endif /* __POK_ARCHVCPU_H__ */
 #endif /* POK_NEEDS_X86_VMM */

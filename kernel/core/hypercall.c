@@ -71,13 +71,17 @@ pok_ret_t pok_core_hypercall (const pok_hypercall_id_t       hypercall_id,
 
    /* register interrupt delivery to vcpu */
    case POK_HYPERCALL_IRQ_REGISTER_VCPU:
-       return pok_bsp_irq_register_vcpu(args->arg1,(void(*)(uint8_t)) ((args->arg2 + infos->base_addr));
+       return pok_bsp_irq_register_vcpu(args->arg1,(void(*)(uint8_t)) ((args->arg2 + infos->base_addr)));
        break;
    /* unregister interrupt delivery to vcpu */
-   case POK_HYPERCALL_IRQ_REGISTER_VCPU:
+   case POK_HYPERCALL_IRQ_UNREGISTER_VCPU:
        return pok_bsp_irq_unregister_vcpu(args->arg1);
        break;
-       
+   
+   /* Do iret in user space */
+   case POK_HYPERCALL_IRQ_DO_IRET:
+      return do_iret(infos->frame);
+      break;
        
 #endif /* POK_NEEDS_X86_VMM */
 

@@ -21,19 +21,12 @@
 
 #define PIT_IRQ 0
 
-static unsigned counter = 0;
+void handle_irq();
 
-void time_handler( unsigned vector, void* frame )
-{
-  (void) frame;
-  (void)vector;
-  counter++;
-}
-
-
+uint64_t tick_counter = 0;
 void register_handler()
 {
-  pok_ret_t ret = pok_hypercall2( POK_HYPERCALL_IRQ_REGISTER_HANDLER, 0, (uint32_t)&time_handler );
+  pok_ret_t ret = pok_hypercall2( POK_HYPERCALL_IRQ_REGISTER_VCPU, 0, (uint32_t)&handle_irq);
   if( ret != POK_ERRNO_OK )
     printf( "Couldn't register handler\n");
 }
@@ -43,37 +36,34 @@ void register_handler()
  * If we don't try to register the handler, the program executes propperly.
  */
 
-static int flag = 0;
 int user_hello( void )
 {
   printf( "Hello POK world!\n");
-//  if (flag < 1)
-//  {
-//    register_handler();
-//    flag++;
-//  }
-  pok_time_t tmp = 0;
-  uint8_t _level = 0;
-
-  pok_hypercall2(POK_HYPERCALL_IRQ_REGISTER_VCPU , PIT_IRQ);
-
-  printf( "Forever spin\n");
-  for( ;; )
-  {
-//    pok_hypercall2(POK_HYPERCALL_GETTICK, (uint32_t)(&tmp),0);
-//    if( tmp >= 2000 && tmp <= 3000 )
-//    {
-//      pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_DISABLE, _level );
-//      printf( "Counter: %u\n", counter );
-//    }
-//    if( tmp >= 6000 && tmp <= 8000 )
-//    {
-//      pok_hypercall1( POK_HYPERCALL_IRQ_PARTITION_ENABLE, _level );
-//      printf( "Counter: %u\n", counter );
-//    }
-//
-//    printf( "Clock gettick: %u \n", tmp );
-  }
+  register_handler();
 
   return 0;
+}
+
+void handle_irq()
+{
+  uint32_t irq=0;
+  do{
+  asm(
+      "add %%eax,%0  \n"	\
+      :"=m"(irq)	\
+      :
+      :"%eax");
+  }while(0);
+  switch(irq)
+  {
+case PIT_IRQ:
+    tick_counter++;
+    printf( "Clock gettick: %u \n",tick_counter);
+    pok_hypercall1( POK_HYPERCALL_IRQ_DO_IRET,0);    
+    break;
+
+    
+default:
+    pok_hypercall1( POK_HYPERCALL_IRQ_DO_IRET,0);    
+  }
 }

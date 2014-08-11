@@ -51,11 +51,11 @@ void do_IRQ_guest(uint8_t vector)
     v = pok_partitions[i].vcpu;
     for (j = 0 ; j< 16; j++)
     {
-      if(v->arch.irqdesc[i].vector == vector)
+      if(v->arch.irqdesc[j].vector == vector)
       {
-        v->arch.irqdesc[i].pending = TRUE;
+        v->arch.irqdesc[j].pending = TRUE;
 	v->pending = TRUE;
-	v->arch.irqdesc[i].counter++;
+	v->arch.irqdesc[j].counter++;
       }
     }
   }
@@ -96,7 +96,7 @@ uint32_t upcall_irq(interrupt_frame* frame)
  */
 void __upcall_irq(interrupt_frame* frame,uint8_t vector, uint32_t handler)
 {
-  frame->eax = vector;        //put the irq number to eax
+  frame->eax = vector - 32;        //put the irq number to eax, also adjust the vector.
   frame->eip = handler;       //Set the eip as handler
 }
 

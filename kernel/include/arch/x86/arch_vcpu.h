@@ -22,11 +22,12 @@ typedef struct trap_info
 
 typedef struct vcpu_context
 {
-  interrupt_frame frame;
+  int8_t lastframe;
+  interrupt_frame frame[16];
 //  trap_info_t trap_ctxt[256];
   unsigned long ctrlreg[8];
 }vcpu_context_t;
-
+  
 typedef struct vcpu vcpu_t;
 
 /*
@@ -58,6 +59,7 @@ typedef struct arch_vcpu
 
 pok_ret_t vcpu_initialize(struct vcpu *);
 pok_ret_t vcpu_irq_init();
+pok_ret_t vcpu_irq_context_init(struct vcpu *v);
 
 void save_interrupt_vcpu(struct vcpu* v, interrupt_frame* frame);
 void restore_interrupt_vcpu(struct vcpu* v, interrupt_frame* frame);

@@ -251,6 +251,7 @@ pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector,void (*handle_irq)(uint8_t))
   uint8_t i;
   struct vcpu *v;
   
+  vector += 32; 	//adjust the vector number.
   if(vector < 32)
     return POK_ERRNO_EINVAL; 
   v = pok_partitions[POK_SCHED_CURRENT_PARTITION].vcpu;
@@ -260,6 +261,10 @@ pok_ret_t pok_bsp_irq_register_vcpu(uint8_t vector,void (*handle_irq)(uint8_t))
     {
       v->arch.irqdesc[i].vector=vector;
       v->arch.handler=(uint32_t) handle_irq;
+      return POK_ERRNO_OK;
+    }
+    else if(v->arch.irqdesc[i].vector == vector)
+    {
       return POK_ERRNO_OK;
     }
   }

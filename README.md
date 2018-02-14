@@ -1,4 +1,4 @@
 pok
 ===
 
-POK kernel repository. Visit http://pok.tuxfamily.org
+POK kernel repository. More information on https://pok-kernel.github.io/

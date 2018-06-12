@@ -95,8 +95,12 @@ void RECEIVE_QUEUING_MESSAGE (
       /*out*/ RETURN_CODE_TYPE          *return_code )
 {
    pok_ret_t core_ret;
-
-   core_ret = pok_port_queueing_receive (QUEUING_PORT_ID, TIME_OUT, *LENGTH, MESSAGE_ADDR, (pok_port_size_t*)LENGTH);
+   SYSTEM_TIME_TYPE pok_timeout=TIME_OUT;
+   if(TIME_OUT==INFINITE_TIME_VALUE) {
+     pok_timeout = 0;
+   }
+   
+   core_ret = pok_port_queueing_receive (QUEUING_PORT_ID, pok_timeout, *LENGTH, MESSAGE_ADDR, (pok_port_size_t*)LENGTH);
 
    if(core_ret == POK_ERRNO_EMPTY) core_ret = NOT_AVAILABLE;
    *return_code = core_ret;

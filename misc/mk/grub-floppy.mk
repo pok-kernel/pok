@@ -164,7 +164,7 @@ endif
 
 launch-run:
 	$(ECHO) $(ECHO_FLAGS) "[QEMU] Start"
-	$(QEMU) $(CONFIG_QEMU) $(QEMU_MISC) $(NETWORK_ARGS) -pidfile qemu.pid -hda fat:. -boot a $(QEMU_ENDCOMMAND) &
+	$(QEMU) $(CONFIG_QEMU) $(QEMU_MISC) $(NETWORK_ARGS) -pidfile qemu.pid -drive format=raw,media=disk,file=fat:rw:.,if=ide,index=0 -boot a $(QEMU_ENDCOMMAND) &
 	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK "; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi
 
 run: xcov-pre-run spoq-pre-run instrumentation-pre-run launch-run xcov-post-run instrumentation-post-run spoq-post-run

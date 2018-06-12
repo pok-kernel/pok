@@ -14,7 +14,7 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-#ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE
+//#ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE
 
 #ifdef POK_NEEDS_THREADS
 
@@ -28,5 +28,5 @@ pok_ret_t pok_thread_sleep (const pok_time_t ms)
 
 #endif
 
-#endif /* POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE */
+//#endif /* POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE */
 

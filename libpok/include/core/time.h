@@ -24,7 +24,7 @@
 #include <errno.h>
 #include <core/syscall.h>
 
-#define pok_time_get(v) pok_time_gettick(v)
+pok_ret_t pok_time_get (pok_time_t* ms);
 /*
  * Get the amount of milliseconds expired since the system starts.
  */
@@ -49,10 +49,6 @@ pok_ret_t pok_time_compute_deadline (const pok_time_t relative, pok_time_t* abso
  * This function is a facility to compute tasks' deadline.
  */
 
-#define pok_time_gettick(value) pok_syscall2(POK_SYSCALL_GETTICK,(uint32_t)value,0);
-/*
- * Get number of ticks that passed since the system starts
- * Similar to : pok_ret_t   pok_time_gettick (uint64_t* value);
- */
+pok_ret_t pok_time_gettick(pok_time_t * value);
 
 #endif  /* __POK_TIME_H__ */

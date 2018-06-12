@@ -7,6 +7,7 @@ LO_TARGET=core.lo
 
 LO_OBJS=	allocator.o \
 			timecomputedeadline.o \
+			timeget.o \
 			eventlock.o \
 			errno.o \
 			eventunlock.o \

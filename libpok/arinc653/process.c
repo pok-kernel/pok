@@ -226,14 +226,11 @@ void START (PROCESS_ID_TYPE   process_id,
 	DELAYED_START(process_id,0,return_code);
 }
 
-#ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE
 void STOP (PROCESS_ID_TYPE    process_id,
-						RETURN_CODE_TYPE *return_code )
+	   RETURN_CODE_TYPE *return_code )
 {
-	 (void) process_id;
-	 *return_code = NOT_AVAILABLE;
+  *return_code = pok_thread_stop(process_id);
 }
-#endif
 
 void DELAYED_START (PROCESS_ID_TYPE   process_id,
 				SYSTEM_TIME_TYPE  delay_time,

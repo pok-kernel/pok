@@ -21,16 +21,19 @@
 #include <arinc653/time.h>
 
 #include <core/thread.h>
+#include <core/time.h>
 #include <types.h>
 
+unsigned long long __udivdi3(unsigned long long num,
+			     unsigned long long den);
 
-#ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE
 void TIMED_WAIT (SYSTEM_TIME_TYPE delay_time, RETURN_CODE_TYPE *return_code)
 {
-   (void) delay_time;
-   *return_code = NOT_AVAILABLE;
+  pok_time_t ms;
+  ms = __udivdi3(delay_time,1000);
+  *return_code = pok_thread_sleep (ms);
 }
-#endif
+
 
 void PERIODIC_WAIT (RETURN_CODE_TYPE *return_code)
 {
@@ -39,13 +42,15 @@ void PERIODIC_WAIT (RETURN_CODE_TYPE *return_code)
    *return_code = core_ret;
 }
 
-#ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE
+
 void GET_TIME (SYSTEM_TIME_TYPE *system_time, RETURN_CODE_TYPE *return_code)
 {
-   (void) system_time;
-   *return_code = NOT_AVAILABLE;
+  pok_time_t pok_time;
+  *return_code = pok_time_get (&pok_time);
+  *system_time = pok_time*1000;
 }
 
+#ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE
 void REPLENISH (SYSTEM_TIME_TYPE budget_time, RETURN_CODE_TYPE *return_code)
 {
    (void) budget_time;

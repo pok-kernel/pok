@@ -57,7 +57,8 @@ void                      pok_sched_partition_switch();
 #endif
 
 #if defined (POK_NEEDS_PORTS_SAMPLING) || defined (POK_NEEDS_PORTS_QUEUEING)
-void pok_port_flushall (void);
+extern void pok_port_flushall (void);
+extern void pok_port_flush_partition (uint8_t);
 #endif
 
 uint64_t           pok_sched_slots[POK_CONFIG_SCHEDULING_NBSLOTS]
@@ -68,6 +69,10 @@ uint8_t           pok_sched_slots_allocation[POK_CONFIG_SCHEDULING_NBSLOTS]
 pok_sched_t       pok_global_sched;
 uint64_t          pok_sched_next_deadline;
 uint64_t          pok_sched_next_major_frame;
+uint64_t          pok_sched_next_flush; // variable used to handle user defined
+                                        // flushing period, i.e. distinct from
+                                        // MAF and from partition slot
+                                        // boundaries
 uint8_t           pok_sched_current_slot = 0; /* Which slot are we executing at this time ?*/
 uint32_t	         current_thread = KERNEL_THREAD;
 
@@ -110,6 +115,7 @@ void pok_sched_init (void)
    pok_sched_current_slot        = 0;
    pok_sched_next_major_frame    = POK_CONFIG_SCHEDULING_MAJOR_FRAME;
    pok_sched_next_deadline       = pok_sched_slots[0];
+   pok_sched_next_flush          = 0;
    pok_current_partition         = pok_sched_slots_allocation[0];
 }
 
@@ -138,11 +144,27 @@ uint8_t	pok_elect_partition()
   {
       /* Here, we change the partition */
 #  if defined (POK_NEEDS_PORTS_SAMPLING) || defined (POK_NEEDS_PORTS_QUEUEING)
+#    if defined (POK_FLUSH_PERIOD)
+    // Flush periodically all partition ports
+    // nb : Flush periodicity is a multiple of POK time base.
+    if (pok_sched_next_flush <= now)
+    {
+      pok_sched_next_flush += POK_FLUSH_PERIOD;
+      pok_port_flushall();
+    }
+#    elif defined (POK_NEEDS_FLUSH_ON_WINDOWS)
+    //Flush only the ports of the partition that just finished its slot
+    if ((pok_sched_next_deadline<=now))
+    {
+      pok_port_flush_partition (pok_current_partition);
+    }
+#    else // activate default flushing policy at each Major Frame beginning
     if (pok_sched_next_major_frame <= now)
     {
       pok_sched_next_major_frame = pok_sched_next_major_frame +	POK_CONFIG_SCHEDULING_MAJOR_FRAME;
       pok_port_flushall();
     }
+#    endif /* defined POK_FLUSH_PERIOD || POK_NEEDS_FLUSH_ON_WINDOWS */
 #  endif /* defined (POK_NEEDS_PORTS....) */
 
     pok_sched_current_slot = (pok_sched_current_slot + 1) % POK_CONFIG_SCHEDULING_NBSLOTS;
@@ -522,6 +544,7 @@ void pok_sched_activate_error_thread (void)
    uint32_t error_thread = pok_partitions[pok_current_partition].thread_error;
    if (error_thread != 0)
    {
+      pok_threads[error_thread].priority = pok_sched_get_priority_max(0);
       pok_threads[error_thread].remaining_time_capacity = 1000;
       pok_threads[error_thread].period = 100;
       pok_threads[error_thread].next_activation= 0;

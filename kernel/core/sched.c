@@ -272,7 +272,9 @@ uint32_t	pok_elect_thread(uint8_t new_partition_id)
             {
                POK_CURRENT_THREAD.remaining_time_capacity = POK_CURRENT_THREAD.remaining_time_capacity - 1;
             }
-            else
+            else if(POK_CURRENT_THREAD.time_capacity > 0) // Wait next activation only for thread 
+                                                          // with non-infinite capacity (could be 
+                                                          // infinite with value -1 <--> INFINITE_TIME_CAPACITY)
             {
                POK_CURRENT_THREAD.state = POK_STATE_WAIT_NEXT_ACTIVATION;
             }
@@ -442,7 +444,18 @@ uint32_t pok_sched_part_rms (const uint32_t index_low, const uint32_t index_high
             }
             from++;
         }
-        printf(" are runnable\n");
+        printf(" are runnable; \n\t\t");
+        from=index_low;	
+	while ( from <= index_high )
+        {
+            if ( pok_threads[from].state!=POK_STATE_RUNNABLE )
+            {
+                printf(" %d (state = %d)",from,pok_threads[from].state);
+            }
+            from++;
+        }
+        printf(" are NOT runnable;\n");
+
     }
 #endif
 

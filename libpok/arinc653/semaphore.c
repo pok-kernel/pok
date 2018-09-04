@@ -113,7 +113,11 @@ void WAIT_SEMAPHORE (SEMAPHORE_ID_TYPE SEMAPHORE_ID,
       return;
    }
 
-   core_ret = pok_sem_wait (pok_arinc653_semaphores_layers[SEMAPHORE_ID].core_id, TIME_OUT);
+   SYSTEM_TIME_TYPE pok_timeout = TIME_OUT;
+   if(pok_timeout ==-1)
+     pok_timeout = 0;
+
+   core_ret = pok_sem_wait (pok_arinc653_semaphores_layers[SEMAPHORE_ID].core_id, pok_timeout);
 
    *RETURN_CODE = INVALID_PARAM;
 

@@ -305,7 +305,7 @@ pok_ret_t pok_lockobj_lock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* at
        */
       if ((attr != NULL) && (attr->time > 0))
       {
-         timeout = attr->time;
+         timeout = attr->time + POK_GETTICK();
       }
 
       while ( (obj->is_locked == TRUE ) || (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_LOCK)) 
@@ -318,6 +318,7 @@ pok_ret_t pok_lockobj_lock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* at
             if (POK_GETTICK() >= timeout)
             {
                obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
+               SPIN_UNLOCK (obj->spin);
                return POK_ERRNO_TIMEOUT;
             }
          }

@@ -57,9 +57,9 @@ INTERRUPT_HANDLER_syscall(syscall_gate)
    /*
     * Check that pointer is inside the adress space
     */
-   if (POK_CHECK_PTR_IN_PARTITION(syscall_info.partition, syscall_args) == 0)
+   if (pok_check_ptr_in_partition(syscall_info.partition, (void*)frame->ebx, sizeof(pok_syscall_args_t)) == 0)
    {
-         syscall_ret = POK_ERRNO_EINVAL;
+      syscall_ret = POK_ERRNO_EINVAL;
    }
    else
    {

@@ -25,7 +25,7 @@ void  *memcpy(void * to, const void * from, size_t n);
 /* avoid errors for windows */
 /*__attribute__ ((weak))*/
 void  *memset(void *dest, unsigned char val, size_t count);
-int   strlen (const char* str);
+size_t   strlen (const char* str);
 
 int   strcmp (const char *s1, const char *s2);
 int   strncmp(const char *s1, const char *s2, size_t size);

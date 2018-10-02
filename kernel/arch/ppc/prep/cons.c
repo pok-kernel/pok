@@ -23,7 +23,7 @@
 #include <core/cons.h>
 #include "cons.h"
 
-#if defined (POK_NEEDS_CONSOLE) || defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS)
+#if defined (POK_NEEDS_CONSOLE) || defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS) || defined (POK_NEEDS_USER_DEBUG)
 
 #define  COM1      0x3F8
 

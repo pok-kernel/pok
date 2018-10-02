@@ -18,7 +18,8 @@
 #ifndef __POK_CONS_H__
 #define __POK_CONS_H__
 
-#if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_CONSOLE) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS)
+#if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_CONSOLE) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS) ||  defined (POK_NEEDS_USER_DEBUG)
+
 #include <arch.h>
 #include <errno.h>
 #include <types.h>

@@ -25,6 +25,10 @@
 #include <arinc653/process.h>
 #include <libc/string.h>
 
+uint32_t pok_arinc653_processes[POK_CONFIG_NB_THREADS];
+uint32_t pok_arinc653_processes_nb;
+
+
 void GET_PROCESS_ID (PROCESS_NAME_TYPE process_name[MAX_NAME_LENGTH],
 										 PROCESS_ID_TYPE   *process_id,
 										 RETURN_CODE_TYPE  *return_code )
@@ -63,7 +67,9 @@ void GET_PROCESS_STATUS (PROCESS_ID_TYPE     process_id,
 	pok_thread_attr_t	attr;
 	pok_ret_t		core_ret;
 
-	core_ret = pok_thread_status (process_id, &attr);
+	uint32_t          core_process_id = pok_arinc653_processes[process_id];
+	
+	core_ret = pok_thread_status (core_process_id, &attr);
 	if (core_ret ==  POK_ERRNO_PARAM)
 		{
 			*return_code =  INVALID_PARAM;
@@ -71,8 +77,8 @@ void GET_PROCESS_STATUS (PROCESS_ID_TYPE     process_id,
 		}
 	process_status->DEADLINE_TIME = attr.deadline;
 	process_status->PROCESS_STATE = attr.state;
-	strcpy(process_status->ATTRIBUTES.NAME, arinc_process_attribute[process_id].NAME);
-	process_status->ATTRIBUTES.BASE_PRIORITY = arinc_process_attribute[process_id].BASE_PRIORITY;
+	strcpy(process_status->ATTRIBUTES.NAME, arinc_process_attribute[core_process_id].NAME);
+	process_status->ATTRIBUTES.BASE_PRIORITY = arinc_process_attribute[core_process_id].BASE_PRIORITY;
 	process_status->ATTRIBUTES.DEADLINE = HARD;
 	process_status->CURRENT_PRIORITY = attr.priority;
 	process_status->ATTRIBUTES.PERIOD = attr.period;
@@ -81,6 +87,7 @@ void GET_PROCESS_STATUS (PROCESS_ID_TYPE     process_id,
 	process_status->ATTRIBUTES.STACK_SIZE = attr.stack_size;
 	*return_code = NO_ERROR;
 }
+
 
 void CREATE_PROCESS (PROCESS_ATTRIBUTE_TYPE  *attributes,
 										 PROCESS_ID_TYPE         *process_id,
@@ -108,13 +115,17 @@ void CREATE_PROCESS (PROCESS_ATTRIBUTE_TYPE  *attributes,
 	 core_attr.stack_size      = attributes->STACK_SIZE;
 
 	 core_ret = pok_thread_create (&core_process_id, &core_attr);
-	 arinc_process_attribute[core_process_id].BASE_PRIORITY = attributes->BASE_PRIORITY;
-	 strcpy(arinc_process_attribute[core_process_id].NAME, attributes->NAME);
-	 *process_id = core_process_id;
 	 *return_code = core_ret;
-   if(core_ret != POK_ERRNO_OK) {
+	 if(core_ret==POK_ERRNO_OK) {
+	   pok_arinc653_processes_nb++;
+	   pok_arinc653_processes[pok_arinc653_processes_nb] = core_process_id;
+	   arinc_process_attribute[pok_arinc653_processes_nb].BASE_PRIORITY = attributes->BASE_PRIORITY;
+	   strcpy(arinc_process_attribute[pok_arinc653_processes_nb].NAME, attributes->NAME);
+	   *process_id = pok_arinc653_processes_nb;
+	 }
+	 else
 	   return;
-   }
+
    // ARINC specifies that threads shall be created in the DORMANT state
    core_ret = pok_thread_suspend_target(core_process_id);
    *return_code = core_ret;
@@ -133,7 +144,9 @@ void SET_PRIORITY (PROCESS_ID_TYPE  process_id,
 	pok_thread_attr_t core_attr;
 	pok_ret_t         core_ret;
 
-	core_ret = pok_thread_status (process_id, &core_attr);
+	uint32_t          core_process_id = pok_arinc653_processes[process_id];
+	
+	core_ret = pok_thread_status (core_process_id, &core_attr);
 	if (core_ret != POK_ERRNO_OK)
 		{
 			*return_code =  INVALID_PARAM;
@@ -149,7 +162,7 @@ void SET_PRIORITY (PROCESS_ID_TYPE  process_id,
 			*return_code = INVALID_MODE;
 			return;
 		}
-	core_ret = pok_thread_set_priority(process_id, priority);
+	core_ret = pok_thread_set_priority(core_process_id, priority);
 	*return_code = core_ret;
 }
 
@@ -169,7 +182,9 @@ void SUSPEND (PROCESS_ID_TYPE    process_id,
 	pok_thread_attr_t  attr;
 	pok_ret_t    core_ret;
 
-	core_ret = pok_thread_status (process_id, &attr);
+	uint32_t          core_process_id = pok_arinc653_processes[process_id];
+	
+	core_ret = pok_thread_status (core_process_id, &attr);
 	if (attr.state == DORMANT)
 		{
 			*return_code = INVALID_MODE;
@@ -185,7 +200,7 @@ void SUSPEND (PROCESS_ID_TYPE    process_id,
 			*return_code = NO_ACTION;
 			return ;
 		}
-	core_ret = pok_thread_suspend_target (process_id);
+	core_ret = pok_thread_suspend_target (core_process_id);
 	*return_code = core_ret;
 }
 
@@ -195,7 +210,9 @@ void RESUME (PROCESS_ID_TYPE     process_id,
 	pok_thread_attr_t  attr;
 	pok_ret_t    core_ret;
 
-	core_ret = pok_thread_status (process_id, &attr);
+	uint32_t          core_process_id = pok_arinc653_processes[process_id];
+	
+	core_ret = pok_thread_status (core_process_id, &attr);
 	if (core_ret != 0)
 		{
 			*return_code = INVALID_PARAM;
@@ -216,20 +233,21 @@ void RESUME (PROCESS_ID_TYPE     process_id,
 			*return_code = INVALID_MODE;
 			return ;
 		}
-	core_ret = pok_thread_resume (process_id);
+	core_ret = pok_thread_resume (core_process_id);
 	*return_code = core_ret;
 }
 
 void START (PROCESS_ID_TYPE   process_id,
 					 RETURN_CODE_TYPE   *return_code )
 {
-	DELAYED_START(process_id,0,return_code);
+  DELAYED_START(process_id,0,return_code);
 }
 
 void STOP (PROCESS_ID_TYPE    process_id,
 	   RETURN_CODE_TYPE *return_code )
 {
-  *return_code = pok_thread_stop(process_id);
+  uint32_t          core_process_id = pok_arinc653_processes[process_id];
+  *return_code = pok_thread_stop(core_process_id);
 }
 
 void DELAYED_START (PROCESS_ID_TYPE   process_id,
@@ -239,7 +257,9 @@ void DELAYED_START (PROCESS_ID_TYPE   process_id,
   pok_thread_attr_t     attr;
   pok_ret_t		core_ret;
 
-  core_ret = pok_thread_status (process_id, &attr);
+  uint32_t          core_process_id = pok_arinc653_processes[process_id];
+  
+  core_ret = pok_thread_status (core_process_id, &attr);
   if (core_ret != POK_ERRNO_OK)
     {
       *return_code = INVALID_PARAM;
@@ -260,7 +280,7 @@ void DELAYED_START (PROCESS_ID_TYPE   process_id,
     *return_code = INVALID_PARAM;
     return;
   }*/
-  core_ret = pok_thread_delayed_start(process_id, delay_time);
+  core_ret = pok_thread_delayed_start(core_process_id, delay_time);
   if (core_ret == POK_ERRNO_OK) {
     *return_code = NO_ERROR;
   }else {

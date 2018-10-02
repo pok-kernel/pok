@@ -21,6 +21,9 @@ $(TARGET): assemble-partitions
 	$(RM) -f sizes.c
 	$(TOUCH) sizes.c
 	$(ECHO) "#include <types.h>" >> sizes.c
+	grep pok_ports_names kernel/deployment.c | \
+	cut -d'{' -f2 | tr -d '};'               | \
+	awk '{n=split($$0,a,","); m=0; for (i in a) { l = length(a[i])-2; if (m<l) m=l;} print "uint32_t pok_ports_names_max_len = "m";" }' >> sizes.c
 	$(ECHO) "uint32_t part_sizes[] = {" >> sizes.c
 	N=1 ; for v in $(PARTITIONS); do \
 		if test $$N -eq 0; then $(ECHO) "," >> sizes.c ; fi ; N=0 ;\
@@ -37,6 +40,9 @@ plop: assemble-partitions
 	$(RM) -f sizes.c
 	$(TOUCH) sizes.c
 	$(ECHO) "#include <types.h>" >> sizes.c
+	grep pok_ports_names kernel/deployment.c | \
+	cut -d'{' -f2 | tr -d '};'               | \
+	awk '{n=split($$0,a,","); m=0; for (i in a) { l = length(a[i])-2; if (m<l) m=l;} print "uint32_t pok_ports_names_max_len = "m";" }' >> sizes.c
 	$(ECHO) "uint32_t part_sizes[] = {" >> sizes.c
 	N=1 ; for v in $(PARTITIONS); do \
 		if test $$N -eq 0; then $(ECHO) "," >> sizes.c ; fi ; N=0 ;\

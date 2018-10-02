@@ -31,7 +31,10 @@
 
 #include <middleware/port.h>
 
+
+#if defined POK_NEEDS_PORTS_QUEUEING || defined POK_NEEDS_PORTS_SAMPLING || defined POK_NEEDS_PORTS_VIRTUAL
 extern uint32_t pok_ports_names_max_len;
+#endif
 
 /**
  * \file kernel/core/syscalls.c

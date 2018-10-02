@@ -18,6 +18,7 @@
 #ifdef POK_NEEDS_PORTS_SAMPLING
 #include <errno.h>
 #include <types.h>
+#include <core/partition.h>
 #include <core/lockobj.h>
 #include <core/sched.h>
 #include <core/time.h>
@@ -65,6 +66,17 @@ pok_ret_t pok_port_sampling_read (const pok_port_id_t id,
    }
 
    pok_lockobj_lock (&pok_ports[id].lock, NULL);
+
+   {
+      uint8_t   pid = pok_current_partition;
+      void     *ptr = data - pok_partitions[pid].base_addr;
+      uint32_t  sz  = pok_ports[pid].size;
+
+      if (!pok_check_ptr_in_partition(pid, ptr, sz))
+      {
+         return POK_ERRNO_EINVAL;
+      }
+   }
 
    ret = pok_port_get ((uint8_t)id, data, pok_ports[id].size);
 

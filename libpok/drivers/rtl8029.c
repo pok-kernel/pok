@@ -120,7 +120,9 @@ void rtl8029_enqueue (pok_packet_t *packet)
   /* overflow? */
   if (queue->len + packet->udp.len > RECV_BUF_SZ)
   {
+#ifdef POK_NEEDS_DEBUG
     printf("rtl8029_read: error: ring buffer %d overflow!\n", packet->udp.dst);
+#endif
     return;
   }
 
@@ -157,13 +159,17 @@ void rtl8029_read (pok_port_id_t port_id, void* data, uint32_t len)
     uint32_t	size = len < queue->len ? len : queue->len;
     uint32_t	copied = 0;
 
+#ifdef POK_NEEDS_DEBUG
     printf ("[RTL8029] READ DATA FROM LOCAL PORT %d "
 	    "GLOBAL_PORT=%d), size=%d\n", port_id, global, len);
-
+#endif
+    
     /* is there something to read ? */
     if (queue->len == 0)
     {
+#ifdef POK_NEEDS_DEBUG
       printf("rtl8029_read: error: empty read ring buffer %d!\n", port_id);
+#endif
       return;
     }
 
@@ -208,8 +214,10 @@ void rtl8029_write (pok_port_id_t port_id, const void* data, uint32_t len)
     ret = pok_port_virtual_destination (port_id, tmp, &dest);
     if (ret == POK_ERRNO_OK)
     {
+#ifdef POK_NEEDS_DEBUG
       printf ("[RTL8029] SEND DATA THROUGH NETWORK FROM LOCAL PORT %d "
 	      "TO GLOBAL PORT %d, size=%d\n", port_id, dest, len);
+#endif
 
       memcpy(packet.eth.src, dev.mac, ETH_MAC_LEN);
       memcpy(packet.eth.dst, node2, ETH_MAC_LEN);
@@ -295,8 +303,9 @@ void rtl8029_polling ()
 	// error
       }
 
+#ifdef POK_NEEDS_DEBUG
       printf("[*]\n");
-
+#endif
       /* no errors */
       s_ne2000_header	ne2000_hdr;	// ne2000 packet header
       unsigned short	offset;		// dma offset
@@ -387,7 +396,9 @@ void rtl8029_init ()
 
   if (pci_register(&(dev.pci)) != 0)
   {
+#ifdef POK_NEEDS_DEBUG
     printf("rtl8029: PCI init failed!\n");
+#endif
     return;
   }
 

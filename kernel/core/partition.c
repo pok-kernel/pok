@@ -288,13 +288,22 @@ pok_ret_t pok_partition_set_mode (const uint8_t pid, const pok_partition_mode_t 
 					 thread->state = POK_STATE_WAITING;
 				 }
 				 thread->wakeup_time += POK_GETTICK();
-				 thread->end_time =  thread->wakeup_time + thread->time_capacity;
+				 if(thread->time_capacity>0)
+				   thread->end_time =  thread->wakeup_time + thread->time_capacity;
 			 }
 		 } else {
 			 if(thread->state == POK_STATE_DELAYED_START) { // delayed start, the delay is in the wakeup time
+			   if(!thread->wakeup_time) {
+			     thread->state = POK_STATE_RUNNABLE;
+			     thread->wakeup_time += POK_GETTICK();
+			     if(thread->time_capacity>0)
+			       thread->end_time =  thread->wakeup_time + thread->time_capacity;
+			   } else {
 				 thread->next_activation = thread->wakeup_time + POK_CONFIG_SCHEDULING_MAJOR_FRAME + POK_CURRENT_PARTITION.activation;
 				 thread->end_time =  thread->next_activation + thread->time_capacity;
 				 thread->state = POK_STATE_WAIT_NEXT_ACTIVATION;
+			      
+			   }
 			 }
 		 }
 	 }

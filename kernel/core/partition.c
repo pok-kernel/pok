@@ -448,16 +448,24 @@ pok_ret_t pok_current_partition_get_start_condition (pok_start_condition_t *star
  */
 pok_ret_t pok_partition_stop_thread (const uint32_t tid)
 {
+   uint32_t id;
    if (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_error)
    {
       return POK_ERRNO_THREAD;
    }
+
+   id = tid + POK_CURRENT_PARTITION.thread_index_low;
+   if (POK_CURRENT_PARTITION.thread_index_low > id || POK_CURRENT_PARTITION.thread_index_high < id)
+   {
+      return POK_ERRNO_THREADATTR;
+   }
+
    /*
     * We check which thread try to call this function. Only the error handling
     * thread can stop other threads.
     */
 
-   pok_sched_stop_thread (tid + POK_CURRENT_PARTITION.thread_index_low);
+   pok_sched_stop_thread (id);
    pok_sched ();
    return (POK_ERRNO_OK);
 }
@@ -467,16 +475,24 @@ pok_ret_t pok_partition_stop_thread (const uint32_t tid)
  */
 pok_ret_t pok_partition_restart_thread (const uint32_t tid)
 {
+   uint32_t id;
    if (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_error)
    {
       return POK_ERRNO_THREAD;
    }
+
+   id = tid + POK_CURRENT_PARTITION.thread_index_low;
+   if (POK_CURRENT_PARTITION.thread_index_low > id || POK_CURRENT_PARTITION.thread_index_high < id)
+   {
+      return POK_ERRNO_THREADATTR;
+   }
+
    /*
     * We check which thread try to call this function. Only the error handling
     * thread can stop other threads.
     */
 
-   pok_thread_restart (tid + POK_CURRENT_PARTITION.thread_index_low);
+   pok_thread_restart (id);
    pok_sched ();
    return (POK_ERRNO_OK);
 }

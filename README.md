@@ -1,4 +1,4 @@
-[![Build status](https://travis-ci.org/pok/pok-kernel.svg?master)](https://travis-ci.org/juli1)
+[![Build status](https://travis-ci.org/pok-kernel/pok.svg?master)](https://travis-ci.org/pok-kernel)
 
 POK
 ===

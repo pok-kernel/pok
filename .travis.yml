@@ -1,0 +1,17 @@
+os:
+    - linux
+
+language: c
+
+env:
+    global:
+        - POK_PATH=$HOME
+
+before_install:
+    - sudo apt-get install -y gcc make mtools perl libxml-libxml-perl
+    - sudo apt-get install -y libxml-simple-perl libfile-copy-recursive-perl
+
+script:
+    - make configure
+    - (cd examples/mutexes && make)
+    - (cd examples/semaphores && make)

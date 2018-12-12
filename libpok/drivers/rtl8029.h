@@ -28,7 +28,7 @@
 #  define ETH_DATA_MINLEN	46
 #  define ETH_MAC_LEN		6
 
-#  define RECV_BUF_SZ		20
+#  define RECV_BUF_SZ		30000 // 20*ETH_DATA_MAXLEN
 
 void rtl8029_init ();
 void rtl8029_polling ();

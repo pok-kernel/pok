@@ -34,6 +34,7 @@ void rtl8029_init ();
 void rtl8029_polling ();
 void rtl8029_write (pok_port_id_t port_id, const void* data, uint32_t len);
 void rtl8029_read (pok_port_id_t port_id, void* data, uint32_t len);
+void rtl8029_poll_and_read (pok_port_id_t port_id, void* data, uint32_t len);
 
 // Ethernet header
 typedef struct

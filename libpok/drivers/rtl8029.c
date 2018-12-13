@@ -140,6 +140,103 @@ void rtl8029_enqueue (pok_packet_t *packet)
   queue->len += packet->udp.len;
 }
 
+void rtl8029_poll_and_read (pok_port_id_t port_id, void* data, uint32_t len)
+{
+  pok_port_id_t global;
+  pok_ret_t     ret;
+  
+  ret = pok_port_virtual_get_global (port_id, &global);
+
+  if(ret!= POK_ERRNO_OK)
+    return;
+  
+  unsigned char	state; // ISR state
+
+  NE2000_SELECT_PAGE(&dev, 0);
+
+  // do we have an interrupt flag set?
+  state = pok_inb(dev.addr + NE2000_ISR);
+  
+  if (state && (state & NE2000_ISR_PRX))
+  {
+    if ((pok_inb(dev.addr + NE2000_RSR) & NE2000_RSR_PRX) == 0)
+    {
+      // error
+    }
+    
+#ifdef POK_NEEDS_DEBUG
+    printf("[*]\n");
+#endif
+    /* no errors */
+    s_ne2000_header	ne2000_hdr;	// ne2000 packet header
+    unsigned short	offset;		// dma offset
+    unsigned char	start, end;	// pointers for the ring buffer
+    pok_packet_t	recv_packet;
+
+    /* This register is used to prevent overwrite of the receive buffer ring.
+       It is typically used as a pointer indicating the last receive buffer
+       page the host has read.*/
+    start = pok_inb(dev.addr + NE2000_BNRY) + 1;
+    
+    /* This register points to the page address of the first receive
+       buffer page to be used for a packet reception. */
+    NE2000_SELECT_PAGE(&dev, 1);
+    end = pok_inb(dev.addr + NE2000_CURR);
+    NE2000_SELECT_PAGE(&dev, 0);
+    
+    if ((end % NE2000_MEMSZ) == (start % NE2000_MEMSZ) + 1)
+    {
+      return;
+    }
+
+    /* et on decapsule! */
+    offset = start << 8;
+    // ne2000 header
+    offset += ne2000_read(&dev, &ne2000_hdr, sizeof(s_ne2000_header),
+			  offset);
+    
+    ne2000_read(&dev, &recv_packet,
+		ne2000_hdr.size - sizeof(s_ne2000_header), offset);
+    if(recv_packet.udp.dst==global)
+      rtl8029_enqueue(&recv_packet);
+    
+    // update the BNRY register... almost forgot that
+    outb(ne2000_hdr.next > NE2000_MEMSZ ?
+	 NE2000_RXBUF - 1 : ne2000_hdr.next - 1, dev.addr + NE2000_BNRY);
+    
+  }
+
+  char	*dest = data;
+  pok_queue_t* queue = dev.recv_buf + global;
+  uint32_t	size = len < queue->len ? len : queue->len;
+  uint32_t	copied = 0;
+  
+#ifdef POK_NEEDS_DEBUG
+  printf ("[RTL8029] READ DATA FROM LOCAL PORT %d "
+	  "GLOBAL_PORT=%d), size=%d\n", port_id, global, len);
+#endif
+    
+  /* is there something to read ? */
+  if (queue->len == 0)
+  {
+#ifdef POK_NEEDS_DEBUG
+    printf("rtl8029_read: error: empty read ring buffer %d!\n", port_id);
+#endif
+    outb(NE2000_ISR_PRX, dev.addr + NE2000_ISR); // Clear PRX flag
+    return;
+  }
+  
+  /* copy from the queue to the buffer */
+  for (copied = 0; copied < size; copied++)
+  {
+    dest[copied % RECV_BUF_SZ] = queue->data[queue->off];
+    queue->off = (queue->off + 1) % RECV_BUF_SZ;
+  }
+  
+  /* updating data length in this queue */
+  queue->len -= size;
+
+}
 /**
  *  @brief Reads data from the corresponding network stack
  *

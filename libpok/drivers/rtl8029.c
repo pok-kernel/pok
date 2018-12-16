@@ -225,6 +225,7 @@ void rtl8029_poll_and_read (pok_port_id_t port_id, void* data, uint32_t len)
     outb(NE2000_ISR_PRX, dev.addr + NE2000_ISR); // Clear PRX flag
     return;
   }
+
   
   /* copy from the queue to the buffer */
   for (copied = 0; copied < size; copied++)
@@ -282,6 +283,16 @@ void rtl8029_read (pok_port_id_t port_id, void* data, uint32_t len)
   }
 }
 
+void display_mac(char*mac)
+{
+  printf("%d:", mac[0]);
+  printf("%d:", mac[1]);
+  printf("%d:", mac[2]);
+  printf("%d:", mac[3]);
+  printf("%d:", mac[4]);
+  printf("%d\n", mac[5]);
+}
+
 /**
  *  @brief Send data to the interface
  *
@@ -314,26 +325,29 @@ void rtl8029_write (pok_port_id_t port_id, const void* data, uint32_t len)
 #ifdef POK_NEEDS_DEBUG
       printf ("[RTL8029] SEND DATA THROUGH NETWORK FROM LOCAL PORT %d "
 	      "TO GLOBAL PORT %d, size=%d\n", port_id, dest, len);
+      printf("[RTL8029] DESTINATION MAC ADDR: ");
+      display_mac(node2);
 #endif
 
+      uint32_t msg_len = len;
       memcpy(packet.eth.src, dev.mac, ETH_MAC_LEN);
       memcpy(packet.eth.dst, node2, ETH_MAC_LEN);
       packet.eth.ethertype = 0x4242;
       packet.udp.src = port_id;
       packet.udp.dst = dest;
 
-      for (d = data; len != 0; len -= cpylen, data += cpylen)
+      for (d = data; msg_len != 0; msg_len -= cpylen, data += cpylen)
       {
 	// too short; let's cut
-	if (len <= NET_DATA_MINLEN)
+	if (msg_len <= NET_DATA_MINLEN)
 	{
-	  cpylen = len;
+	  cpylen = msg_len;
 	  sndlen = ETH_DATA_MINLEN + sizeof(eth_hdr_t);
 	}
 	else
 	{
 	  // too big; let's pad
-	  if (len >= NET_DATA_MAXLEN)
+	  if (msg_len >= NET_DATA_MAXLEN)
 	  {
 	    cpylen = NET_DATA_MAXLEN;
 	    sndlen = ETH_DATA_MAXLEN + sizeof(eth_hdr_t);
@@ -341,7 +355,7 @@ void rtl8029_write (pok_port_id_t port_id, const void* data, uint32_t len)
 	  // normal
 	  else
 	  {
-	    cpylen = len;
+	    cpylen = msg_len;
 	    sndlen = sizeof(eth_hdr_t) + sizeof(udp_hdr_t) + cpylen;
 	  }
 	}
@@ -555,6 +569,11 @@ void rtl8029_init ()
   outb(dev.mac[4], dev.addr + NE2000_PAR4);
   outb(dev.mac[5], dev.addr + NE2000_PAR5);
 
+#ifdef POK_NEEDS_DEBUG
+  printf ("[RTL8029] INIT NODE WITH MAC ADDR: ");
+  display_mac(dev.mac);
+#endif
+  
   NE2000_SELECT_PAGE(&dev, 0);
 
   // Start command

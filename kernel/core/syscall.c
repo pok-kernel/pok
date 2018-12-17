@@ -107,8 +107,27 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
                                              (pok_port_id_t*) (args->arg2 + infos->base_addr));
          break;
 
+      case POK_SYSCALL_MIDDLEWARE_VIRTUAL_NODE:
+	pok_check_ptr_or_return(infos->partition,
+				(void*)args->arg2,
+				sizeof(uint32_t));
+
+	 return pok_port_virtual_node((uint32_t) (args->arg1), (uint8_t*) (args->arg2 + infos->base_addr));
 #endif
 
+#ifdef POK_NEEDS_MAC_ADDR
+      case POK_SYSCALL_MIDDLEWARE_NODE_MAC_ADDR:
+	pok_check_ptr_or_return(infos->partition,
+				(void*)args->arg1,
+				6);
+	 
+	pok_check_ptr_or_return(infos->partition,
+				(void*)args->arg2,
+				sizeof(uint32_t));
+
+	 return pok_node_mac_addr((uint8_t*) (args->arg1 + infos->base_addr), (char*) (args->arg2 + infos->base_addr));
+#endif
+	   
 #if defined POK_NEEDS_GETTICK
       case POK_SYSCALL_GETTICK:
          pok_check_ptr_or_return(infos->partition,

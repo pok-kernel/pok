@@ -23,6 +23,7 @@ LO_OBJS=	portqueueingcreate.o \
 			portinit.o \
 			portcreate.o \
 			portutils.o \
+			portvirtualutils.o \
 			queueinit.o \
 			ressources.o 
 

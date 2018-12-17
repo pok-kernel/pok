@@ -28,6 +28,7 @@ LO_OBJS=	blackboardcreate.o \
 			portvirtualdestination.o \
 			portvirtualnbdestinations.o \
 			portvirtualgetglobal.o \
+			portvirtualutils.o \
 			ressources.o
 
 LO_DEPS=

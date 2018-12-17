@@ -171,6 +171,11 @@ pok_ret_t pok_port_virtual_id (char*            name,
 pok_ret_t pok_port_virtual_nb_destinations (const pok_port_id_t id, uint32_t* result);
 pok_ret_t pok_port_virtual_destination (const pok_port_id_t id, const uint32_t n, uint32_t* result);
 pok_ret_t pok_port_virtual_get_global (const pok_port_id_t local, pok_port_id_t* global);
+pok_ret_t pok_port_virtual_node(uint32_t port, uint8_t * node);
+#ifdef POK_NEEDS_MAC_ADDR
+pok_ret_t pok_node_mac_addr(uint8_t * node_id, char * addr);
+#endif
+
 #endif
 
 #endif

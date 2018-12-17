@@ -283,15 +283,17 @@ void rtl8029_read (pok_port_id_t port_id, void* data, uint32_t len)
   }
 }
 
+#ifdef POK_NEEDS_DEBUG
 void display_mac(char*mac)
 {
-  printf("%d:", mac[0]);
-  printf("%d:", mac[1]);
-  printf("%d:", mac[2]);
-  printf("%d:", mac[3]);
-  printf("%d:", mac[4]);
-  printf("%d\n", mac[5]);
+  printf("%x:", mac[0]);
+  printf("%x:", mac[1]);
+  printf("%x:", mac[2]);
+  printf("%x:", mac[3]);
+  printf("%x:", mac[4]);
+  printf("%x\n", mac[5]);
 }
+#endif
 
 /**
  *  @brief Send data to the interface
@@ -322,15 +324,21 @@ void rtl8029_write (pok_port_id_t port_id, const void* data, uint32_t len)
     ret = pok_port_virtual_destination (port_id, tmp, &dest);
     if (ret == POK_ERRNO_OK)
     {
+      uint32_t msg_len = len;
+      memcpy(packet.eth.src, dev.mac, ETH_MAC_LEN);
+#ifdef POK_NEEDS_MAC_ADDR
+      uint8_t node_id = 0;
+      pok_port_virtual_node(dest, &node_id);
+      pok_node_mac_addr(&node_id, node2);
+#endif
+
 #ifdef POK_NEEDS_DEBUG
       printf ("[RTL8029] SEND DATA THROUGH NETWORK FROM LOCAL PORT %d "
 	      "TO GLOBAL PORT %d, size=%d\n", port_id, dest, len);
       printf("[RTL8029] DESTINATION MAC ADDR: ");
       display_mac(node2);
 #endif
-
-      uint32_t msg_len = len;
-      memcpy(packet.eth.src, dev.mac, ETH_MAC_LEN);
+      
       memcpy(packet.eth.dst, node2, ETH_MAC_LEN);
       packet.eth.ethertype = 0x4242;
       packet.udp.src = port_id;
@@ -501,6 +509,10 @@ void rtl8029_polling ()
  */
 void rtl8029_init ()
 {
+  static char init = 0;
+  if(init)
+    return;
+  init++;
   dev.pci.vendorid = 0x10ec;
   dev.pci.deviceid = 0x8029;
   dev.pci.io_range = 0x10;
@@ -514,7 +526,7 @@ void rtl8029_init ()
   }
 
   dev.addr = dev.pci.bar[0] & (~0x1F);
-
+  
   unsigned char	i = 0;
   unsigned char	buf[6 * 2]; // used for MAC address
 

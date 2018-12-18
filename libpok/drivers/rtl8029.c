@@ -311,7 +311,7 @@ void rtl8029_write (pok_port_id_t port_id, const void* data, uint32_t len)
   const char*     d;
   size_t          cpylen = 0;
   size_t          sndlen = 0;
-  unsigned char	state; // ISR state
+  unsigned char	  state; // ISR state
 
   ret = pok_port_virtual_nb_destinations (port_id, &nbdest);
   if (ret != POK_ERRNO_OK)
@@ -344,7 +344,7 @@ void rtl8029_write (pok_port_id_t port_id, const void* data, uint32_t len)
       packet.udp.src = port_id;
       packet.udp.dst = dest;
 
-      for (d = data; msg_len != 0; msg_len -= cpylen, data += cpylen)
+      for (d = data; msg_len != 0; msg_len -= cpylen, d += cpylen)
       {
 	// too short; let's cut
 	if (msg_len <= NET_DATA_MINLEN)
@@ -369,7 +369,7 @@ void rtl8029_write (pok_port_id_t port_id, const void* data, uint32_t len)
 	}
 
 	packet.udp.len = cpylen;
-	memcpy(&(packet.data), data, cpylen);
+	memcpy(&(packet.data), d, cpylen);
 
 	ne2000_write(&dev, &packet, sndlen, NE2000_TXBUF * 256);
 

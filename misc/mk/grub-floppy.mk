@@ -30,7 +30,8 @@ install-clean:
 #################
 
 ifdef MAC_ADDR
-NETWORK_ARGS=-net nic,model=ne2k_pci,macaddr=$(MAC_ADDR) -net socket,$(QEMU_NETWORK_MODE)=127.0.0.1:1234
+#NETWORK_ARGS=-net nic,model=ne2k_pci,macaddr=$(MAC_ADDR) -net socket,$(QEMU_NETWORK_MODE)=127.0.0.1:1234
+NETWORK_ARGS=-net nic,model=ne2k_pci,macaddr=$(MAC_ADDR) -net socket,mcast=230.0.0.1:1234
 else
 NETWORK_ARGS=
 endif

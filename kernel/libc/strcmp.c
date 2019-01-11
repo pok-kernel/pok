@@ -14,7 +14,7 @@
  * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
-#if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_PORTS_QUEUEING) || defined (POK_NEEDS_PORTS_SAMPLING)
+#if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_PORTS_QUEUEING) || defined (POK_NEEDS_PORTS_SAMPLING) || defined(POK_NEEDS_PORTS_VIRTUAL)
 
 #include <libc.h>
 

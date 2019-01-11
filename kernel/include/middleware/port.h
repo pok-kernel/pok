@@ -160,9 +160,11 @@ pok_port_size_t   pok_port_available_size (uint8_t gid);
 pok_port_size_t   pok_port_consumed_size (uint8_t gid);
 pok_ret_t         pok_port_get (const uint32_t gid, void *data, const pok_port_size_t size);
 pok_ret_t         pok_port_write (const uint8_t gid, const void *data, const pok_port_size_t size);
-bool_t            pok_own_port (const uint8_t partition, const uint8_t port);
 #endif
 
+#if defined (POK_NEEDS_PORTS_SAMPLING) || defined (POK_NEEDS_PORTS_QUEUEING) ||defined (POK_NEEDS_PORTS_VIRTUAL)
+bool_t            pok_own_port (const uint8_t partition, const uint8_t port);
+#endif
 
 #ifdef POK_NEEDS_PORTS_VIRTUAL
 pok_ret_t pok_port_virtual_id (char*            name,

@@ -22,6 +22,7 @@
  */
 
 #if defined (POK_NEEDS_PORTS_SAMPLING) || defined (POK_NEEDS_PORTS_QUEUEING)
+
 #include <types.h>
 #include <libc.h>
 #include <core/time.h>
@@ -31,6 +32,7 @@
 extern pok_port_t    pok_ports[POK_CONFIG_NB_PORTS];
 extern pok_queue_t   pok_queue;
 extern uint8_t       pok_current_partition;
+
 
 pok_port_size_t pok_port_available_size (uint8_t pid)
 {
@@ -291,6 +293,9 @@ pok_ret_t pok_port_transfer (const uint8_t pid_dst, const uint8_t pid_src)
    return POK_ERRNO_OK;
 }
 
+#endif
+
+#if defined (POK_NEEDS_PORTS_SAMPLING) || defined (POK_NEEDS_PORTS_QUEUEING) || defined (POK_NEEDS_PORTS_VIRTUAL)
 bool_t pok_own_port (const uint8_t partition, const uint8_t port)
 {
    if (port > POK_CONFIG_NB_PORTS)

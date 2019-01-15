@@ -438,7 +438,7 @@ my %colors =
    }
    else
    {
-      $makevars{'CONFIG_QEMU_x86'} = " -fda \$(POK_PATH)/misc/grub-boot-only.img ";
+      $makevars{'CONFIG_QEMU_x86'} = " -fda grub-boot-only.img ";
    }
    
  

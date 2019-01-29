@@ -5,6 +5,7 @@ LO_TARGET=pok.lo
 
 LO_DEPS=core/core.lo \
         middleware/middleware.lo \
+	drivers/drivers.lo \
         libc/libc.lo \
         arch/arch.lo
 
@@ -33,6 +34,9 @@ core/core.lo::
 middleware/middleware.lo::
 	$(CD) middleware && $(MAKE)
 
+drivers/drivers.lo::
+	$(CD) drivers && $(MAKE)
+
 .PHONY: all clean distclean depend
 
 clean: common-clean
@@ -40,6 +44,7 @@ clean: common-clean
 	$(CD) core && $(MAKE) clean
 	$(CD) libc && $(MAKE) clean
 	$(CD) middleware && $(MAKE) clean
+	$(CD) drivers && $(MAKE) clean
 	$(RM) $(LO_TARGET)
 
 distclean: clean
@@ -47,6 +52,7 @@ distclean: clean
 	$(CD) core && $(MAKE) distclean
 	$(CD) libc && $(MAKE) distclean
 	$(CD) middleware && $(MAKE) distclean
+	$(CD) drivers && $(MAKE) distclean
 	$(RM) .depend
 
 depend .depend:
@@ -54,6 +60,7 @@ depend .depend:
 	$(CD) core && $(MAKE) depend
 	$(CD) libc && $(MAKE) depend
 	$(CD) middleware && $(MAKE) depend
+	$(CD) drivers && $(MAKE) depend
 	$(TOUCH) .depend
 
 include ../misc/mk/rules-common.mk

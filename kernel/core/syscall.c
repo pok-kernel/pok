@@ -36,6 +36,11 @@
 extern uint32_t pok_ports_names_max_len;
 #endif
 
+// Bellow, POK_NEEDS_PCI is kept for backward compatibility with code generators
+#if (defined POK_NEEDS_RTL8029 || defined POK_NEEDS_PCI)
+#include <drivers/rtl8029.h>
+#endif
+
 /**
  * \file kernel/core/syscalls.c
  * \brief This file implement generic system calls
@@ -514,6 +519,52 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
        break;
 #endif /* POK_NEEDS_PCI */
 
+// Bellow, POK_NEEDS_PCI is kept for backward compatibility with code generators
+#if (defined POK_NEEDS_RTL8029 || defined POK_NEEDS_PCI)
+   case POK_SYSCALL_RTL8929_READ:
+     pok_check_ptr_or_return(infos->partition,
+                                 (void*)args->arg2,
+                                 sizeof(uint32_t));
+
+     rtl8029_read ( (pok_port_id_t) (args->arg1),
+		    (uint32_t*) (args->arg2 + infos->base_addr),
+		    (uint32_t) (args->arg3));
+     
+     break;
+
+   case POK_SYSCALL_RTL8929_POLL_AND_READ:
+     pok_check_ptr_or_return(infos->partition,
+                                 (void*)args->arg2,
+                                 sizeof(uint32_t));
+
+     rtl8029_poll_and_read ( (pok_port_id_t) (args->arg1),
+			     (uint32_t*) (args->arg2 + infos->base_addr),
+			     (uint32_t) (args->arg3));
+     
+     break;
+     
+   case POK_SYSCALL_RTL8929_WRITE:
+     pok_check_ptr_or_return(infos->partition,
+			     (void*)args->arg2,
+			     sizeof(uint32_t));
+
+     rtl8029_write ( (pok_port_id_t) (args->arg1),
+			    (uint32_t*) (args->arg2 + infos->base_addr),
+			    (uint32_t) (args->arg3));
+     break;
+     
+   case POK_SYSCALL_RTL8929_POLL:
+     rtl8029_poll();
+     break;
+     
+   case POK_SYSCALL_RTL8929_CLEAR:
+     rtl8029_clear();
+     break;
+     
+   case POK_SYSCALL_RTL8929_INIT:
+     rtl8029_init();
+     break;
+#endif
 
       /**
        * Here is the default syscall handler. In this case, the syscall

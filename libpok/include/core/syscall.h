@@ -91,6 +91,17 @@ typedef enum
 #ifdef POK_NEEDS_PCI
 	 POK_SYSCALL_PCI_REGISTER                        = 601,
 #endif
+
+// Bellow, POK_NEEDS_PCI is kept for backward compatibility with code generators
+#if (defined POK_NEEDS_RTL8029 || defined POK_NEEDS_PCI)
+	 POK_SYSCALL_RTL8929_READ                        = 701,
+	 POK_SYSCALL_RTL8929_POLL_AND_READ               = 702,
+	 POK_SYSCALL_RTL8929_WRITE                       = 703,
+	 POK_SYSCALL_RTL8929_POLL                        = 704,
+	 POK_SYSCALL_RTL8929_CLEAR                       = 705,
+	 POK_SYSCALL_RTL8929_INIT                        = 706
+#endif
+	 
 } pok_syscall_id_t;
 
 typedef struct

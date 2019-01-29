@@ -17,7 +17,7 @@
 
 #ifdef POK_NEEDS_PCI
 
-# ifndef __POK_x86_PCI_H__
+# ifndef __POK_X86_PCI_H__
 #  define __POK_X86_PCI_H__
 
 #  include <arch/x86/ioports.h>

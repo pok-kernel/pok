@@ -106,6 +106,7 @@ size_t ne2000_read(const s_ne2000_dev*	dev,
   return (ret);
 }
 
+extern uint8_t pok_global_ports_to_local_ports[POK_CONFIG_NB_GLOBAL_PORTS];
 
 /**
  *  @brief Enqueues a packet in the appropriate queue
@@ -114,7 +115,10 @@ size_t ne2000_read(const s_ne2000_dev*	dev,
 static inline
 void rtl8029_enqueue (pok_packet_t *packet)
 {
-  pok_queue_t*	queue = dev.recv_buf + packet->udp.dst;
+
+  pok_port_id_t port_id = pok_global_ports_to_local_ports[packet->udp.dst];
+  
+  pok_queue_t*	queue = dev.recv_buf + port_id;
   uint32_t	off = 0;
   uint32_t	i = 0;
 
@@ -145,13 +149,6 @@ void rtl8029_enqueue (pok_packet_t *packet)
 
 void rtl8029_poll_and_read (pok_port_id_t port_id, void* data, uint32_t len)
 {
-  pok_port_id_t global;
-  pok_ret_t     ret;
-  
-  ret = pok_port_virtual_get_global (port_id, &global);
-
-  if(ret!= POK_ERRNO_OK)
-    return;
   
   unsigned char	state; // ISR state
 
@@ -215,13 +212,13 @@ void rtl8029_poll_and_read (pok_port_id_t port_id, void* data, uint32_t len)
   }
 
   char	*dest = data;
-  pok_queue_t* queue = dev.recv_buf + global;
+  pok_queue_t* queue = dev.recv_buf + port_id;
   uint32_t	size = len < queue->len ? len : queue->len;
   uint32_t	copied = 0;
   
 #ifdef POK_NEEDS_DEBUG
-  printf ("[RTL8029] READ DATA FROM LOCAL PORT %d "
-	  "GLOBAL_PORT=%d), size=%d\n", port_id, global, size);
+  printf ("[RTL8029] READ DATA FROM LOCAL PORT %d, "
+	  "size=%d\n", port_id, size);
 #endif
     
   /* Is there something to read on the device? */
@@ -268,43 +265,36 @@ void rtl8029_poll_and_read (pok_port_id_t port_id, void* data, uint32_t len)
  */
 void rtl8029_read (pok_port_id_t port_id, void* data, uint32_t len)
 {
-  pok_port_id_t global;
-  pok_ret_t     ret;
-
-  ret = pok_port_virtual_get_global (port_id, &global);
-
-  if (ret == POK_ERRNO_OK)
+  char	*dest = data;
+  pok_queue_t* queue = dev.recv_buf + port_id;
+  uint32_t	size = len < queue->len ? len : queue->len;
+  uint32_t	copied = 0;
+  
+#ifdef POK_NEEDS_DEBUG
+  printf ("[RTL8029] READ DATA FROM LOCAL PORT %d, "
+	  "size=%d\n", port_id, len);
+#endif
+  
+  /* is there something to read ? */
+  if (queue->len == 0)
   {
-    char	*dest = data;
-    pok_queue_t* queue = dev.recv_buf + global;
-    uint32_t	size = len < queue->len ? len : queue->len;
-    uint32_t	copied = 0;
-
 #ifdef POK_NEEDS_DEBUG
-    printf ("[RTL8029] READ DATA FROM LOCAL PORT %d "
-	    "GLOBAL_PORT=%d), size=%d\n", port_id, global, len);
+    printf("rtl8029_read: error: empty read ring buffer %d!\n", port_id);
 #endif
-    
-    /* is there something to read ? */
-    if (queue->len == 0)
-    {
-#ifdef POK_NEEDS_DEBUG
-      printf("rtl8029_read: error: empty read ring buffer %d!\n", port_id);
-#endif
-      return;
-    }
-
-    /* copy from the queue to the buffer */
-    for (copied = 0; copied < size; copied++)
-    {
-      dest[copied % RECV_BUF_SZ] = queue->data[queue->off];
-      queue->off = (queue->off + 1) % RECV_BUF_SZ;
-    }
-
-    /* updating data length in this queue */
-    queue->len -= size;
+    return;
   }
+
+  /* copy from the queue to the buffer */
+  for (copied = 0; copied < size; copied++)
+  {
+    dest[copied % RECV_BUF_SZ] = queue->data[queue->off];
+    queue->off = (queue->off + 1) % RECV_BUF_SZ;
+  }
+
+  /* updating data length in this queue */
+  queue->len -= size;
 }
+
 
 #ifdef POK_NEEDS_DEBUG
 void display_mac(char*mac)

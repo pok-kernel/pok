@@ -1,5 +1,5 @@
 [![Build status](https://travis-ci.org/pok-kernel/pok.svg?master)](https://travis-ci.org/pok-kernel)
-[![Code Grade](https://www.code-inspector.com/project/12/status/svg)](https://www.code-inspector.com)
+[![Code Grade](https://www.code-inspector.com/project/12/status/svg)](https://www.code-inspector.com/public/project/12/POK/dashboard)
 
 POK
 ===

@@ -28,7 +28,7 @@ arch/arch.lo::
 core/core.lo::
 	$(CD) core && $(MAKE)
 
-core/core.lo::
+libc/libc.lo::
 	$(CD) libc && $(MAKE)
 
 middleware/middleware.lo::

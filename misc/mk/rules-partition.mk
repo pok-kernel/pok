@@ -35,3 +35,4 @@ $(TARGET): $(OBJS)
 
 libpok-clean:
 	$(CD) $(POK_PATH)/libpok && $(MAKE) clean
+	$(RM) $(shell pwd)/libpok.a $(shell pwd)/libpart.a

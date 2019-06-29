@@ -19,7 +19,7 @@ endif
 kernel: $(TARGET_KERNEL)
 
 $(TARGET_KERNEL): $(DEPLOYMENT_HEADER)
-	$(CD) $(POK_PATH)/kernel && $(MAKE) distclean all
+	$(CD) $(POK_PATH)/kernel && $(MAKE) all
 
 copy-kernel:
 	$(CP) $(POK_PATH)/kernel/pok.lo $(shell pwd)/

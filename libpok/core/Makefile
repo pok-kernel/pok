@@ -60,4 +60,4 @@ depend:
 
 include $(TOPDIR)/misc/mk/rules-common.mk
 include $(TOPDIR)/misc/mk/rules-partition.mk
-
+-include .depend.mk

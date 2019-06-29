@@ -17,6 +17,10 @@
 #ifndef __LIBPOK_DEPENDENCIES_H__
 #define __LIBPOK_DEPENDENCIES_H__
 
+#if defined POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE && defined GENERATED_CODE_PATH
+#include "deployment.h"
+#endif
+
 
 #ifdef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE
 

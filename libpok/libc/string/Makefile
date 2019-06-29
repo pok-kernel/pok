@@ -17,7 +17,7 @@ LO_OBJS=	itoa.o \
 # XXX: Compile arch optimized versions
 LO_DEPS=
 
-all: $(LO_TARGET)
+all: depend $(LO_TARGET)
 
 
 .PHONY: clean distclean depend all
@@ -32,7 +32,8 @@ distclean:
 	$(RM) .depend.mk
 
 depend:
-	$(if $(LO_OBJS), $(CC) $(CFLAGS) -MM $(wildcard *.c) $(wildcard *.S) > .depend.mk,)
+	$(if $(LO_OBJS), $(CC) $(CFLAGS) $(COPTS) -MM $(wildcard *.c) $(wildcard *.S) > .depend.mk,)
 
 include $(TOPDIR)/misc/mk/rules-common.mk
 include $(TOPDIR)/misc/mk/rules-partition.mk
+-include .depend.mk

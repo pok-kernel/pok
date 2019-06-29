@@ -10,7 +10,7 @@ LO_OBJS=
 LO_DEPS=	stdio/stdio.lo string/string.lo misc/misc.lo stdlib/stdlib.lo
 
 
-all: $(LO_TARGET)
+all: depend $(LO_TARGET)
 
 stdio/stdio.lo::
 	$(CD) stdio && $(MAKE)
@@ -50,3 +50,4 @@ depend:
 
 include $(TOPDIR)/misc/mk/rules-common.mk
 include $(TOPDIR)/misc/mk/rules-partition.mk
+-include .depend.mk

@@ -20,7 +20,7 @@ endif
 libpok: $(TARGET_LIBPOK)
 
 $(TARGET_LIBPOK): $(DEPLOYMENT_HEADER)
-	$(CD) $(POK_PATH)/libpok && $(MAKE) clean all
+	$(CD) $(POK_PATH)/libpok && $(MAKE) all
 	$(CP) $(POK_PATH)/libpok/libpok.a `pwd`/
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[AR] libpart.a "
 	$(AR) -x libpok.a

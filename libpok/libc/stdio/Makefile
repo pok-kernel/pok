@@ -9,7 +9,7 @@ LO_OBJS=	printf.o
 
 LO_DEPS=
 
-all: $(LO_TARGET)
+all: depend $(LO_TARGET)
 
 .PHONY: clean distclean depend all
 
@@ -27,3 +27,4 @@ depend:
 
 include $(TOPDIR)/misc/mk/rules-common.mk
 include $(TOPDIR)/misc/mk/rules-partition.mk
+-include .depend.mk

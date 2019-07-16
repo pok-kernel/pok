@@ -13,7 +13,7 @@ OBJS=		main.o activity.o
 
 all: libpok $(TARGET)
 
-clean: common-clean
+clean: common-clean libpok-clean
 
 include $(POK_PATH)/misc/mk/common-$(ARCH).mk
 include $(POK_PATH)/misc/mk/rules-common.mk

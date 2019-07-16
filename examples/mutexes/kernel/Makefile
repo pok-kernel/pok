@@ -12,7 +12,7 @@ all: kernel copy-kernel $(LO_TARGET)
 
 .PHONY: clean distclean install all
 
-clean: common-clean
+clean: common-clean kernel-clean
 
 include $(POK_PATH)/misc/mk/common-$(ARCH).mk
 include $(POK_PATH)/misc/mk/rules-common.mk

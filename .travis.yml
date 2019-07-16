@@ -17,4 +17,3 @@ script:
     - make configure
     - (cd examples/mutexes && make)
     - (cd examples/semaphores && make)
-    - code-inspector -v

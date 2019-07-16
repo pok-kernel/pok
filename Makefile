@@ -31,6 +31,7 @@ distclean:
 	$(RM) misc/mk/config.mk pok-[0-9]*.tgz
 
 test:
+	$(MAKE) clean
 	$(MAKE) -C examples test
 
 #8-> CUT HERE

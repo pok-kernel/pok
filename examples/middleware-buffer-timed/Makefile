@@ -1,4 +1,4 @@
-POK_PATH=../../
+POK_PATH=$(CURDIR)/../../
 include $(POK_PATH)/misc/mk/config.mk
 
 compiletest: all

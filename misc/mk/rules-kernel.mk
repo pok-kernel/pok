@@ -12,8 +12,8 @@ ifneq ($(DEPLOYMENT_HEADER),)
 COPTS += -include $(DEPLOYMENT_HEADER)
 endif
 
-ifeq ($(TARGET_KERNEL),) # This variable should identify the path to the copied libpok.a file. Put a dummy value if empty
-TARGET_KERNEL = $(DEPLOYMENT_HEADER)/kernel/pok.lo
+ifeq ($(TARGET_KERNEL),) # This variable should identify the path to the copied pok.lo file.
+TARGET_KERNEL = $(POK_PATH)/kernel/pok.lo
 endif
 
 kernel: $(TARGET_KERNEL)
@@ -22,7 +22,7 @@ $(TARGET_KERNEL): $(DEPLOYMENT_HEADER)
 	$(CD) $(POK_PATH)/kernel && $(MAKE) all
 
 copy-kernel:
-	$(CP) $(POK_PATH)/kernel/pok.lo $(shell pwd)/
+	$(CP) $(TARGET_KERNEL) $(shell pwd)/
 
 kernel-clean:
 	$(CD) $(POK_PATH)/kernel && $(MAKE) distclean

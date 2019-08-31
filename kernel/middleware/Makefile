@@ -29,6 +29,8 @@ LO_OBJS=	portqueueingcreate.o \
 
 LO_DEPS=
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: $(LO_TARGET)
 
 .PHONY: clean distclean depend all

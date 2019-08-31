@@ -9,6 +9,8 @@ LO_OBJS=	printf.o
 
 LO_DEPS=
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: depend $(LO_TARGET)
 
 .PHONY: clean distclean depend all

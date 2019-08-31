@@ -17,6 +17,8 @@ LO_OBJS=	itoa.o \
 # XXX: Compile arch optimized versions
 LO_DEPS=
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: depend $(LO_TARGET)
 
 

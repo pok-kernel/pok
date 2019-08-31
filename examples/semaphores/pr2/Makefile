@@ -1,4 +1,4 @@
-export POK_PATH=../../../
+export POK_PATH=$(CURDIR)/../../../
 export ARCH=x86
 export BSP=x86-qemu
 export DEPLOYMENT_HEADER=$(shell pwd)/deployment.h

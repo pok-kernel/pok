@@ -167,6 +167,8 @@ LO_OBJS=	acos.o \
 
 LO_DEPS=
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: $(LO_TARGET)
 
 .PHONY: depend all

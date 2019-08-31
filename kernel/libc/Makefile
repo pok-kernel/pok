@@ -9,6 +9,8 @@ LO_OBJS=	memcpy.o memset.o __udivdi3.o printf.o strlen.o strcmp.o
 
 LO_DEPS=
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: $(LO_TARGET)
 
 .PHONY: clean distclean depend all

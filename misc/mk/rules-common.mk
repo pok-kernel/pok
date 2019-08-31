@@ -21,29 +21,32 @@ ifneq ($(POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE),)
 CFLAGS+=-DPOK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE=1
 endif
 
-
-
+ifneq ($(LO_TARGET),) 
 $(LO_TARGET): $(LO_DEPS) $(LO_OBJS)
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[LD] $@ "
 	$(LD) $(LDFLAGS) $(LDOPTS) -r $(LO_DEPS) $(LO_OBJS) -o $(LO_TARGET)
 	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK "; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi
+endif
 
-%.a: $(LO_DEPS)
+$(OBJ_DIR)/%.a: $(LO_DEPS)
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[AR] $@ "
 	$(AR) rcs $@ $(LO_DEPS)
 	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK "; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi
 
-%.o: %.S
+$(OBJ_DIR)/%.o: %.S
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[CC] $< "
 	$(CC) -c $(CFLAGS) -DASM_SOURCE=1 $< -o $@
 	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK "; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi
 
-%.o: %.c
+$(OBJ_DIR)/%.o: %.c
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[CC] $< "
+ifneq ($(OBJ_DIR),.)
+	$(MKDIR) -p $(OBJ_DIR)
+endif
 	$(CC) -c $(CFLAGS) $(COPTS) $< -o $@
 	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK"; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi
 
-%.o: %.adb %.ads
+$(OBJ_DIR)/%.o: %.adb %.ads
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[ADA] $< "
 	$(CC) -c $(ADAFLAGS) $< -o $@
 	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK"; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi

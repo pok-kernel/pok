@@ -20,6 +20,8 @@ LO_OBJS=	\
 
 LO_DEPS=
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: $(LO_TARGET)
 
 .PHONY: clean distclean depend all

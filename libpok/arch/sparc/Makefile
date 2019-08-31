@@ -10,6 +10,8 @@ LO_OBJS= arch.o    \
 
 LO_DEPS=
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: $(LO_TARGET)
 
 .PHONY: clean distclean depend all

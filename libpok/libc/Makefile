@@ -9,19 +9,20 @@ LO_OBJS=
 
 LO_DEPS=	stdio/stdio.lo string/string.lo misc/misc.lo stdlib/stdlib.lo
 
+include $(TOPDIR)/misc/mk/objdir.mk
 
 all: depend $(LO_TARGET)
 
-stdio/stdio.lo::
+$(OBJ_DIR)/stdio/stdio.lo::
 	$(CD) stdio && $(MAKE)
 
-stdlib/stdlib.lo::
+$(OBJ_DIR)/stdlib/stdlib.lo::
 	$(CD) stdlib && $(MAKE)
 
-string/string.lo::
+$(OBJ_DIR)/string/string.lo::
 	$(CD) string && $(MAKE)
 
-misc/misc.lo::
+$(OBJ_DIR)/misc/misc.lo::
 	$(CD) misc && $(MAKE)
 
 .PHONY: clean distclean depend all

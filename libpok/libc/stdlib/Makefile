@@ -12,6 +12,8 @@ LO_OBJS=	rand.o \
 
 LO_DEPS=
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: depend $(LO_TARGET)
 
 .PHONY: clean distclean depend all

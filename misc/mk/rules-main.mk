@@ -1,6 +1,6 @@
 -include .depend.mk
 
-LDOPTS=-T $(POK_PATH)/misc/ldscripts/$(ARCH)/$(BSP)/kernel.lds -o $@ $(POK_PATH)/kernel/pok.lo 
+LDOPTS=-T $(POK_PATH)/misc/ldscripts/$(ARCH)/$(BSP)/kernel.lds -o $@ $(TARGET_KERNEL)
 
 assemble-partitions:
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[BIN] partitions.bin"

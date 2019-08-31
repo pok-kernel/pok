@@ -1,5 +1,5 @@
 ifndef POK_PATH
-export POK_PATH=../../
+export POK_PATH=$(CURDIR)/../../
 endif
 
 include $(POK_PATH)/misc/mk/config.mk

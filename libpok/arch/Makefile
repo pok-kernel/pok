@@ -9,9 +9,11 @@ LO_OBJS=
 
 LO_DEPS=	$(ARCH)/$(ARCH).lo
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: $(LO_TARGET)
 
-$(ARCH)/$(ARCH).lo::
+$(OBJ_DIR)/$(ARCH)/$(ARCH).lo::
 	$(CD) $(ARCH) && $(MAKE)
 
 .PHONY: clean distclean depend all

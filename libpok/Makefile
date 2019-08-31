@@ -10,6 +10,8 @@ LO_DEPS=	arch/arch.lo \
 			protocols/protocols.lo \
 			libc/libc.lo
 
+include ../misc/mk/objdir.mk
+
 ifeq ($(strip $(ARCH)), )
 all:
 	@echo "";
@@ -20,33 +22,33 @@ all:
 	@echo "";
 	@exit 0
 else
-all: .depend libpok.a
+all: .depend $(OBJ_DIR)/libpok.a
 endif
 
-libpok.a: $(LO_DEPS)
+$(OBJ_DIR)/libpok.a: $(LO_DEPS)
 
-arch/arch.lo::
+$(OBJ_DIR)/arch/arch.lo::
 	$(CD) arch && $(MAKE)
 
-core/core.lo::
+$(OBJ_DIR)/core/core.lo::
 	$(CD) core && $(MAKE)
 
-middleware/middleware.lo::
+$(OBJ_DIR)/middleware/middleware.lo::
 	$(CD) middleware && $(MAKE)
 
-arinc653/arinc653.lo::
+$(OBJ_DIR)/arinc653/arinc653.lo::
 	$(CD) arinc653 && $(MAKE)
 
-libc/libc.lo::
+$(OBJ_DIR)/libc/libc.lo::
 	$(CD) libc && $(MAKE)
 
-libm/libm.lo::
+$(OBJ_DIR)/libm/libm.lo::
 	$(CD) libm && $(MAKE)
 
-drivers/drivers.lo::
+$(OBJ_DIR)/drivers/drivers.lo::
 	$(CD) drivers && $(MAKE)
 
-protocols/protocols.lo::
+$(OBJ_DIR)/protocols/protocols.lo::
 	$(CD) protocols && $(MAKE)
 
 .PHONY: all clean distclean depend

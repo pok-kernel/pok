@@ -18,9 +18,11 @@ LO_OBJS=	arch.o		\
 
 LO_DEPS=	$(BSP)/$(BSP).lo
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: $(LO_TARGET)
 
-$(BSP)/$(BSP).lo::
+$(OBJ_DIR)/$(BSP)/$(BSP).lo::
 	$(CD) $(BSP) && $(MAKE)
 
 .PHONY: clean distclean depend all

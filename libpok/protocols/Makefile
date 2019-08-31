@@ -9,6 +9,8 @@ LO_DEPS=ceasar/ceasar.lo \
         blowfish/blowfish.lo \
 		  des/des.lo
 
+include $(TOPDIR)/misc/mk/objdir.mk
+
 all: $(LO_TARGET)
 
 .PHONY: clean distclean depend all
@@ -18,13 +20,13 @@ clean:
 	$(CD) blowfish && $(MAKE) clean
 	$(CD) des && $(MAKE) clean
 
-blowfish/blowfish.lo::
+$(OBJ_DIR)/blowfish/blowfish.lo::
 	$(CD) blowfish && $(MAKE)
 
-ceasar/ceasar.lo::
+$(OBJ_DIR)/ceasar/ceasar.lo::
 	$(CD) ceasar && $(MAKE)
 
-des/des.lo::
+$(OBJ_DIR)/des/des.lo::
 	$(CD) des && $(MAKE)
 
 distclean:

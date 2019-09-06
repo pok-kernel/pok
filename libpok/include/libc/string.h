@@ -21,6 +21,7 @@
 #include <types.h>
 
 char     *itoa(int value, char *buff, int radix);
+int      atoi(const char *str);
 void     *memcpy(void *dest, const void *src, size_t count);
 void     *memset(void *dest, unsigned char val, size_t count);
 int		strcmp(const char *s1, const char *s2);

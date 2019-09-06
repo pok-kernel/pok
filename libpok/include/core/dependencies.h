@@ -322,6 +322,7 @@
 #define POK_CONFIG_NEEDS_FUNC_STRLEN         1
 #define POK_CONFIG_NEEDS_FUNC_STREQ          1
 #define POK_CONFIG_NEEDS_FUNC_ITOA           1
+#define POK_CONFIG_NEEDS_FUNC_ATOI           1
 #define POK_CONFIG_NEEDS_FUNC_UDIVDI3        1
 
 /*

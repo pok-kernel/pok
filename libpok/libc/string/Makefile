@@ -6,6 +6,7 @@ include $(TOPDIR)/misc/mk/config.mk
 LO_TARGET=	string.lo
 
 LO_OBJS=	itoa.o \
+		atoi.o \
 		memcpy.o \
 		memset.o \
 		memcmp.o \

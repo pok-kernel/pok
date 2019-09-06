@@ -69,7 +69,16 @@ pok_ret_t pok_core_syscall (const pok_syscall_id_t       syscall_id,
          }
          break;
 #endif
+#ifdef POK_NEEDS_CONSOLE
+      case POK_SYSCALL_GETCHAR:
+         pok_check_ptr_or_return(infos->partition,
+				 (void*)args->arg1,
+				 NULL);
 
+	 pok_cons_get_char((char *)args->arg1 + infos->base_addr);
+	 return POK_ERRNO_OK;
+#endif
+     
 #ifdef POK_NEEDS_PORTS_VIRTUAL
       case POK_SYSCALL_MIDDLEWARE_VIRTUAL_CREATE:
          pok_check_ptr_or_return(infos->partition,

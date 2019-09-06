@@ -36,6 +36,12 @@
    #ifndef POK_CONFIG_NEEDS_FUNC_VPRINTF
    #define POK_CONFIG_NEEDS_FUNC_VPRINTF 1
    #endif
+
+   
+   #ifndef POK_CONFIG_NEEDS_FUNC_GETCHAR
+   #define POK_CONFIG_NEEDS_FUNC_GETCHAR 1
+   #endif
+
 #endif
 
 #ifdef POK_NEEDS_LIBC_STDLIB

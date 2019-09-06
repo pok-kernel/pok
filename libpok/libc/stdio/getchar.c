@@ -9,23 +9,20 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2019 POK team 
  *
- * Created by julien on Thu Jan 15 23:34:13 2009 
+ * Created by etienne on Wed Sept 04 15:15:15 2019 
  */
 
+#include <stdio.h>
+#include <core/syscall.h>
 
-#ifndef __POK_LIBC_STDIO_H__
-#define __POK_LIBC_STDIO_H__
-
-#include <stdarg.h>
-
-#define EOF -1
-
-int		vprintf(const char* format, va_list args);
-
-int		printf(const char *format, ...);
-
-int             getChar();
-
-#endif /* __POK_LIBC_STDIO_H_ */
+#if defined (POK_CONFIG_NEEDS_FUNC_GETCHAR)
+int getChar()
+{
+  
+  char res=-1;
+  pok_syscall1 (POK_SYSCALL_GETCHAR, (uint32_t)&res);
+  return (int) res;
+}
+#endif

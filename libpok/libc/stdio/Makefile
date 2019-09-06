@@ -5,7 +5,8 @@ include $(TOPDIR)/misc/mk/config.mk
 
 LO_TARGET=	stdio.lo
 
-LO_OBJS=	printf.o
+LO_OBJS=	printf.o \
+		getchar.o
 
 LO_DEPS=
 

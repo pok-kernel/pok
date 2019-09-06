@@ -60,6 +60,12 @@ pok_bool_t  pok_cons_write(const char *s, size_t length);
 void        pok_cons_clear(void);
 #endif
 
+#ifdef POK_NEEDS_CONSOLE
+
+void pok_cons_get_char (char * c);
+
+#endif
+
 int         pok_cons_init(void);
 
 #endif

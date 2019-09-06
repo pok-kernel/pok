@@ -23,6 +23,7 @@
 typedef enum
 {
    POK_SYSCALL_CONSWRITE                           =  10,
+   POK_SYSCALL_GETCHAR                             =  11,
    POK_SYSCALL_GETTICK                             =  20,
    POK_SYSCALL_INT_NUMBER                          =  42,
    POK_SYSCALL_THREAD_CREATE                       =  50,

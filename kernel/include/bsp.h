@@ -42,6 +42,8 @@ pok_ret_t pok_bsp_time_init ();
 bool_t pok_cons_write (const char* s,
                        size_t length);
 
+void pok_cons_get_char (char * c);
+
 #ifdef POK_NEEDS_DEBUG
 void pok_bsp_debug();
 #endif

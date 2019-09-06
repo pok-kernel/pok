@@ -24,6 +24,7 @@
 
 #include "cons.h"
 
+
 #if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_CONSOLE) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS)
 
 static const int     screen_w = 80;
@@ -32,21 +33,32 @@ static const int     tab_size = 8;
 static char *const   vga_base = (char *)0xb8000;
 struct s_cons        g_cons;
 
-#if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS) || defined(POK_NEEDS_USER_DEBUG)
 #define  COM1      0x3F8
 
-int is_transmit_empty() {
+#if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS) || defined(POK_NEEDS_USER_DEBUG)
+
+int is_transmitter_holding_register() {
    return inb(COM1 + 5) & 0x20;
 }
 
 void write_serial(char a) {
-   while (is_transmit_empty() == 0);
+   while (is_transmitter_holding_register() == 0);
 
    outb(COM1,a);
 }
+
 #endif
 
+#ifdef POK_NEEDS_CONSOLE
+int is_received_data_ready() {
+  return inb(COM1 + 5) & 0x01;
+}
 
+void read_serial(char * a) {
+  if(is_received_data_ready() != 0)
+    *a = inb(COM1);
+}
+#endif
 
 void pok_cons_print_char (const char c)
 {
@@ -108,6 +120,13 @@ void pok_cons_print_char (const char c)
    g_cons = local_curs;
 #endif
 }
+
+#ifdef POK_NEEDS_CONSOLE
+void pok_cons_get_char (char * c)
+{
+   read_serial (c);
+}
+#endif
 
 void pok_cons_attr (uint8_t attr)
 {
@@ -225,6 +244,7 @@ int pok_cons_init (void)
    outb(COM1 + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
    outb(COM1 + 1, 0x00);    //                  (hi byte)
    outb(COM1 + 3, 0x03);    // 8 bits, no parity, one stop bit
+   outb(COM1 + 4, 0x0D);    // Init MCR (see data sheet, table 3)
    outb(COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
    outb(COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 #endif

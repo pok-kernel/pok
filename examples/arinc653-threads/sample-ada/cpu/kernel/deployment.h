@@ -77,13 +77,13 @@
 /*  memory for each partition.This value was deduced from the property */
 /*  POK::Needed_Memory_Size of each process*/
 
-#define POK_CONFIG_SCHEDULING_SLOTS {500,500}
+#define POK_CONFIG_SCHEDULING_SLOTS {500000000,500000000}
 
 #define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0,1}
 
 #define POK_CONFIG_SCHEDULING_NBSLOTS 2
 
-#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 1000
+#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 1000000000
 
 #define POK_CONFIG_STACKS_SIZE 8000
 

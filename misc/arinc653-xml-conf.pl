@@ -380,12 +380,12 @@ sub header_partitions_scheduling
 
    $modulenode = pop @module;
    $majorframe = $modulenode->getAttribute ("MajorFrameSeconds");
-   $majorframe = $majorframe * 1000; #Convert from seconds to milliseconds
+   $majorframe = $majorframe * 1000000000; #Convert from seconds to nanoseconds
 
    print $header_file "\n\n";
    print $header_file "#define POK_CONFIG_SCHEDULING_MAJOR_FRAME $majorframe\n";
    print $header_file "/* Corresponds to the MajorFrameSeconds converted to */\n";
-   print $header_file "/* millisecond.                                      */\n";
+   print $header_file "/* nanoisecond.                                      */\n";
    print $header_file "\n\n";
 
 
@@ -398,7 +398,7 @@ sub header_partitions_scheduling
          print STDERR "Attribute WindowDurationSeconds not found in Window_Schedule XML element\n";
       }
 
-      $slotlength = $slotlength * 1000; #Convert to millisecond
+      $slotlength = $slotlength * 1000000000; #Convert to nanosecond
       push @slots, $slotlength;
 
       $slotpartition = $tmp->parentNode->getAttribute("PartitionName");

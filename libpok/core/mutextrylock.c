@@ -23,15 +23,15 @@
 #include <core/mutex.h>
 #include <core/syscall.h>
 
-pok_ret_t pok_mutex_trylock (const pok_mutex_id_t id, const uint64_t time)
+pok_ret_t pok_mutex_trylock (const pok_mutex_id_t id, const uint64_t us)
 {
    pok_lockobj_lockattr_t lockattr;
    lockattr.operation   = LOCKOBJ_OPERATION_LOCK;
 
-   if (time > 0)
+   if (us > 0)
    {
       pok_time_get (&lockattr.time);
-      lockattr.time        += time;
+      lockattr.time        += us*1000;
    }
 
    lockattr.obj_kind    = POK_LOCKOBJ_KIND_MUTEX;

@@ -22,7 +22,7 @@ void* pinger_job ()
    while (1)
    {
       printf("Hello, i'm task one in partition two\n");
-      pok_thread_sleep (2000);
+      pok_thread_sleep (2000000);
    }
 }
 

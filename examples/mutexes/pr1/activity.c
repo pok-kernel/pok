@@ -32,11 +32,11 @@ void* pinger_job ()
       printf("mutex lock, ret=%d\n", ret);
       val = 10;
       printf ("Hello, I'm task one in partition one, before sleep val=%d\n", val);
-      pok_thread_sleep (100);
+      pok_thread_sleep (100000);
       printf ("Hello, I'm task one in partition one, after sleep val=%d\n", val);
       ret = pok_mutex_unlock (mid);
       printf("mutex unlock, ret=%d\n", ret);
-      pok_thread_sleep (1000);
+      pok_thread_sleep (1000000);
    }
 }
 
@@ -49,10 +49,10 @@ void* pinger_job2 ()
       printf("mutex lock, ret=%d\n", ret);
       printf ("Hello, I'm task two in partition one, value before change=%d\n", val);
       val = 5;
-      pok_thread_sleep (200);
+      pok_thread_sleep (200000);
       printf ("Hello, I'm task two in partition one, value after change=%d\n", val);
       ret = pok_mutex_unlock (mid);
       printf("mutex unlock, ret=%d\n", ret);
-      pok_thread_sleep (500);
+      pok_thread_sleep (500000);
    }
 }

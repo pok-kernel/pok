@@ -32,7 +32,7 @@ void main ()
 
   pok_thread_create(&tid,&tattr);
 
-  pok_thread_sleep (100000);
+  pok_thread_sleep (100000000);
 
 }
 

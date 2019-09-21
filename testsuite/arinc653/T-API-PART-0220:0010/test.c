@@ -23,12 +23,12 @@ void test ()
    RETURN_CODE_TYPE ret;
    GET_PARTITION_STATUS (&status, &ret);
 
-   if (status.PERIOD != 1000)
+   if (status.PERIOD != 1000000000)
    {
       printf("ERROR PERIOD\n");
    }
 
-   if (status.DURATION != 1000)
+   if (status.DURATION != 1000000000)
    {
       printf("ERROR DURATION\n");
    }

@@ -44,7 +44,7 @@ void* pinger_job2 ()
    while (1)
    {
       printf ("P1T2: before trylock\n");
-      ret = pok_mutex_trylock (mid, 1000);
+      ret = pok_mutex_trylock (mid, 1000000);
       printf ("P1T2: mutex trylock, ret=%d\n", ret);
       if (ret == POK_ERRNO_TIMEOUT)
       {

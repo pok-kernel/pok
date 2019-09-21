@@ -94,13 +94,13 @@ typedef struct
 
 void           pok_thread_init (void);
 pok_ret_t      pok_thread_create (uint8_t* thread_id, const pok_thread_attr_t* attr);
-pok_ret_t      pok_thread_sleep (const uint32_t ms);
-pok_ret_t      pok_thread_sleep_until (const uint32_t ms);
+pok_ret_t      pok_thread_sleep (const uint32_t us);
+pok_ret_t      pok_thread_sleep_until (const uint32_t us);
 pok_ret_t      pok_thread_suspend (void);
 void           pok_thread_start (void (*entry)(), unsigned int id);
 pok_ret_t      pok_thread_suspend (void);
 pok_ret_t      pok_thread_restart (const uint32_t tid);
-pok_ret_t pok_thread_delayed_start (const uint32_t id, const uint32_t ms);
+pok_ret_t pok_thread_delayed_start (const uint32_t id, const uint32_t us);
 pok_ret_t      pok_thread_get_status (const uint32_t id, pok_thread_attr_t *attr);
 pok_ret_t      pok_thread_set_priority (const uint32_t id, const uint32_t priority);
 pok_ret_t      pok_thread_resume (const uint32_t id);

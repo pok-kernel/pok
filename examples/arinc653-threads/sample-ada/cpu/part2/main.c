@@ -122,8 +122,8 @@ int main ()
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   tattr.ENTRY_POINT = thr2_job;
-  tattr.DEADLINE = 600;
-  tattr.PERIOD = 1000;
+  tattr.DEADLINE = 600000000;
+  tattr.PERIOD = 1000000000;
   tattr.STACK_SIZE = 4000;
   tattr.TIME_CAPACITY = 1;
   CREATE_PROCESS (&(tattr), &(arinc_threads[1]), &(ret));

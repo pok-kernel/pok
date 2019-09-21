@@ -19,7 +19,6 @@
 unsigned long long __udivdi3 (unsigned long long num,
 			                     unsigned long long den)
 {
-#ifdef POK_NEEDS_DEBUG
    unsigned long long quot, qbit;
 
    quot = 0;
@@ -48,10 +47,5 @@ unsigned long long __udivdi3 (unsigned long long num,
    }
 
    return quot;
-#else
-   (void) num;
-   (void) den;
-   return 0;
-#endif
 }
 

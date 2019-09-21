@@ -85,8 +85,8 @@ int main ()
   /*  This sampling port was mapped from a in dataport contained in the */
   /*  process. It is usedfor inter-partition communication.*/
   tattr.ENTRY_POINT = thr_job;
-  tattr.DEADLINE = 200;
-  tattr.PERIOD = 200;
+  tattr.DEADLINE = 200000000;
+  tattr.PERIOD = 200000000;
   tattr.TIME_CAPACITY = 2;
   CREATE_PROCESS (&(tattr), &(arinc_threads[1]), &(ret));
   /*  This thread was mapped from a thread component containedin this */

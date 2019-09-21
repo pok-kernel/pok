@@ -31,7 +31,7 @@ void* pinger_job ()
       printf ("P1T1: I will signal semaphores\n");
       ret = pok_sem_signal (sid);
       printf ("P1T1: pok_sem_signal, ret=%d\n", ret);
-      pok_thread_sleep (2000);
+      pok_thread_sleep (2000000);
    }
 }
 
@@ -45,6 +45,6 @@ void* pinger_job2 ()
       printf ("P1T2: pok_sem_wait, ret=%d\n", ret);
       ret = pok_sem_wait (sid, 0);
       printf ("P1T2: pok_sem_wait, ret=%d\n", ret);
-      pok_thread_sleep (2000);
+      pok_thread_sleep (2000000);
    }
 }

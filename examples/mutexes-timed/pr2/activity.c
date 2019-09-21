@@ -25,7 +25,7 @@ void* pinger_job ()
       printf("P2T1: before lock\n");
       ret = pok_mutex_lock (0);
       printf ("P2T1: Try to lock mutex 0, result=%d\n", ret);
-      pok_thread_sleep (10000);
+      pok_thread_sleep (10000000);
    }
 }
 

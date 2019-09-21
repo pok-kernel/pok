@@ -37,7 +37,7 @@ void* pinger_job ()
       {
          printf ("SEND ERROR, ret=%d\n", ret);
       }
-      pok_thread_sleep (1000);
+      pok_thread_sleep (1000000);
    }
 }
 

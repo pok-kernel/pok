@@ -21,7 +21,7 @@ void test ()
 {
    PARTITION_STATUS_TYPE status;
    status.IDENTIFIER = 1;
-   status.PERIOD = 1000;
+   status.PERIOD = 1000000000;
    status.DURATION = 5;
    /* FIXME status.LOCKLEVEL */
    status.OPERATING_MODE = IDLE;

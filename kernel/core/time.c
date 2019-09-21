@@ -60,7 +60,7 @@ void pok_time_init (void)
  */
 pok_ret_t pok_gettick_by_pointer (uint64_t* clk_val)
 {
-   *clk_val = pok_tick_counter;
+   *clk_val = POK_GETTICK();
    return POK_ERRNO_OK;
 }
 #endif

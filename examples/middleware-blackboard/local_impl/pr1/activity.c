@@ -36,7 +36,7 @@ void* pinger_job ()
       do_ping_spg(&(data_source_request_var));
       ret = pok_blackboard_display (blackboard_id, &data_source_request_var, sizeof (data_source_request_var));
       printf("Display blackboard value=%d, return=%d\n", data_source_request_var, ret);
-      pok_thread_sleep (1000);
+      pok_thread_sleep (1000000);
    }
 }
 
@@ -60,7 +60,7 @@ void* pingme_job ()
       {
          printf("No data to read on blackboard, return = %d\n", ret);
       }
-      pok_thread_sleep (500);
+      pok_thread_sleep (500000);
    }
 }
 

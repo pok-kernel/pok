@@ -46,7 +46,7 @@ void* pingme_job ()
       {
          printf("No data to print, return = %d\n", ret);
       }
-      pok_thread_sleep (500);
+      pok_thread_sleep (500000);
    }
 }
 

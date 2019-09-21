@@ -36,7 +36,7 @@ void* pinger_job ()
       do_ping_spg(&(data_source_request_var));
       ret = pok_buffer_send (buffer_id, &data_source_request_var, sizeof (data_source_request_var), 5);
       printf("buffer_send ret=%d\n", ret);
-      pok_thread_sleep (1000);
+      pok_thread_sleep (1000000);
    }
 }
 
@@ -57,7 +57,7 @@ void* pingme_job ()
       {
          printf("No data to read on buffer, return = %d\n", ret);
       }
-      pok_thread_sleep (3000);
+      pok_thread_sleep (3000000);
    }
 }
 

@@ -242,10 +242,10 @@ void pok_thread_start(void (*entry)(), unsigned int id)
 }
 
 #ifdef POK_NEEDS_THREAD_SLEEP
-pok_ret_t pok_thread_sleep (uint32_t time)
+pok_ret_t pok_thread_sleep (uint32_t us)
 {
    uint64_t mytime;
-   mytime = time + POK_GETTICK();
+   mytime = ((uint64_t)us)*1000 + POK_GETTICK();
    pok_sched_lock_current_thread_timed (mytime);
    pok_sched ();
    return POK_ERRNO_OK;
@@ -253,9 +253,9 @@ pok_ret_t pok_thread_sleep (uint32_t time)
 #endif
 
 #ifdef POK_NEEDS_THREAD_SLEEP_UNTIL
-pok_ret_t pok_thread_sleep_until (uint32_t time)
+pok_ret_t pok_thread_sleep_until (uint32_t us)
 {
-   pok_sched_lock_current_thread_timed ((uint64_t)time);
+  pok_sched_lock_current_thread_timed (((uint64_t)us)*1000);
    pok_sched ();
    return POK_ERRNO_OK;
 }
@@ -302,8 +302,9 @@ pok_ret_t pok_thread_restart (const uint32_t tid)
 }
 #endif
 
-pok_ret_t pok_thread_delayed_start (const uint32_t id, const uint32_t ms)
+pok_ret_t pok_thread_delayed_start (const uint32_t id, const uint32_t us)
 {
+  uint64_t ns = 1000*((uint64_t) us);
   if (POK_CURRENT_PARTITION.thread_index_low > id || POK_CURRENT_PARTITION.thread_index_high < id)
     return POK_ERRNO_THREADATTR;
   pok_threads[id].priority = pok_threads[id].base_priority;
@@ -313,7 +314,7 @@ pok_ret_t pok_thread_delayed_start (const uint32_t id, const uint32_t ms)
     {
       if (pok_partitions[pok_threads[id].partition].mode == POK_PARTITION_MODE_NORMAL)
   	{
-  	  if (ms == 0)
+  	  if (ns == 0)
   	    {
   	      pok_threads[id].state = POK_STATE_RUNNABLE;
   	      pok_threads[id].end_time = POK_GETTICK() + pok_threads[id].time_capacity;
@@ -321,7 +322,7 @@ pok_ret_t pok_thread_delayed_start (const uint32_t id, const uint32_t ms)
   	  else
   	    {
   	      pok_threads[id].state = POK_STATE_WAITING;
-  	      pok_threads[id].wakeup_time = POK_GETTICK() + ms;
+  	      pok_threads[id].wakeup_time = POK_GETTICK() + ns;
   	    }
 	  //the preemption is always enabled so
   	  pok_sched();
@@ -329,20 +330,20 @@ pok_ret_t pok_thread_delayed_start (const uint32_t id, const uint32_t ms)
       else //the partition mode is cold or warm start
   	{
   	  pok_threads[id].state = POK_STATE_DELAYED_START;
-	  pok_threads[id].wakeup_time = ms;
+	  pok_threads[id].wakeup_time = ns;
   	}
     }
   else
     {
       if (pok_partitions[pok_threads[id].partition].mode == POK_PARTITION_MODE_NORMAL)
 	    { // set the first release point
-	      pok_threads[id].next_activation = ms + POK_GETTICK();
+	      pok_threads[id].next_activation = ns + POK_GETTICK();
 	      pok_threads[id].end_time = pok_threads[id].deadline + pok_threads[id].next_activation;
 	    }
       else
 	   {
 	     pok_threads[id].state = POK_STATE_DELAYED_START;
-	     pok_threads[id].wakeup_time = ms; // temporarly storing the delay, see set_partition_mode
+	     pok_threads[id].wakeup_time = ns; // temporarly storing the delay, see set_partition_mode
 	   }
     }
   return POK_ERRNO_OK;

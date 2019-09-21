@@ -22,9 +22,9 @@
 #include <types.h>
 #include <core/time.h>
 
-pok_ret_t pok_time_get (pok_time_t* ms)
+pok_ret_t pok_time_get (pok_time_t* ns)
 {
-   return (pok_time_gettick (ms));
+   return (pok_time_gettick (ns));
 }
 
 pok_ret_t pok_time_gettick(pok_time_t * value)

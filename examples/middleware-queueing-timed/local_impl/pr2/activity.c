@@ -46,7 +46,7 @@ void* pingme_job ()
       {
          printf("P2T1: RECEIVE ERROR, ret=%d\n", ret);
       }
-      pok_thread_sleep (500);
+      pok_thread_sleep (500000);
    }
 }
 

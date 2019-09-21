@@ -29,9 +29,7 @@ unsigned long long __udivdi3(unsigned long long num,
 
 void TIMED_WAIT (SYSTEM_TIME_TYPE delay_time, RETURN_CODE_TYPE *return_code)
 {
-  pok_time_t ms;
-  ms = __udivdi3(delay_time,1000);
-  *return_code = pok_thread_sleep (ms);
+  *return_code = pok_thread_sleep ((pok_time_t) delay_time/1000);
 }
 
 
@@ -45,9 +43,7 @@ void PERIODIC_WAIT (RETURN_CODE_TYPE *return_code)
 
 void GET_TIME (SYSTEM_TIME_TYPE *system_time, RETURN_CODE_TYPE *return_code)
 {
-  pok_time_t pok_time;
-  *return_code = pok_time_get (&pok_time);
-  *system_time = pok_time*1000;
+  *return_code = pok_time_get ((pok_time_t*)system_time);
 }
 
 #ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE

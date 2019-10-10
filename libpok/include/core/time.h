@@ -24,9 +24,9 @@
 #include <errno.h>
 #include <core/syscall.h>
 
-pok_ret_t pok_time_get (pok_time_t* ms);
+pok_ret_t pok_time_get (pok_time_t* ns);
 /*
- * Get the amount of milliseconds expired since the system starts.
+ * Get the amount of nanoseconds expired since the system starts.
  */
 
 #define pok_time_milliseconds(value) value

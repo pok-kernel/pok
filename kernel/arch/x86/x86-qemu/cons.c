@@ -237,7 +237,7 @@ int pok_cons_init (void)
    pok_print_init (pok_cons_print_char, pok_cons_attr);
 #endif
 
-#if defined (POK_NEEDS_DEBUG) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS) || defined(POK_NEEDS_USER_DEBUG)
+#if defined (POK_NEEDS_CONSOLE) || (POK_NEEDS_DEBUG) || defined (POK_NEEDS_INSTRUMENTATION) || defined (POK_NEEDS_COVERAGE_INFOS) || defined(POK_NEEDS_USER_DEBUG)
    /* To be fixed : init serial */
    outb(COM1 + 1, 0x00);    // Disable all interrupts
    outb(COM1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)

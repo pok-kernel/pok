@@ -199,10 +199,24 @@ void rtl8029_poll_and_read (pok_port_id_t port_id, void* data, uint32_t len)
       ne2000_read(&dev, &recv_packet,
 		  ne2000_hdr.size - sizeof(s_ne2000_header), offset);
       
+      if(pok_global_ports_to_local_ports[recv_packet.udp.dst] != invalid_local_port)
+      {
 #ifdef POK_NEEDS_DEBUG
-      printf("ENQUEUE on (global) port %d\n", recv_packet.udp.dst);
+	printf("ENQUEUE on (global) port %d\n", recv_packet.udp.dst);
 #endif
-      rtl8029_enqueue(&recv_packet);
+	rtl8029_enqueue(&recv_packet);
+      }
+      else
+      {
+#ifdef POK_NEEDS_DEBUG
+	printf("[RTL8029] ERROR, received msg from MAC ");
+	display_mac(recv_packet.eth.src);
+	printf("\tsrc global port %d with an invalid port id for the destination (%d)\n", recv_packet.udp.src, recv_packet.udp.dst);
+#endif
+	outb(dev.addr + NE2000_BNRY,
+	     ne2000_hdr.next > NE2000_MEMSZ ? NE2000_RXBUF - 1 : ne2000_hdr.next - 1);
+	break;
+      }
 
       // update the BNRY register... almost forgot that
       outb(dev.addr + NE2000_BNRY,

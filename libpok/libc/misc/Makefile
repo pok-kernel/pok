@@ -5,7 +5,8 @@ include $(TOPDIR)/misc/mk/config.mk
 
 LO_TARGET=	misc.lo
 
-LO_OBJS=	__udivdi3.o
+LO_OBJS=	__udivdi3.o \
+		__umoddi3.o
 
 LO_DEPS=
 

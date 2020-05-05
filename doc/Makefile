@@ -1,4 +1,5 @@
--include $(POK_PATH)/misc/mk/config.mk
+export POK_PATH=$(CURDIR)/..
+include $(POK_PATH)/misc/mk/config.mk
 
 all:
 	doxygen ../misc/doxygen-kernel.conf

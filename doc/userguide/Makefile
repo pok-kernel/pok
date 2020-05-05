@@ -24,7 +24,7 @@ LIBPOK_HEADERS=arch.h errno.h libm.h\
 all: $(PDFFILE)
 
 %.pdf: %.svg
-	inkscape --export-pdf=$@ $<
+	inkscape --export-filename=$@ $<
 
 $(PDFFILE): $(TEXFILES) $(EPSFILES) $(BIBLIO) $(LISTINGS)
 	rm -rf include-libpok

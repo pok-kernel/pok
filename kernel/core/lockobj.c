@@ -295,7 +295,18 @@ pok_ret_t pok_lockobj_lock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* at
 
    if ( (obj->is_locked == FALSE ) && (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_UNLOCK ))
    {
-      obj->is_locked = TRUE;
+      if (obj->kind == POK_LOCKOBJ_KIND_SEMAPHORE)
+      {
+         obj->current_value--;
+         if (obj->current_value == 0)
+         {
+            obj->is_locked = TRUE;
+         }
+      }
+      else
+      {
+         obj->is_locked = TRUE;
+      }
       SPIN_UNLOCK (obj->spin);
    }
    else

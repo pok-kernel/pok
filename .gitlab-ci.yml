@@ -1,0 +1,14 @@
+image: debian:stable
+
+stages:
+  - compile
+
+compile:
+  stage: compile
+  before_script:
+    - apt -y update
+    - apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc
+  script:
+    - make configure
+    - (cd examples/mutexes && make)
+    - (cd examples/semaphores && make)

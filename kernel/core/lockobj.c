@@ -67,9 +67,9 @@ pok_ret_t pok_lockobj_init ()
 
    for ( i = 0 ; i < POK_CONFIG_NB_LOCKOBJECTS ; i++)
    {
-      pok_partitions_lockobjs[i].spin        = 0;
-      pok_partitions_lockobjs[i].is_locked   = FALSE;
-      pok_partitions_lockobjs[i].initialized = FALSE;
+      pok_partitions_lockobjs[i].spin          = 0;
+      pok_partitions_lockobjs[i].current_value = 1;
+      pok_partitions_lockobjs[i].initialized   = FALSE;
    }
 #endif
    return POK_ERRNO_OK;
@@ -108,11 +108,10 @@ pok_ret_t pok_lockobj_create (pok_lockobj_t* obj, const pok_lockobj_attr_t* attr
    {
       obj->current_value = attr->initial_value;
       obj->max_value     = attr->max_value;
-      
-      if (obj->current_value == 0)
-      {
-         obj->is_locked = TRUE;
-      }
+   }
+   else
+   {
+      obj->current_value = 0;
    }
 
    return POK_ERRNO_OK;
@@ -293,20 +292,9 @@ pok_ret_t pok_lockobj_lock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* at
    
    SPIN_LOCK (obj->spin);
 
-   if ( (obj->is_locked == FALSE ) && (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_UNLOCK ))
+   if ( (obj->current_value > 0) && (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_UNLOCK ))
    {
-      if (obj->kind == POK_LOCKOBJ_KIND_SEMAPHORE)
-      {
-         obj->current_value--;
-         if (obj->current_value == 0)
-         {
-            obj->is_locked = TRUE;
-         }
-      }
-      else
-      {
-         obj->is_locked = TRUE;
-      }
+      obj->current_value--;
       SPIN_UNLOCK (obj->spin);
    }
    else
@@ -319,7 +307,7 @@ pok_ret_t pok_lockobj_lock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* at
          timeout = attr->time + POK_GETTICK();
       }
 
-      while ( (obj->is_locked == TRUE ) || (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_LOCK)) 
+      while ( (obj->current_value == 0) || (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_LOCK))
       {
          obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_LOCK;
 
@@ -343,30 +331,7 @@ pok_ret_t pok_lockobj_lock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* at
          SPIN_LOCK (obj->spin);
       }
       
-      switch (obj->kind)
-      {
-         case POK_LOCKOBJ_KIND_SEMAPHORE:
-         {
-            obj->current_value--;
-            if (obj->current_value == 0)
-            {
-               obj->is_locked = TRUE;
-            }
-            break;
-         }
-         
-         case POK_LOCKOBJ_KIND_MUTEX:
-         {
-            obj->is_locked = TRUE;
-            break;
-         }
-         
-         default:
-         {
-            obj->is_locked = TRUE;
-            break;
-         }
-      }
+      obj->current_value--;
       SPIN_UNLOCK(obj->spin);
       pok_sched_unlock_thread (POK_SCHED_CURRENT_THREAD);
    }
@@ -389,30 +354,17 @@ pok_ret_t pok_lockobj_unlock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* 
    res = 0;
    SPIN_LOCK (obj->spin);
 
-   switch (obj->kind)
+   if (obj->kind == POK_LOCKOBJ_KIND_SEMAPHORE)
    {
-      case POK_LOCKOBJ_KIND_SEMAPHORE:
+      if (obj->current_value < obj->max_value)
       {
-         if (obj->current_value < obj->max_value)
-         {
-            obj->current_value++;
-         }
-         obj->is_locked = FALSE;
-         break;
+         obj->current_value++;
       }
-      
-      case POK_LOCKOBJ_KIND_MUTEX:
-      {
-         obj->is_locked = FALSE;
-         break;
-      }
-      
-      default:
-      {
-         obj->is_locked = FALSE;
-         break;
-      }
-   }  
+   }
+   else
+   {
+      obj->current_value = 1;
+   }
    
    res = POK_SCHED_CURRENT_THREAD;
    res = (res + 1) % (POK_CONFIG_NB_THREADS);

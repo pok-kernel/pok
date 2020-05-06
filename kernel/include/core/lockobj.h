@@ -75,9 +75,6 @@ typedef struct
    pok_spinlock_t             eventspin;
    /* spinlock to enfoce mutual exclusion */
 
-   bool_t                     is_locked;
-   /* Is the mutex locked ? */
-   
    pok_mutex_state_t          thread_state[POK_CONFIG_NB_THREADS + 2];
    /* Describe which thread is blocked in the mutex */
    
@@ -93,7 +90,12 @@ typedef struct
    /* Is the mutex initialized ? */
    
    uint16_t                   current_value;
+   /* The number of available resources in this lock object.
+      For a non-semaphore, the value can only be 1 (object is
+      available) or 0 (object is locked) */
+
    uint16_t                   max_value;
+   /* For a semaphore, the maximum cap value */
 } pok_lockobj_t;
 
 

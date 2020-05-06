@@ -340,6 +340,7 @@ pok_ret_t pok_lockobj_lock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* at
          
          SPIN_UNLOCK (obj->spin);
          pok_sched();     /* reschedule baby, reschedule !! */
+         SPIN_LOCK (obj->spin);
       }
       
       switch (obj->kind)
@@ -366,6 +367,7 @@ pok_ret_t pok_lockobj_lock (pok_lockobj_t* obj, const pok_lockobj_lockattr_t* at
             break;
          }
       }
+      SPIN_UNLOCK(obj->spin);
       pok_sched_unlock_thread (POK_SCHED_CURRENT_THREAD);
    }
 

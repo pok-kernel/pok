@@ -1,10 +1,19 @@
-image: debian:stable
-
 stages:
+  - style
   - compile
+
+check_style:
+  stage: style
+  image: ubuntu:20.04
+  before_script:
+    - apt -y update
+    - apt -y install clang-format git
+  script:
+    - misc/fix-style --check
 
 compile:
   stage: compile
+  image: debian:stable
   before_script:
     - apt -y update
     - apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc

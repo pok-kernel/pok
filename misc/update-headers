@@ -1,6 +1,9 @@
 #! /usr/bin/python
 #
-# Usage: update-headers.py [--force]
+# Usage: update-headers [--force | --check]
+#
+# Update header on missing files, update headers on all files with --force
+# or check the validity of all headers with --check.
 #
 #                               POK header
 #
@@ -50,6 +53,16 @@ class Lang(object):
         self.end_delimeter = end_delimeter
         self.empty_after = empty_after
 
+    def check_header(self, filename):
+        """Check that a file has the expected header."""
+        try:
+            content = [l.strip("\n") for l in open(filename)]
+            transformed = self.add_header(content[:], True)
+            return content == transformed
+        except Exception:
+            print("Error while handling file {}".format(filename))
+            raise
+
     def has_header(self, content):
         """Return True if the header marker is present."""
         return any(MARKER in l for l in content)
@@ -60,8 +73,8 @@ class Lang(object):
             content = [l.strip("\n") for l in open(filename)]
             content = self.add_header(content, force)
             open(filename, "w").write("\n".join(content) + "\n")
-        except Exception as e:
-            print("Error while handling file {}: {}".format(filename, e))
+        except Exception:
+            print("Error while handling file {}".format(filename))
             raise
 
     def add_header(self, content, force):
@@ -107,8 +120,14 @@ register(Lang("%"), "tex")                  # LaTeX
 register(Lang("#"), "pm", "pl", "py")       # Perl and Python
 
 force = sys.argv[1:2] == ["--force"]
+check = sys.argv[1:2] == ["--check"]
 
 for filename in (f.strip() for f in os.popen("git ls-files")):
     handler = extensions.get(filename.split(".")[-1])
     if handler:
-        handler.fix_header(filename, force)
+        if check:
+            if not handler.check_header(filename):
+                print("Invalid header for file {}".format(filename))
+                sys.exit(1)
+        else:
+            handler.fix_header(filename, force)

@@ -11,6 +11,15 @@ check_style:
   script:
     - misc/fix-style --check
 
+check_headers:
+  stage: style
+  image: debian:stable
+  before_script:
+    - apt -y update
+    - apt -y install python git
+  script:
+    - misc/update-headers --check
+
 compile:
   stage: compile
   image: debian:stable

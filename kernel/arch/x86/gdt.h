@@ -18,6 +18,7 @@
 #ifndef __POK_X86_GDT_H__
 #define __POK_X86_GDT_H__
 
+#include <errno.h>
 #include <types.h>
 
 typedef enum e_gdte_type

@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /* @(#)s_tanh.c 5.1 93/09/24 */
@@ -52,43 +52,43 @@
  *	only tanh(0)=0 is exact for finite argument.
  */
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-static const double one=1.0, two=2.0, tiny = 1.0e-300;
+static const double one = 1.0, two = 2.0, tiny = 1.0e-300;
 
-double
-tanh(double x)
-{
-	double t,z;
-	int32_t jx,ix;
+double tanh(double x) {
+  double t, z;
+  int32_t jx, ix;
 
-    /* High word of |x|. */
-	GET_HIGH_WORD(jx,x);
-	ix = jx&0x7fffffff;
+  /* High word of |x|. */
+  GET_HIGH_WORD(jx, x);
+  ix = jx & 0x7fffffff;
 
-    /* x is INF or NaN */
-	if(ix>=0x7ff00000) {
-	    if (jx>=0) return one/x+one;    /* tanh(+-inf)=+-1 */
-	    else       return one/x-one;    /* tanh(NaN) = NaN */
-	}
+  /* x is INF or NaN */
+  if (ix >= 0x7ff00000) {
+    if (jx >= 0)
+      return one / x + one; /* tanh(+-inf)=+-1 */
+    else
+      return one / x - one; /* tanh(NaN) = NaN */
+  }
 
-    /* |x| < 22 */
-	if (ix < 0x40360000) {		/* |x|<22 */
-	    if (ix<0x3c800000) 		/* |x|<2**-55 */
-		return x*(one+x);    	/* tanh(small) = small */
-	    if (ix>=0x3ff00000) {	/* |x|>=1  */
-		t = expm1(two*fabs(x));
-		z = one - two/(t+two);
-	    } else {
-	        t = expm1(-two*fabs(x));
-	        z= -t/(t+two);
-	    }
+  /* |x| < 22 */
+  if (ix < 0x40360000) {    /* |x|<22 */
+    if (ix < 0x3c800000)    /* |x|<2**-55 */
+      return x * (one + x); /* tanh(small) = small */
+    if (ix >= 0x3ff00000) { /* |x|>=1  */
+      t = expm1(two * fabs(x));
+      z = one - two / (t + two);
+    } else {
+      t = expm1(-two * fabs(x));
+      z = -t / (t + two);
+    }
     /* |x| > 22, return +-1 */
-	} else {
-	    z = one - tiny;		/* raised inexact flag */
-	}
-	return (jx>=0)? z: -z;
+  } else {
+    z = one - tiny; /* raised inexact flag */
+  }
+  return (jx >= 0) ? z : -z;
 }
 
 #endif

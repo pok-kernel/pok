@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,12 +9,11 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Wed Jan 21 23:07:15 2009 
+ * Created by julien on Wed Jan 21 23:07:15 2009
  */
 
+void pok_kernel_restart(void);
 
-void pok_kernel_restart (void);
-
-void pok_kernel_stop (void);
+void pok_kernel_stop(void);

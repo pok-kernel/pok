@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Thu Dec  3 10:21:25 2009 
+ * Created by julien on Thu Dec  3 10:21:25 2009
  */
 
 #ifndef __LIBPOK_PROTOCOLS_H__
@@ -28,7 +28,7 @@
  * provides features to encode and decode messages
  * before sending data through partitions. It is
  * especially useful when you want to encrypt data
- * over the network before sending or adapt application 
+ * over the network before sending or adapt application
  * data to a particular protocol.
  *
  * For each protocol, we have:

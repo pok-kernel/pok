@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,13 +9,13 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by laurent on Tue Dec 22 14:57:52 2009 
+ * Created by laurent on Tue Dec 22 14:57:52 2009
  */
 
 #ifndef __OCARINA_GENERATED_DEPLOYMENT_H_
-#define __OCARINA_GENERATED_DEPLOYMENT_H_ 
+#define __OCARINA_GENERATED_DEPLOYMENT_H_
 #include <core/schedvalues.h>
 /*****************************************************/
 
@@ -65,7 +65,8 @@
 /*  the kernel.It comprises the tasks for the partition and the main task of */
 /*  each partition that initialize all ressources.*/
 
-#define POK_CONFIG_PARTITIONS_NTHREADS {3,3}
+#define POK_CONFIG_PARTITIONS_NTHREADS                                         \
+  { 3, 3 }
 
 /*  The maccro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of */
 /*  threads in each partition we also add an additional process that */
@@ -73,17 +74,21 @@
 
 #define POK_NEEDS_SCHED_RR 1
 
-#define POK_CONFIG_PARTITIONS_SIZE {80000,80000}
+#define POK_CONFIG_PARTITIONS_SIZE                                             \
+  { 80000, 80000 }
 
-#define POK_CONFIG_PARTITIONS_SCHEDULER {POK_SCHED_RR,POK_SCHED_RR}
+#define POK_CONFIG_PARTITIONS_SCHEDULER                                        \
+  { POK_SCHED_RR, POK_SCHED_RR }
 
 /*  The maccro POK_CONFIG_PARTTITIONS_SIZE indicates the required amount of */
 /*  memory for each partition.This value was deduced from the property */
 /*  POK::Needed_Memory_Size of each process*/
 
-#define POK_CONFIG_SCHEDULING_SLOTS {500000000,500000000}
+#define POK_CONFIG_SCHEDULING_SLOTS                                            \
+  { 500000000, 500000000 }
 
-#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0,1}
+#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION                                 \
+  { 0, 1 }
 
 #define POK_CONFIG_SCHEDULING_NBSLOTS 2
 
@@ -97,7 +102,8 @@
 
 #define POK_CONFIG_STACKS_SIZE 16384
 
-#define POK_CONFIG_PARTITIONS_PORTS {0,1}
+#define POK_CONFIG_PARTITIONS_PORTS                                            \
+  { 0, 1 }
 
 #define POK_CONFIG_NB_PORTS 2
 
@@ -106,20 +112,15 @@
 /*  The maccro POK_CONFIG_NB_PORTS represent the amount of inter-partition */
 /*  communication in the system.Sampling and Queueing ports are counted.*/
 
-typedef enum
-{
+typedef enum {
   pr2_pdatain = 0,
   pr1_pdataout = 1,
   invalid_local_port = 2
 } pok_port_local_identifier_t;
 
-typedef enum
-{
-  cpu = 0
-} pok_node_identifier_t;
+typedef enum { cpu = 0 } pok_node_identifier_t;
 
-typedef enum
-{
+typedef enum {
   pr2_pdatain_global = 0,
   pr1_pdataout_global = 1
 } pok_port_identifier_t;
@@ -129,10 +130,7 @@ typedef enum
 
 #define POK_CONFIG_NB_BUSES 0
 
-typedef enum
-{
-  invalid_bus = 0
-} pok_bus_identifier_t;
+typedef enum { invalid_bus = 0 } pok_bus_identifier_t;
 
 #define POK_CONFIG_NB_NODES 1
 

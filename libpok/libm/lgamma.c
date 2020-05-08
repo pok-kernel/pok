@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /* @(#)w_lgamma.c 5.1 93/09/24 */
@@ -26,7 +26,6 @@
  * ====================================================
  */
 
-
 #ifdef POK_NEEDS_LIBMATH
 
 /* double lgamma(double x)
@@ -35,25 +34,24 @@
  * Method: call __ieee754_lgamma_r
  */
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-double
-lgamma(double x)
-{
+double lgamma(double x) {
 #ifdef _IEEE_LIBM
-	return __ieee754_lgamma_r(x,&signgam);
+  return __ieee754_lgamma_r(x, &signgam);
 #else
-        double y;
-        y = __ieee754_lgamma_r(x,&signgam);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finite(y)&&finite(x)) {
-            if(floor(x)==x&&x<=0.0)
-                return __kernel_standard(x,x,15); /* lgamma pole */
-            else
-                return __kernel_standard(x,x,14); /* lgamma overflow */
-        } else
-            return y;
+  double y;
+  y = __ieee754_lgamma_r(x, &signgam);
+  if (_LIB_VERSION == _IEEE_)
+    return y;
+  if (!finite(y) && finite(x)) {
+    if (floor(x) == x && x <= 0.0)
+      return __kernel_standard(x, x, 15); /* lgamma pole */
+    else
+      return __kernel_standard(x, x, 14); /* lgamma overflow */
+  } else
+    return y;
 #endif
 }
 

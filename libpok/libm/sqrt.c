@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 13:44:27 2009 
+ * Created by julien on Fri Jan 30 13:44:27 2009
  */
 
 /*
@@ -34,20 +34,20 @@
 #include "math_private.h"
 #include <libm.h>
 
-double sqrt (double x)		/* wrapper sqrt */
+double sqrt(double x) /* wrapper sqrt */
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_sqrt(x);
+  return __ieee754_sqrt(x);
 #else
-	double z;
-	z = __ieee754_sqrt(x);
-	if(isnan(x)) return z;
-	if(x<0.0) {
-	    return -1.0;
-	} else
-	    return z;
+  double z;
+  z = __ieee754_sqrt(x);
+  if (isnan(x))
+    return z;
+  if (x < 0.0) {
+    return -1.0;
+  } else
+    return z;
 #endif
 }
 
 #endif
-

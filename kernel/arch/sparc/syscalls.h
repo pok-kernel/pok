@@ -25,4 +25,3 @@
 void pok_syscalls_init(void);
 
 #endif /* !__POK_PPC_SYSCALLS_H__ */
-

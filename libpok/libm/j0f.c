@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /* w_j0f.c -- float version of w_j0.c.
@@ -35,47 +35,47 @@
  * wrapper j0f(float x), y0f(float x)
  */
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-float
-j0f(float x)		/* wrapper j0f */
+float j0f(float x) /* wrapper j0f */
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_j0f(x);
+  return __ieee754_j0f(x);
 #else
-	float z = __ieee754_j0f(x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x)) return z;
-	if(fabsf(x)>(float)X_TLOSS) {
-		/* j0f(|x|>X_TLOSS) */
-	        return (float)__kernel_standard((double)x,(double)x,134);
-	} else
-	    return z;
+  float z = __ieee754_j0f(x);
+  if (_LIB_VERSION == _IEEE_ || isnanf(x))
+    return z;
+  if (fabsf(x) > (float)X_TLOSS) {
+    /* j0f(|x|>X_TLOSS) */
+    return (float)__kernel_standard((double)x, (double)x, 134);
+  } else
+    return z;
 #endif
 }
 
-float
-y0f(float x)		/* wrapper y0f */
+float y0f(float x) /* wrapper y0f */
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_y0f(x);
+  return __ieee754_y0f(x);
 #else
-	float z;
-	z = __ieee754_y0f(x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x) ) return z;
-        if(x <= (float)0.0){
-                if(x==(float)0.0)
-                    /* d= -one/(x-x); */
-                    return (float)__kernel_standard((double)x,(double)x,108);
-                else
-                    /* d = zero/(x-x); */
-                    return (float)__kernel_standard((double)x,(double)x,109);
-        }
-	if(x>(float)X_TLOSS) {
-		/* y0(x>X_TLOSS) */
-	        return (float)__kernel_standard((double)x,(double)x,135);
-	} else
-	    return z;
+  float z;
+  z = __ieee754_y0f(x);
+  if (_LIB_VERSION == _IEEE_ || isnanf(x))
+    return z;
+  if (x <= (float)0.0) {
+    if (x == (float)0.0)
+      /* d= -one/(x-x); */
+      return (float)__kernel_standard((double)x, (double)x, 108);
+    else
+      /* d = zero/(x-x); */
+      return (float)__kernel_standard((double)x, (double)x, 109);
+  }
+  if (x > (float)X_TLOSS) {
+    /* y0(x>X_TLOSS) */
+    return (float)__kernel_standard((double)x, (double)x, 135);
+  } else
+    return z;
 #endif
 }
 

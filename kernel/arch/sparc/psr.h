@@ -23,58 +23,52 @@
 #ifndef __POK_SPARC_PSR_H__
 #define __POK_SPARC_PSR_H__
 
-#define PSR_ET        0x20  /**< enable traps */
-#define PSR_PS        0x40  /**< previous supervisor */
-#define PSR_S         0x80  /**< supervisor */
-#define PSR_CWP_MASK  0x1F  /**< Current Window Pointer Mask */
-#define PSR_PIL(pil)  (((pil) & 0xF) << 8)  /**< Proc Interrupt Level */
+#define PSR_ET 0x20                     /**< enable traps */
+#define PSR_PS 0x40                     /**< previous supervisor */
+#define PSR_S 0x80                      /**< supervisor */
+#define PSR_CWP_MASK 0x1F               /**< Current Window Pointer Mask */
+#define PSR_PIL(pil) (((pil)&0xF) << 8) /**< Proc Interrupt Level */
 
-static inline unsigned int psr_get(void)
-{
+static inline unsigned int psr_get(void) {
   unsigned int psr;
-  asm volatile ("rd %%psr, %0\n"
-                : "=r" (psr)
-                : /* no inputs */
-                : "memory");
+  asm volatile("rd %%psr, %0\n"
+               : "=r"(psr)
+               : /* no inputs */
+               : "memory");
 
   return psr;
 }
 
-static inline void psr_set(unsigned int new_psr)
-{
-  asm volatile ("wr %0, 0x0, %%psr\n"
-                "nop\n"
-                "nop\n"
-                "nop\n"
-                : /* no outputs */
-                : "r" (new_psr)
-                : "memory", "cc");
+static inline void psr_set(unsigned int new_psr) {
+  asm volatile("wr %0, 0x0, %%psr\n"
+               "nop\n"
+               "nop\n"
+               "nop\n"
+               : /* no outputs */
+               : "r"(new_psr)
+               : "memory", "cc");
 }
 
-static inline void psr_enable_traps(void)
-{
+static inline void psr_enable_traps(void) {
   unsigned int psr = psr_get();
   psr |= PSR_ET;
   psr_set(psr);
 }
 
-static inline void psr_disable_traps(void)
-{
+static inline void psr_disable_traps(void) {
   unsigned int psr = psr_get();
   psr &= ~PSR_ET;
   psr_set(psr);
 }
 
-static inline void psr_disable_interupt(void)
-{
+static inline void psr_disable_interupt(void) {
   unsigned int psr = psr_get();
 
   psr &= ~(0xF << 8);
   psr_set(psr | PSR_PIL(0xF));
 }
 
-static inline void psr_enable_interupt(void)
-{
+static inline void psr_enable_interupt(void) {
   unsigned int psr = psr_get();
 
   psr &= ~(0xF << 8);

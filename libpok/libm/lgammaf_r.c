@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /* w_lgammaf_r.c -- float version of w_lgamma_r.c.
@@ -35,27 +35,27 @@
  * wrapper float lgammaf_r(float x, int *signgamp)
  */
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-float
-lgammaf_r(float x, int *signgamp) /* wrapper lgammaf_r */
+float lgammaf_r(float x, int *signgamp) /* wrapper lgammaf_r */
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_lgammaf_r(x,signgamp);
+  return __ieee754_lgammaf_r(x, signgamp);
 #else
-        float y;
-        y = __ieee754_lgammaf_r(x,signgamp);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finitef(y)&&finitef(x)) {
-            if(floorf(x)==x&&x<=(float)0.0)
-	        /* lgamma pole */
-                return (float)__kernel_standard((double)x,(double)x,115);
-            else
-	        /* lgamma overflow */
-	        return (float)__kernel_standard((double)x,(double)x,114);
-        } else
-            return y;
+  float y;
+  y = __ieee754_lgammaf_r(x, signgamp);
+  if (_LIB_VERSION == _IEEE_)
+    return y;
+  if (!finitef(y) && finitef(x)) {
+    if (floorf(x) == x && x <= (float)0.0)
+      /* lgamma pole */
+      return (float)__kernel_standard((double)x, (double)x, 115);
+    else
+      /* lgamma overflow */
+      return (float)__kernel_standard((double)x, (double)x, 114);
+  } else
+    return y;
 #endif
 }
 

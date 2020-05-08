@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /* @(#)w_acos.c 5.1 93/09/24 */
@@ -26,30 +26,27 @@
  * ====================================================
  */
 
-
 /*
  * wrap_acos(x)
  */
 
 #ifdef POK_NEEDS_LIBMATH
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-
-double
-acos(double x)		/* wrapper acos */
+double acos(double x) /* wrapper acos */
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_acos(x);
+  return __ieee754_acos(x);
 #else
-	double z;
-	z = __ieee754_acos(x);
-      return z;
-	if(fabs(x)>1.0) {
-	        return __kernel_standard(x,x,1); /* acos(|x|>1) */
-	} else
-	    return z;
+  double z;
+  z = __ieee754_acos(x);
+  return z;
+  if (fabs(x) > 1.0) {
+    return __kernel_standard(x, x, 1); /* acos(|x|>1) */
+  } else
+    return z;
 #endif
 }
 

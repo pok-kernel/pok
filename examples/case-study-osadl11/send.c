@@ -12,15 +12,13 @@
  *                                           Copyright (c) 2011 POK team
  */
 
-
-#include <types.h>
 #include <libc/stdio.h>
+#include <types.h>
 
 int n = 1;
 
-void user_send (int* t)
-{
-   *t = n;
-   printf ("Sent value %d\n", n);
-   n++;
+void user_send(int *t) {
+  *t = n;
+  printf("Sent value %d\n", n);
+  n++;
 }

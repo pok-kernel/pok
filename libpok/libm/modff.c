@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /* s_modff.c -- float version of s_modf.c.
@@ -31,42 +31,40 @@
 
 #ifdef POK_NEEDS_LIBMATH
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
 static const float one = 1.0;
 
-float
-modff(float x, float *iptr)
-{
-	int32_t i0,jj0;
-	uint32_t i;
-	GET_FLOAT_WORD(i0,x);
-	jj0 = ((i0>>23)&0xff)-0x7f;	/* exponent of x */
-	if(jj0<23) {			/* integer part in x */
-	    if(jj0<0) {			/* |x|<1 */
-	        SET_FLOAT_WORD(*iptr,i0&0x80000000);	/* *iptr = +-0 */
-		return x;
-	    } else {
-		i = (0x007fffff)>>jj0;
-		if((i0&i)==0) {			/* x is integral */
-		    uint32_t ix;
-		    *iptr = x;
-		    GET_FLOAT_WORD(ix,x);
-		    SET_FLOAT_WORD(x,ix&0x80000000);	/* return +-0 */
-		    return x;
-		} else {
-		    SET_FLOAT_WORD(*iptr,i0&(~i));
-		    return x - *iptr;
-		}
-	    }
-	} else {			/* no fraction part */
-	    uint32_t ix;
-	    *iptr = x*one;
-	    GET_FLOAT_WORD(ix,x);
-	    SET_FLOAT_WORD(x,ix&0x80000000);	/* return +-0 */
-	    return x;
-	}
+float modff(float x, float *iptr) {
+  int32_t i0, jj0;
+  uint32_t i;
+  GET_FLOAT_WORD(i0, x);
+  jj0 = ((i0 >> 23) & 0xff) - 0x7f;           /* exponent of x */
+  if (jj0 < 23) {                             /* integer part in x */
+    if (jj0 < 0) {                            /* |x|<1 */
+      SET_FLOAT_WORD(*iptr, i0 & 0x80000000); /* *iptr = +-0 */
+      return x;
+    } else {
+      i = (0x007fffff) >> jj0;
+      if ((i0 & i) == 0) { /* x is integral */
+        uint32_t ix;
+        *iptr = x;
+        GET_FLOAT_WORD(ix, x);
+        SET_FLOAT_WORD(x, ix & 0x80000000); /* return +-0 */
+        return x;
+      } else {
+        SET_FLOAT_WORD(*iptr, i0 & (~i));
+        return x - *iptr;
+      }
+    }
+  } else { /* no fraction part */
+    uint32_t ix;
+    *iptr = x * one;
+    GET_FLOAT_WORD(ix, x);
+    SET_FLOAT_WORD(x, ix & 0x80000000); /* return +-0 */
+    return x;
+  }
 }
 
 #endif

@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /* s_sinf.c -- float version of s_sin.c.
@@ -31,9 +31,9 @@
 
 #ifdef POK_NEEDS_LIBMATH
 
-#include <libm.h>
-#include "namespace.h"
 #include "math_private.h"
+#include "namespace.h"
+#include <libm.h>
 
 #if 0 /* notyet */
 #ifdef __weak_alias
@@ -41,32 +41,35 @@ __weak_alias(sinf, _sinf)
 #endif
 #endif
 
-float
-sinf(float x)
-{
-	float y[2],z=0.0;
-	int32_t n, ix;
+float sinf(float x) {
+  float y[2], z = 0.0;
+  int32_t n, ix;
 
-	GET_FLOAT_WORD(ix,x);
+  GET_FLOAT_WORD(ix, x);
 
-    /* |x| ~< pi/4 */
-	ix &= 0x7fffffff;
-	if(ix <= 0x3f490fd8) return __kernel_sinf(x,z,0);
+  /* |x| ~< pi/4 */
+  ix &= 0x7fffffff;
+  if (ix <= 0x3f490fd8)
+    return __kernel_sinf(x, z, 0);
 
-    /* sin(Inf or NaN) is NaN */
-	else if (ix>=0x7f800000) return x-x;
+  /* sin(Inf or NaN) is NaN */
+  else if (ix >= 0x7f800000)
+    return x - x;
 
-    /* argument reduction needed */
-	else {
-	    n = __ieee754_rem_pio2f(x,y);
-	    switch(n&3) {
-		case 0: return  __kernel_sinf(y[0],y[1],1);
-		case 1: return  __kernel_cosf(y[0],y[1]);
-		case 2: return -__kernel_sinf(y[0],y[1],1);
-		default:
-			return -__kernel_cosf(y[0],y[1]);
-	    }
-	}
+  /* argument reduction needed */
+  else {
+    n = __ieee754_rem_pio2f(x, y);
+    switch (n & 3) {
+    case 0:
+      return __kernel_sinf(y[0], y[1], 1);
+    case 1:
+      return __kernel_cosf(y[0], y[1]);
+    case 2:
+      return -__kernel_sinf(y[0], y[1], 1);
+    default:
+      return -__kernel_cosf(y[0], y[1]);
+    }
+  }
 }
 
 #endif

@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /*-
@@ -44,29 +44,26 @@
 
 #include <libm.h>
 
-float
-roundf(float x)
-{
-	float t;
-	int i;
+float roundf(float x) {
+  float t;
+  int i;
 
-	i = fpclassify(x);
-	if (i == FP_INFINITE || i == FP_NAN)
-		return (x);
+  i = fpclassify(x);
+  if (i == FP_INFINITE || i == FP_NAN)
+    return (x);
 
-	if (x >= 0.0) {
-		t = floorf(x);
-		if (x - t >= 0.5)
-			t += 1.0;
-		return (t);
-	} else {
-		x = -x;
-		t = floorf(x);
-		if (x - t >= 0.5)
-			t += 1.0;
-		return (-t);
-	}
+  if (x >= 0.0) {
+    t = floorf(x);
+    if (x - t >= 0.5)
+      t += 1.0;
+    return (t);
+  } else {
+    x = -x;
+    t = floorf(x);
+    if (x - t >= 0.5)
+      t += 1.0;
+    return (-t);
+  }
 }
 
 #endif
-

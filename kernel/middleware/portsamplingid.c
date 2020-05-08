@@ -14,35 +14,31 @@
  * Created by julien on Thu Jan 15 23:34:13 2009
  */
 
-
 #ifdef POK_NEEDS_PORTS_SAMPLING
-#include <types.h>
-#include <libc.h>
 #include <core/sched.h>
+#include <libc.h>
 #include <middleware/port.h>
+#include <types.h>
 
-extern char*   pok_ports_names[POK_CONFIG_NB_PORTS];
+extern char *pok_ports_names[POK_CONFIG_NB_PORTS];
 extern uint8_t pok_ports_kind[POK_CONFIG_NB_PORTS];
 
-pok_ret_t pok_port_sampling_id (char* name, pok_port_id_t* id)
-{
-	 uint8_t i;
+pok_ret_t pok_port_sampling_id(char *name, pok_port_id_t *id) {
+  uint8_t i;
 
-	 for (i = 0; i < POK_CONFIG_NB_PORTS ; i++)
-	 {
-			if ( (strcmp (name, pok_ports_names[i]) == 0) && (pok_ports_kind[i] == POK_PORT_KIND_SAMPLING))
-			{
-				 if (! pok_own_port (POK_SCHED_CURRENT_PARTITION, i))
-				 {
-						return POK_ERRNO_PORT;
-				 }
+  for (i = 0; i < POK_CONFIG_NB_PORTS; i++) {
+    if ((strcmp(name, pok_ports_names[i]) == 0) &&
+        (pok_ports_kind[i] == POK_PORT_KIND_SAMPLING)) {
+      if (!pok_own_port(POK_SCHED_CURRENT_PARTITION, i)) {
+        return POK_ERRNO_PORT;
+      }
 
-				 *id = i;
+      *id = i;
 
-				 return POK_ERRNO_OK;
-			}
-	 }
-	 return POK_ERRNO_NOTFOUND;
+      return POK_ERRNO_OK;
+    }
+  }
+  return POK_ERRNO_NOTFOUND;
 }
 
 #endif

@@ -12,16 +12,14 @@
  *                                           Copyright (c) 2011 POK team
  */
 
-
-#include <types.h>
 #include <libc/stdio.h>
+#include <types.h>
 static int step = 0;
 
-void user_receive (int t)
-{
-   int d;
-   d = (t + 1) % 3;
-   printf ("Step %d\n", step++);
-   printf ("Received value %d\n", t);
-   printf ("Computed value %d\n", t / d);
+void user_receive(int t) {
+  int d;
+  d = (t + 1) % 3;
+  printf("Step %d\n", step++);
+  printf("Received value %d\n", t);
+  printf("Computed value %d\n", t / d);
 }

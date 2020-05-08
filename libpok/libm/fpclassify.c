@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,24 +9,22 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Sat Jan 31 15:49:24 2009 
+ * Created by julien on Sat Jan 31 15:49:24 2009
  */
 
 #ifdef POK_NEEDS_LIBMATH
 
+#include "math_private.h"
 #include <libm.h>
 #include <types.h>
-#include "math_private.h"
 
-int
-__fpclassifyf (float x)
-{
+int __fpclassifyf(float x) {
   uint32_t w;
 
-  GET_FLOAT_WORD(w,x);
-  
+  GET_FLOAT_WORD(w, x);
+
   if (w == 0x00000000 || w == 0x80000000)
     return FP_ZERO;
   else if ((w >= 0x00800000 && w <= 0x7f7fffff) ||
@@ -41,12 +39,10 @@ __fpclassifyf (float x)
     return FP_NAN;
 }
 
-int
-__fpclassifyd (double x)
-{
+int __fpclassifyd(double x) {
   uint32_t msw, lsw;
 
-  EXTRACT_WORDS(msw,lsw,x);
+  EXTRACT_WORDS(msw, lsw, x);
 
   if ((msw == 0x00000000 && lsw == 0x00000000) ||
       (msw == 0x80000000 && lsw == 0x00000000))
@@ -58,8 +54,7 @@ __fpclassifyd (double x)
   else if ((msw >= 0x00000000 && msw <= 0x000fffff) ||
 bugfix : msw is an uint32_t (unsigned) value, always positive
   */
-  else if ((msw <= 0x000fffff) ||
-           (msw >= 0x80000000 && msw <= 0x800fffff))
+  else if ((msw <= 0x000fffff) || (msw >= 0x80000000 && msw <= 0x800fffff))
     /* zero is already handled above */
     return FP_SUBNORMAL;
   else if ((msw == 0x7ff00000 && lsw == 0x00000000) ||
@@ -68,6 +63,5 @@ bugfix : msw is an uint32_t (unsigned) value, always positive
   else
     return FP_NAN;
 }
-
 
 #endif

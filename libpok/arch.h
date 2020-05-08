@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,24 +9,22 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Thu Jan 15 23:34:13 2009 
+ * Created by julien on Thu Jan 15 23:34:13 2009
  */
-
 
 #ifndef __LIBPOK_ARCH__
 #define __LIBPOK_ARCH__
 
-void pok_arch_idle (void);
+void pok_arch_idle(void);
 /*
  * Dummy function that halts the CPU
  */
 
-void pok_context_switch (uint32_t* old_sp, uint32_t new_sp);
+void pok_context_switch(uint32_t *old_sp, uint32_t new_sp);
 /*
  * Handle context-switch between two threads
  */
 
 #endif
-

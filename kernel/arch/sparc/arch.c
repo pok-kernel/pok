@@ -19,20 +19,19 @@
  * @author Fabien Chouteau
  */
 
-#include <types.h>
-#include <errno.h>
-#include <core/partition.h>
-#include "traps.h"
-#include "space.h"
 #include "psr.h"
+#include "space.h"
 #include "sparc_conf.h"
 #include "syscalls.h"
+#include "traps.h"
+#include <core/partition.h>
+#include <errno.h>
+#include <types.h>
 
 /**
  * Initialize all SPARC managers (traps, syscalls, space).
  */
-pok_ret_t pok_arch_init ()
-{
+pok_ret_t pok_arch_init() {
   traps_init();
   psr_disable_interupt();
   psr_enable_traps();
@@ -43,44 +42,36 @@ pok_ret_t pok_arch_init ()
   return (POK_ERRNO_OK);
 }
 
-pok_ret_t pok_arch_preempt_disable()
-{
+pok_ret_t pok_arch_preempt_disable() {
   psr_disable_interupt();
 
   return (POK_ERRNO_OK);
 }
 
-pok_ret_t pok_arch_preempt_enable()
-{
+pok_ret_t pok_arch_preempt_enable() {
   psr_enable_interupt();
 
   return (POK_ERRNO_OK);
 }
 
-pok_ret_t pok_arch_idle()
-{
-  while (1)
-  {
+pok_ret_t pok_arch_idle() {
+  while (1) {
     /* Leon3 Only ? */
-    asm volatile ("wr %g0, %asr19");
+    asm volatile("wr %g0, %asr19");
   }
 
-   return (POK_ERRNO_OK);
+  return (POK_ERRNO_OK);
 }
 
 /**
  * Attach the handler to the given trap number (vector).
  * @see pok_sparc_isr
  */
-pok_ret_t pok_arch_event_register (uint8_t vector, void (*handler)(void))
-{
-  if (pok_sparc_isr[vector] == NULL)
-  {
+pok_ret_t pok_arch_event_register(uint8_t vector, void (*handler)(void)) {
+  if (pok_sparc_isr[vector] == NULL) {
     pok_sparc_isr[vector] = handler;
     return (POK_ERRNO_OK);
-  }
-  else
-  {
+  } else {
     return (POK_ERRNO_UNAVAILABLE);
   }
 }
@@ -88,10 +79,8 @@ pok_ret_t pok_arch_event_register (uint8_t vector, void (*handler)(void))
 /**
  * Compute the stack adress for the given thread.
  */
-uint32_t    pok_thread_stack_addr   (const uint8_t    partition_id,
-                                     const uint32_t   local_thread_id)
-{
-  return pok_partitions[partition_id].size - (local_thread_id * POK_USER_STACK_SIZE);
+uint32_t pok_thread_stack_addr(const uint8_t partition_id,
+                               const uint32_t local_thread_id) {
+  return pok_partitions[partition_id].size -
+         (local_thread_id * POK_USER_STACK_SIZE);
 }
-
-

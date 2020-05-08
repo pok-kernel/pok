@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -9,9 +9,9 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
+ *                                      Copyright (c) 2007-2009 POK team
  *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ * Created by julien on Fri Jan 30 14:41:34 2009
  */
 
 /* @(#)e_scalb.c 5.1 93/09/24 */
@@ -34,30 +34,33 @@
 
 #ifdef POK_NEEDS_LIBMATH
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
 #ifdef _SCALB_INT
-double
-__ieee754_scalb(double x, int fn)
+double __ieee754_scalb(double x, int fn)
 #else
-double
-__ieee754_scalb(double x, double fn)
+double __ieee754_scalb(double x, double fn)
 #endif
 {
 #ifdef _SCALB_INT
-	return scalbn(x,fn);
+  return scalbn(x, fn);
 #else
-	if (isnan(x)||isnan(fn)) return x*fn;
-	if (!finite(fn)) {
-	    if(fn>0.0) return x*fn;
-	    else       return x/(-fn);
-	}
-	if (rint(fn)!=fn) return (fn-fn)/(fn-fn);
-	if ( fn > 65000.0) return scalbn(x, 65000);
-	if (-fn > 65000.0) return scalbn(x,-65000);
-	return scalbn(x,(int)fn);
+  if (isnan(x) || isnan(fn))
+    return x * fn;
+  if (!finite(fn)) {
+    if (fn > 0.0)
+      return x * fn;
+    else
+      return x / (-fn);
+  }
+  if (rint(fn) != fn)
+    return (fn - fn) / (fn - fn);
+  if (fn > 65000.0)
+    return scalbn(x, 65000);
+  if (-fn > 65000.0)
+    return scalbn(x, -65000);
+  return scalbn(x, (int)fn);
 #endif
 }
 #endif
-

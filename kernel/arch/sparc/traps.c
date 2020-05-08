@@ -20,10 +20,10 @@
  * @brief  Traps management.
  */
 
-#include <types.h>
+#include <core/debug.h>
 #include <errno.h>
 #include <libc.h>
-#include <core/debug.h>
+#include <types.h>
 
 #include "thread.h"
 #include "traps.h"
@@ -37,9 +37,8 @@ sparc_traps_handler pok_sparc_isr[256];
  * Initialize ISR table.
  * @see pok_sparc_isr
  */
-pok_ret_t traps_init(void)
-{
-  memset((unsigned char *)pok_sparc_isr, 0x0, sizeof (pok_sparc_isr));
+pok_ret_t traps_init(void) {
+  memset((unsigned char *)pok_sparc_isr, 0x0, sizeof(pok_sparc_isr));
   return POK_ERRNO_OK;
 }
 
@@ -50,36 +49,32 @@ pok_ret_t traps_init(void)
  * @param stack_pointer Adress of the interrupted stack.
  * @see pok_arch_sp
  */
-void trap_handler(unsigned int pc,
-                  unsigned int npc,
-                  unsigned int psr,
-                  unsigned int trap_nb,
-                  unsigned int restore_counter,
-                  unsigned int stack_pointer)
-{
+void trap_handler(unsigned int pc, unsigned int npc, unsigned int psr,
+                  unsigned int trap_nb, unsigned int restore_counter,
+                  unsigned int stack_pointer) {
   (void)restore_counter;
 
   pok_arch_sp = stack_pointer;
 
-  if (pok_sparc_isr[trap_nb] != NULL)
-  {
+  if (pok_sparc_isr[trap_nb] != NULL) {
     pok_sparc_isr[trap_nb]();
-  }
-  else
-  {
+  } else {
 #ifdef POK_NEEDS_DEBUG
-    printf ("[KERNEL] [ERROR] Unhandled trap: 0x%x %%PSR=%x %%PC=%x %%nPC=%x %%sp=0x%x\n", trap_nb, psr, pc, npc, stack_pointer);
-    printf("%%psr : impl:0x%x ver:%x nzvc:%u%u%u%u EC:%u EF:%u PIL:0x%x S:%u PS:%u ET:%u CWP:%u\n\r",
-           (psr >> 28) & 0xF, (psr >> 24) & 0xF,
-           (psr >> 23) & 0x1, (psr >> 22) & 0x1c, (psr >> 21) & 0x1, (psr >> 20) & 0x1,
-           (psr >> 23) & 0x1, (psr >> 12) & 0x1, (psr >> 8) & 0xF, (psr >> 7) & 0x1, (psr >> 6) & 0x1,
-           (psr >> 5) & 0x1, psr & 0xF);
+    printf("[KERNEL] [ERROR] Unhandled trap: 0x%x %%PSR=%x %%PC=%x %%nPC=%x "
+           "%%sp=0x%x\n",
+           trap_nb, psr, pc, npc, stack_pointer);
+    printf("%%psr : impl:0x%x ver:%x nzvc:%u%u%u%u EC:%u EF:%u PIL:0x%x S:%u "
+           "PS:%u ET:%u CWP:%u\n\r",
+           (psr >> 28) & 0xF, (psr >> 24) & 0xF, (psr >> 23) & 0x1,
+           (psr >> 22) & 0x1c, (psr >> 21) & 0x1, (psr >> 20) & 0x1,
+           (psr >> 23) & 0x1, (psr >> 12) & 0x1, (psr >> 8) & 0xF,
+           (psr >> 7) & 0x1, (psr >> 6) & 0x1, (psr >> 5) & 0x1, psr & 0xF);
 #else
     (void)psr;
     (void)npc;
     (void)pc;
 #endif
-    POK_FATAL ("Unhandled trap");
+    POK_FATAL("Unhandled trap");
   }
   return;
 }

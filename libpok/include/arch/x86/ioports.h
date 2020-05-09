@@ -14,7 +14,7 @@
 
 #ifdef POK_NEEDS_IO
 
-#ifndef __POK_x86_IO_H__
+#ifndef __POK_X86_IO_H__
 #define __POK_X86_IO_H__
 
 #include <core/syscall.h>

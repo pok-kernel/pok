@@ -28,5 +28,5 @@ compile:
     - apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc
   script:
     - make configure
-    - (cd examples/mutexes && make)
-    - (cd examples/semaphores && make)
+    - (cd examples/mutexes && make CC="gcc -march=pentium -Wall -Wextra -Werror")
+    - (cd examples/semaphores && make CC="gcc -march=pentium -Wall -Wextra -Werror")

@@ -15,6 +15,10 @@
 #include <core/allocator.h>
 #include <core/dependencies.h>
 
+#ifdef POK_NEEDS_DEBUG
+#include <libc/stdio.h>
+#endif
+
 /*
  * This is the allocator of POK. It remains in partition. You can configure it
  * with POK_CONFIG_ALLOCATOR_MEMORY_SIZE (total amount of memory that can be

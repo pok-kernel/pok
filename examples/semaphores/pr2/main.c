@@ -15,10 +15,11 @@
 #include "activity.h"
 #include <core/partition.h>
 #include <core/thread.h>
+#include <libc/stdio.h>
 #include <types.h>
 
 int main() {
-  uint8_t tid;
+  uint32_t tid;
   int ret;
   pok_thread_attr_t tattr;
 

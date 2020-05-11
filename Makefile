@@ -1,3 +1,4 @@
+export POK_PATH=$(CURDIR)
 -include misc/mk/config.mk
 
 .SILENT:

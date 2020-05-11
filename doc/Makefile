@@ -1,5 +1,5 @@
 export POK_PATH=$(CURDIR)/..
-include $(POK_PATH)/misc/mk/config.mk
+-include $(POK_PATH)/misc/mk/config.mk
 
 all:
 	doxygen ../misc/doxygen-kernel.conf
@@ -12,7 +12,7 @@ all:
 	$(MV) doxygen-kernel/latex/refman.pdf kernel-refman.pdf
 
 clean:
-	$(RM) doxygen-kernel doxygen-libpok
+	$(RM) -r doxygen-kernel doxygen-libpok
 	$(MAKE) -C userguide clean
 	$(MAKE) -C develguide clean
 

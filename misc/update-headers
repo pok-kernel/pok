@@ -24,6 +24,8 @@ import sys
 
 MARKER = "POK header"
 
+IGNORE = "has been " + "automatically generated"  # Keep separated to avoids elf-match
+
 HEADER = """
                               {marker}
 
@@ -57,6 +59,8 @@ class Lang(object):
         """Check that a file has the expected header."""
         try:
             content = [l.strip("\n") for l in open(filename)]
+            if content and IGNORE in content[0]:
+                return True
             transformed = self.add_header(content[:], True)
             return content == transformed
         except Exception:
@@ -71,6 +75,8 @@ class Lang(object):
         """Fix a header in place."""
         try:
             content = [l.strip("\n") for l in open(filename)]
+            if content and IGNORE in content[0]:
+                return
             content = self.add_header(content, force)
             open(filename, "w").write("\n".join(content) + "\n")
         except Exception:
@@ -114,10 +120,10 @@ class Lang(object):
             break
         return content[:i], list(itertools.dropwhile(lambda s: s.strip() == "", content[i:]))
 
-register(Lang("--"), "ads", "adb", "aadl")  # Ada and AADL
-register(Lang("/*", " *", " */"), "c", "h")  # C
-register(Lang("%"), "tex")                  # LaTeX
-register(Lang("#"), "pm", "pl", "py")       # Perl and Python
+register(Lang("--"), "ads", "adb", "aadl")     # Ada and AADL
+register(Lang("/*", " *", " */"), "c", "h")    # C
+register(Lang("%"), "tex")                     # LaTeX
+register(Lang("#"), "pm", "pl", "py", "yaml")  # Perl, Python and YAML
 
 force = sys.argv[1:2] == ["--force"]
 check = sys.argv[1:2] == ["--check"]
@@ -128,6 +134,5 @@ for filename in (f.strip() for f in os.popen("git ls-files")):
         if check:
             if not handler.check_header(filename):
                 print("Invalid header for file {}".format(filename))
-                sys.exit(1)
         else:
             handler.fix_header(filename, force)

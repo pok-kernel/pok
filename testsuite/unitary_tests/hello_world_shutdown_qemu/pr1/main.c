@@ -12,17 +12,14 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-/**
- * \file libpok/include/core/shutdown.c
- * \brief This file implements a shutdown function.
- * \author Romain Guilloteau
- */
-
-#ifdef POK_NEEDS_SHUTDOWN
-
 #include <core/shutdown.h>
-#include <core/syscall.h>
+#include <libc/stdio.h>
 
-void pok_shutdown() { pok_syscall1(POK_SYSCALL_SHUTDOWN, 0); }
+int main() {
 
-#endif
+  printf("Hello World !!!\n");
+
+  pok_shutdown();
+
+  return 0;
+}

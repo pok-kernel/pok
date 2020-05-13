@@ -539,7 +539,8 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
     printf("Failed to shutdown\n");
 #endif
     pok_arch_preempt_disable();
-    while(1) ;
+    while (1)
+      ;
     break;
 
 #endif

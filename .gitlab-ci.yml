@@ -1,7 +1,9 @@
 stages:
   - style
-  - compile
+  - test
 
+# Check that the style of source files respects
+# the coding convention.
 check_style:
   stage: style
   image: ubuntu:20.04
@@ -11,6 +13,7 @@ check_style:
   script:
     - misc/fix-style --check
 
+# Check that headers are up-to-date.
 check_headers:
   stage: style
   image: debian:stable
@@ -20,8 +23,10 @@ check_headers:
   script:
     - misc/update-headers --check
 
+# This should be a proper test pass, but right now we
+# only check that we can compile without error.
 compile:
-  stage: compile
+  stage: test
   image: debian:stable
   before_script:
     - apt -y update
@@ -30,3 +35,13 @@ compile:
     - make configure
     - (cd examples/mutexes && make CC="gcc -march=pentium -Wall -Wextra -Werror")
     - (cd examples/semaphores && make CC="gcc -march=pentium -Wall -Wextra -Werror")
+
+# Run tests for utilities
+test_utils:
+  stage: test
+  image: debian:stable
+  before_script:
+    - apt -y update
+    - apt -y install python3 python3-yaml
+  script:
+    - python3 misc/gen_deployment --test

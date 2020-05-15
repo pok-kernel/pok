@@ -14,6 +14,7 @@
 
 #include "activity.h"
 #include <core/mutex.h>
+#include <core/partition.h>
 #include <core/thread.h>
 #include <libc/stdio.h>
 #include <types.h>
@@ -38,6 +39,7 @@ int main() {
   ret = pok_mutex_create(&mid, NULL);
   printf("pok_mutex_create return=%d, mid=%d\n", ret, mid);
 
+  pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
   pok_thread_wait_infinite();
 
   return (0);

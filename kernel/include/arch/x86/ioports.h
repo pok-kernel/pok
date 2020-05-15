@@ -26,6 +26,8 @@
     res;                                                                       \
   })
 
+#define outw(port, data) asm volatile("outw %w0,%w1" : : "a"(data), "d"(port))
+
 #define outl(port, data) asm volatile("outl %0,%w1" : : "a"(data), "d"(port))
 
 #define inl(port)                                                              \

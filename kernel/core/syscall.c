@@ -22,6 +22,7 @@
 #include <core/error.h>
 #include <core/lockobj.h>
 #include <core/partition.h>
+#include <core/shutdown.h>
 #include <core/syscall.h>
 #include <core/thread.h>
 #include <core/time.h>
@@ -526,6 +527,21 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
   case POK_SYSCALL_RTL8929_INIT:
     rtl8029_init();
     break;
+#endif
+
+#ifdef POK_NEEDS_SHUTDOWN
+
+  case POK_SYSCALL_SHUTDOWN:
+    pok_shutdown();
+
+    // If the execution reachs this point that means the shutdown has failed
+#ifdef POK_NEEDS_DEBUG
+    printf("Failed to shutdown\n");
+#endif
+    pok_arch_preempt_disable();
+    while(1) ;
+    break;
+
 #endif
 
   /**

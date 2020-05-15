@@ -40,7 +40,8 @@ LO_OBJS=	allocator.o \
 			threaddelayedstart.o \
 			threadid.o \
 			threadpriority.o \
-			threadresume.o
+			threadresume.o \
+			shutdown.o
 
 LO_DEPS=
 

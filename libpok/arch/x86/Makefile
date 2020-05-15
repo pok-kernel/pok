@@ -10,7 +10,7 @@ LO_OBJS=	arch.o \
 		pci.o \
 		syscall.o
 
-LO_DEPS=	
+LO_DEPS=
 
 include $(TOPDIR)/misc/mk/objdir.mk
 

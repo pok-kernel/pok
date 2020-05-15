@@ -478,7 +478,8 @@ void pok_sched_unlock_thread(const uint32_t thread_id) {
 #endif
 
 #if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_PORTS_QUEUEING) ||     \
-    defined(POK_NEEDS_PORTS_SAMPLING)
+    defined(POK_NEEDS_PORTS_SAMPLING) || defined(POK_NEEDS_THREAD_SLEEP) ||    \
+    defined(POK_NEEDS_THREAD_SLEEP_UNTIL)
 void pok_sched_lock_current_thread(void) {
   pok_threads[current_thread].state = POK_STATE_LOCK;
 }

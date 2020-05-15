@@ -157,9 +157,6 @@ There are our coding guidelines:
          }
       \end{verbatim}
    \item
-      To commit, do \textbf{not} invoke \texttt{svn commit} but issue \texttt{make commit} at the root of the
-      sources directory. \textbf{To commit, lftp is required}.
-   \item
       If you introduce a new function for the userland, you must add relevant
       documentation in the \texttt{doc/userguide/} directory.
 \end{enumerate}
@@ -471,13 +468,9 @@ Key to Flags:
 
 
 
-\section{Commit on the SVN}
-You \textbf{MUST} commit by ussing \texttt{make commit} at the root of the
-sources. This make target will build all examples on all architectures/platforms
-supported by POK to verify that modified sources seem
-to be consistent and do not introduce a regression.
-
-For that, you have to install compilers for every platform supported by POK.
+\section{Commit}
+Before pushing changes, please check that your test suite passes on all supported
+architectures and that the document is up-to-date and can be properly built.
 
 \section{Join the POK developper network !}
 If you want to join the POK team, please send us an email (\texttt{pok-devel at

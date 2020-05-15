@@ -3,6 +3,12 @@ TOPDIR=		../../
 include $(TOPDIR)/misc/mk/config.mk
 -include $(TOPDIR)/misc/mk/common-$(ARCH).mk
 
+ifdef ARCH
+SUBDIRS:=$(ARCH)
+else
+SUBDIRS:=ppc sparc x86
+endif
+
 LO_TARGET=	arch.lo
 
 LO_OBJS=		
@@ -19,24 +25,10 @@ $(OBJ_DIR)/$(ARCH)/$(ARCH).lo::
 .PHONY: clean distclean depend all
 
 clean: common-clean
-ifdef ARCH
-	$(MAKE) -C $(ARCH) $@
-else
-	for dir in $(shell find -mindepth 1 -maxdepth 1 -type d ! -name ".svn");	\
-	do										\
-		$(MAKE) -C $$dir $@ || exit 1;						\
-	done
-endif
+	for dir in $(SUBDIRS); do $(MAKE) -C $$dir clean; done
 
 distclean: clean
-ifdef ARCH
-	$(MAKE) -C $(ARCH) $@
-else
-	for dir in $(shell find -mindepth 1 -maxdepth 1 -type d ! -name ".svn");	\
-	do										\
-		$(MAKE) -C $$dir $@ || exit 1;						\
-	done
-endif
+	for dir in $(SUBDIRS); do $(MAKE) -C $$dir distclean; done
 
 depend:
 	$(CD) $(ARCH) && $(MAKE) depend

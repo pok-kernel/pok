@@ -50,7 +50,6 @@ doc:
 	$(MAKE) -C doc
 
 release: headers doc
-	svn up
 	$(PERL) ./misc/make-release.pl
 
 testrelease: release

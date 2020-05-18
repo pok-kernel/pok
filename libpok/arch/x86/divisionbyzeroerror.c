@@ -12,19 +12,12 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-#ifndef __LIBPOK_ARCH_H__
+#include <arch.h>
 
-#include <types.h>
-
-/**
- * This function is called when a division by zero occurs in with 64-bit
- * numbers. This function will divide by 0 to force the processor to raise a
- * Division by 0 error.
- */
-void pok_division_by_zero_error(void);
-
-void pok_arch_idle(void);
-
-void pok_arch_yield();
-
-#endif /* __LIBPOK_ARCH_H__ */
+void pok_division_by_zero_error() {
+  asm volatile("mov $0,%%ebx  \n\t"
+               "div %%ebx     \n\t"
+               :
+               :
+               : "%eax", "%ebx", "%edx");
+}

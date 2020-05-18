@@ -12,6 +12,8 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
+#include <arch.h>
+
 unsigned long long __udivdi3(unsigned long long num, unsigned long long den) {
   unsigned long long quot, qbit;
 
@@ -19,6 +21,7 @@ unsigned long long __udivdi3(unsigned long long num, unsigned long long den) {
   qbit = 1;
 
   if (den == 0) {
+    pok_division_by_zero_error();
     return 0;
   }
 

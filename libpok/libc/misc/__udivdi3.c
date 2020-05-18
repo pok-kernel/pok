@@ -12,6 +12,7 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
+#include <arch.h>
 #include <core/dependencies.h>
 
 #ifdef POK_CONFIG_NEEDS_FUNC_UDIVDI3
@@ -19,8 +20,10 @@
 unsigned long long __udivdi3(unsigned long long num, unsigned long long den) {
   unsigned long long quot = 0, qbit = 1;
 
-  if (den == 0)
+  if (den == 0) {
+    pok_division_by_zero_error();
     return 0;
+  }
 
   while ((long long)den >= 0) {
     den <<= 1;

@@ -96,6 +96,13 @@ pok_ret_t pok_space_switch(uint8_t old_partition_id, uint8_t new_partition_id);
 uint32_t pok_thread_stack_addr(const uint8_t partition_id,
                                const uint32_t local_thread_id);
 
+/**
+ * This function is called when a division by zero occurs in with 64-bit
+ * numbers. This function will divide by 0 to force the processor to raise a
+ * Division by 0 error.
+ */
+void pok_division_by_zero_error(void);
+
 #ifdef POK_ARCH_PPC
 #include <arch/ppc/spinlock.h>
 #endif

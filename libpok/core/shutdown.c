@@ -23,6 +23,19 @@
 #include <core/shutdown.h>
 #include <core/syscall.h>
 
-void pok_shutdown() { pok_syscall1(POK_SYSCALL_SHUTDOWN, 0); }
+#ifdef POK_NEEDS_DEBUG
+#include <libc/stdio.h>
+#endif
+
+void pok_shutdown() {
+  pok_syscall1(POK_SYSCALL_SHUTDOWN, 0);
+  // The syscal should never return. If it does, this is an error, but there
+  // is little we can do.
+#ifdef POK_NEEDS_DEBUG
+  printf("[LIBPOK] [SHUTDOWN] Shutdown system call failed\n");
+#endif
+  for (;;)
+    ;
+}
 
 #endif

@@ -28,7 +28,7 @@
  * This method is mainly used in debug purposes.
  */
 
-void pok_shutdown();
+__attribute__((noreturn)) void pok_shutdown(void);
 
 #endif /* __LIBPOK_SHUTDOWN_H__ */
 #endif /* POK_NEEDS_SHUTDOWN */

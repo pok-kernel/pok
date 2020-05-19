@@ -20,6 +20,4 @@ int main() {
   printf("Hello World !!!\n");
 
   pok_shutdown();
-
-  return 0;
 }

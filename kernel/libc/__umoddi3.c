@@ -12,7 +12,9 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
+unsigned long long __udivdi3(unsigned long long, unsigned long long);
+
 unsigned long long __umoddi3(unsigned long long num, unsigned long long den) {
-  unsigned long long res = num - (num / den * den);
+  unsigned long long res = num - __udivdi3(num, den) * den;
   return res;
 }

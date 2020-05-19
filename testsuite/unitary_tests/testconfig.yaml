@@ -11,12 +11,15 @@
 #                                      Copyright (c) 2007-2020 POK team
 
 platform: !mux
-    x86:
+    x86_gcc:
         qemu: qemu-system-i386
         compiler: gcc -m32 -Wall -Wextra -Werror -O3
-    pentium:
+    pentium_gcc:
         qemu: qemu-system-i386
         compiler: gcc -march=pentium -Wall -Wextra -Werror -O3
+    x86_clang:
+        qemu: qemu-system-i386
+        compiler: clang -m32 -Wall -Wextra -Werror -O3
 tests: !mux
     hello_world:
         dir: hello_world_shutdown_qemu

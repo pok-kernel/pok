@@ -53,7 +53,7 @@ unit_tests:
   image: debian:stable
   before_script:
     - apt -y update
-    - apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc python3 python3-venv qemu-system-x86
+    - apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc python3 python3-venv qemu-system-x86 clang
   script:
     - make configure
     - python3 -mvenv venv

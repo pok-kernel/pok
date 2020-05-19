@@ -1,0 +1,7 @@
+avocado-framework==79.0
+avocado-framework-plugin-loader-yaml==79.0
+avocado-framework-plugin-result-html==79.0
+avocado-framework-plugin-varianter-yaml-to-mux==79.0
+Jinja2==2.11.2
+MarkupSafe==1.1.1
+PyYAML==5.3.1

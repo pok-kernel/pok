@@ -535,9 +535,7 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
     pok_shutdown();
 
     // If the execution reaches this point that means the shutdown has failed
-#ifdef POK_NEEDS_DEBUG
-    printf("Failed to shutdown\n");
-#endif
+    // or is asynchronous and takes time.
     pok_arch_preempt_disable();
     while (1)
       ;

@@ -47,3 +47,19 @@ test_utils:
   script:
     - python3 misc/gen_dependencies --test
     - python3 misc/gen_deployment --test
+
+unit_tests:
+  stage: test
+  image: debian:stable
+  before_script:
+    - apt -y update
+    - apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc python3 python3-venv qemu-system-x86
+  script:
+    - make configure
+    - python3 -mvenv venv
+    - source venv/bin/activate
+    - pip install -r misc/requirements.txt
+    - make -C testsuite/unitary_tests check
+  artifacts:
+    reports:
+      junit: testsuite/unitary_tests/report.xml

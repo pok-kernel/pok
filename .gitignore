@@ -19,3 +19,5 @@ __pycache__/
 *.mk
 .depend
 sizes.c
+venv
+testsuite/unitary_tests/report.xml

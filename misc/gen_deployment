@@ -263,15 +263,16 @@ include $(POK_PATH)/misc/mk/rules-common.mk
 include $(POK_PATH)/misc/mk/rules-kernel.mk
 """.format(arch=arch, bsp=bsp))
 
-def c_list(l):
-    """Return a C list initializer, for integers or strings.
+def c_list(l, is_symbol = False):
+    """Return a C list initializer, for integers or strings. Strings
+    can also be forced as symbols.
     
     >>> c_list([1, 2, 3])
     '{1, 2, 3}'
     >>> c_list(["foo", "bar", "baz"])
     '{"foo", "bar", "baz"}'
     """
-    if l and type(l[0]) == str:
+    if l and type(l[0]) == str and not is_symbol:
         l = ['"{}"'.format(e) for e in l]
     else:
         l = [str(e) for e in l]
@@ -293,7 +294,8 @@ def gen_kernel_deployment_h(fd, config):
     add(fd, ["", "#ifndef {}".format(guard),
              "#define {}".format(guard), ""])
 
-    needs = set(["PARTITIONS", "THREADS", "SCHED"])
+    includes = set()
+    needs = {"PARTITIONS", "THREADS", "SCHED"}
     configs = {"NB_PARTITIONS": len(option_value(config, "partitions")),
                "NB_THREADS": sum_option(config, "partitions.threads.count") + 2}
     semaphores = get_option_or(config, "partitions.semaphores", 0)
@@ -321,7 +323,17 @@ def gen_kernel_deployment_h(fd, config):
     configs["SCHEDULING_SLOTS_ALLOCATION"] = c_list(allocations)
     configs["PARTITIONS_NTHREADS"] = c_list(get_option_or(config, "partitions.threads.count", 1))
     configs["PARTITIONS_NLOCKOBJECTS"] = c_list(lockobjects)
+    schedulers = get_option_or(config, "partitions.scheduler", "rr")
+    if any(scheduler not in ["rr", "rms"] for scheduler in schedulers):
+        raise Exception("only RR and RMS schedulers are implemented right now")
+    if "rms" in schedulers:
+        needs.add("SCHED_RMS")
+        configs["PARTITIONS_SCHEDULER"] = c_list(["POK_SCHED_{}".format(v.upper()) for v in schedulers], is_symbol=True)
+        includes.add("core/schedvalues.h")
 
+    if includes:
+        add(fd, ["#include <{}>".format(v) for v in sorted(includes)])
+        add(fd)
     for (key, value) in sorted(configs.items()):
         add(fd, "#define POK_CONFIG_{} {}".format(key, value))
     add(fd)

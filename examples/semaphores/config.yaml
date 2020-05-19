@@ -18,16 +18,17 @@ partitions:
     - name: pr1
       features: [timer, console, libc, debug]
       semaphores: 1
+      scheduler: rms
       threads:
           count: 3
           features: [sleep, suspend]
-      size: 120kB
+      size: 130kB
       objects: ["main.o", "activity.o"]
     - name: pr2
       features: [timer, libc]
       threads:
           count: 2
-      size: 120kB
+      size: 130kB
       objects: ["main.o", "activity.o"]
 
 kernel:

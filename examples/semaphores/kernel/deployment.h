@@ -4,6 +4,8 @@
 #ifndef __POK_KERNEL_GENERATED_DEPLOYMENT_H_
 #define __POK_KERNEL_GENERATED_DEPLOYMENT_H_
 
+#include <core/schedvalues.h>
+
 #define POK_CONFIG_NB_LOCKOBJECTS 1
 #define POK_CONFIG_NB_PARTITIONS 2
 #define POK_CONFIG_NB_THREADS 7
@@ -11,8 +13,10 @@
   { 1, 0 }
 #define POK_CONFIG_PARTITIONS_NTHREADS                                         \
   { 3, 2 }
+#define POK_CONFIG_PARTITIONS_SCHEDULER                                        \
+  { POK_SCHED_RMS, POK_SCHED_RR }
 #define POK_CONFIG_PARTITIONS_SIZE                                             \
-  { 122880, 122880 }
+  { 133120, 133120 }
 #define POK_CONFIG_PROGRAM_NAME                                                \
   { "pr1/pr1.elf", "pr2/pr2.elf" }
 #define POK_CONFIG_SCHEDULING_MAJOR_FRAME 53000000000
@@ -27,6 +31,7 @@
 #define POK_NEEDS_LOCKOBJECTS 1
 #define POK_NEEDS_PARTITIONS 1
 #define POK_NEEDS_SCHED 1
+#define POK_NEEDS_SCHED_RMS 1
 #define POK_NEEDS_THREADS 1
 #define POK_NEEDS_THREAD_SLEEP 1
 #define POK_NEEDS_THREAD_SUSPEND 1

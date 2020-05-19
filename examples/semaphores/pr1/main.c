@@ -29,7 +29,7 @@ int main() {
   ret = pok_sem_create(&sid, 0, 50, POK_SEMAPHORE_DISCIPLINE_FIFO);
   printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
-  tattr.priority = 42;
+  tattr.priority = 40;
   tattr.entry = pinger_job;
 
   ret = pok_thread_create(&tid, &tattr);

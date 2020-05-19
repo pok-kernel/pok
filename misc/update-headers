@@ -25,6 +25,7 @@ import sys
 MARKER = "POK header"
 
 IGNORE = "has been " + "automatically generated"  # Keep separated to avoids elf-match
+IGNORED_FILES = ["stdarg.h"]
 
 HEADER = """
                               {marker}
@@ -57,6 +58,8 @@ class Lang(object):
 
     def check_header(self, filename):
         """Check that a file has the expected header."""
+        if os.path.basename(filename) in IGNORED_FILES:
+            return True
         try:
             content = [l.strip("\n") for l in open(filename)]
             if content and IGNORE in content[0]:
@@ -73,6 +76,8 @@ class Lang(object):
 
     def fix_header(self, filename, force):
         """Fix a header in place."""
+        if os.path.basename(filename) in IGNORED_FILES:
+            return
         try:
             content = [l.strip("\n") for l in open(filename)]
             if content and IGNORE in content[0]:

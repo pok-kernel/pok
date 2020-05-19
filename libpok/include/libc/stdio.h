@@ -15,7 +15,7 @@
 #ifndef __POK_LIBC_STDIO_H__
 #define __POK_LIBC_STDIO_H__
 
-#include <stdarg.h>
+#include "stdarg.h"
 
 #define EOF -1
 

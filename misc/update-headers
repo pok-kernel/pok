@@ -130,9 +130,13 @@ check = sys.argv[1:2] == ["--check"]
 
 for filename in (f.strip() for f in os.popen("git ls-files")):
     handler = extensions.get(filename.split(".")[-1])
+    error = False
     if handler:
         if check:
             if not handler.check_header(filename):
                 print("Invalid header for file {}".format(filename))
+                error = True
         else:
             handler.fix_header(filename, force)
+    if error:
+        sys.exit(1)

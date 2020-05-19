@@ -20,4 +20,5 @@ void pok_division_by_zero_error() {
                :
                :
                : "%eax", "%ebx", "%edx");
+  __builtin_unreachable();
 }

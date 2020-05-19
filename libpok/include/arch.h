@@ -21,7 +21,7 @@
  * numbers. This function will divide by 0 to force the processor to raise a
  * Division by 0 error.
  */
-void pok_division_by_zero_error(void);
+__attribute__((noreturn)) void pok_division_by_zero_error(void);
 
 void pok_arch_idle(void);
 

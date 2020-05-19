@@ -22,7 +22,6 @@ unsigned long long __udivdi3(unsigned long long num, unsigned long long den) {
 
   if (den == 0) {
     pok_division_by_zero_error();
-    return 0;
   }
 
   while ((long long)den >= 0) {

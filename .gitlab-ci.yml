@@ -35,6 +35,7 @@ compile:
     - make configure
     - (cd examples/mutexes && make CC="gcc -march=pentium -Wall -Wextra -Werror")
     - (cd examples/semaphores && make CC="gcc -march=pentium -Wall -Wextra -Werror")
+    - (cd testsuite/unitary_tests/test_modulo_div_64 && make clean && make CC="gcc -march=pentium -Wall -Wextra -Werror")
 
 # Run tests for utilities
 test_utils:

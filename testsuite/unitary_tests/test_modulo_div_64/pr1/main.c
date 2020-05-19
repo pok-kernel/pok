@@ -16,21 +16,24 @@
 
 #include <core/shutdown.h>
 #include <libc/stdio.h>
+#include <libc/stdlib.h>
 #include <types.h>
 
 int main() {
   uint64_t r;
   uint64_t temp1, temp2;
-  uint64_t fixed = 0;
-  printf("P1T1: begin of task\n");
+  uint64_t fixed = 0x2525212526;
+  printf("fixed:%u\n", fixed);
   r = rand();
-  printf("Rand done: %d\n", r);
+  printf("r: %d\n", r);
+
+  temp1 = r % fixed;
+  temp2 = fixed % r;
+  printf("r%%fixed=%u\nfixed%%r=%u\n", (uint32_t)temp1, (uint32_t)temp2);
 
   temp1 = r / fixed;
   temp2 = fixed / r;
-  printf("Division done\n", r);
-  printf("Temp:   r/fixed=%u - fixed/r=%u\n", (uint32_t)temp1, (uint32_t)temp2);
+  printf("r/fixed=%u\nfixed/r=%u\n", (uint32_t)temp1, (uint32_t)temp2);
 
   pok_shutdown();
-  return 0;
 }

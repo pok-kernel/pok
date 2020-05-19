@@ -151,19 +151,19 @@ static int print_float(union u_arg *value, struct s_file *file, int flags) {
 }
 
 static int print_str(union u_arg *value, struct s_file *file, int flags) {
+  (void)flags;
   int count = 0;
   char *s = value->ptr;
 
-  flags = flags;
   for (; *s; ++count, ++s)
     my_putc(*s, file);
   return count;
 }
 
 static int print_char(union u_arg *value, struct s_file *file, int flags) {
+  (void)flags;
   char c;
 
-  flags = flags;
   c = value->sint;
   my_putc(c, file);
   return 1;

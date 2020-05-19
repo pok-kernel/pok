@@ -534,7 +534,7 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
   case POK_SYSCALL_SHUTDOWN:
     pok_shutdown();
 
-    // If the execution reachs this point that means the shutdown has failed
+    // If the execution reaches this point that means the shutdown has failed
 #ifdef POK_NEEDS_DEBUG
     printf("Failed to shutdown\n");
 #endif

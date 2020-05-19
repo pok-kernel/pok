@@ -23,9 +23,6 @@
 #ifndef __LIBPOK_SHUTDOWN_H__
 #define __LIBPOK_SHUTDOWN_H__
 
-#include <core/syscall.h>
-#include <types.h>
-
 /**
  * Function that performs a shutdown in a virtual environment.
  * This method is mainly used in debug purposes.

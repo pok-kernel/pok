@@ -43,6 +43,13 @@
 
 extern pok_thread_t pok_threads[];
 
+#if defined(POK_NEEDS_DEBUG) &&                                                \
+    (defined(POK_NEEDS_SCHED_RMS) || defined(POK_NEEDS_SCHED_STATIC))
+static const char *state_names[] = {
+    "stopped",      "runnable", "waiting", "lock", "waiting next activation",
+    "delayed start"};
+#endif
+
 #ifdef POK_NEEDS_PARTITIONS
 extern pok_partition_t pok_partitions[];
 
@@ -413,9 +420,6 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
   }
 
 #ifdef POK_NEEDS_DEBUG
-  static const char *states[] = {
-      "stopped",      "runnable", "waiting", "lock", "waiting next activation",
-      "delayed start"};
   if (res != IDLE_THREAD || current_thread != IDLE_THREAD) {
     if (res == IDLE_THREAD) {
       printf("--- scheduling idle thread\n\t\t");
@@ -434,7 +438,7 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
     from = index_low;
     while (from <= index_high) {
       if (pok_threads[from].state != POK_STATE_RUNNABLE) {
-        printf(" %d (%s)", from, states[pok_threads[from].state]);
+        printf(" %d (%s)", from, state_names[pok_threads[from].state]);
       }
       from++;
     }
@@ -445,6 +449,69 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
   return res;
 }
 #endif /* POK_NEEDS_SCHED_RMS */
+
+#ifdef POK_NEEDS_SCHED_STATIC
+uint32_t pok_sched_part_static(const uint32_t index_low,
+                               const uint32_t index_high,
+                               const uint32_t prev_thread,
+                               const uint32_t current_thread) {
+  uint32_t from = current_thread != IDLE_THREAD ? current_thread : prev_thread;
+  int32_t max_prio = -1;
+  uint32_t max_thread = current_thread;
+
+  uint32_t i = from;
+  do {
+    if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+        pok_threads[i].priority > max_prio) {
+      max_prio = pok_threads[i].priority;
+      max_thread = i;
+    }
+    i++;
+    if (i >= index_high) {
+      i = index_low;
+    }
+  } while (i != from);
+
+  uint32_t elected = max_prio >= 0 ? max_thread : IDLE_THREAD;
+
+#ifdef POK_NEEDS_DEBUG
+  if (elected != IDLE_THREAD || current_thread != IDLE_THREAD) {
+    uint32_t non_ready = 0;
+    if (elected == IDLE_THREAD) {
+      printf("--- scheduling idle thread\n");
+      non_ready = index_high - index_low;
+    } else {
+      uint32_t first = 1;
+      printf("--- scheduling thread %d (priority %d)\n", elected,
+             pok_threads[elected].priority);
+      printf("--- ready threads:");
+      for (uint32_t i = index_low; i < index_high; i++) {
+        if (pok_threads[i].state == POK_STATE_RUNNABLE) {
+          printf("%s %d (%d)", first ? "" : ",", i, pok_threads[i].priority);
+          first = 0;
+        } else {
+          non_ready++;
+        }
+      }
+      printf("\n");
+    }
+    if (non_ready) {
+      printf("--- non-ready:");
+      uint32_t first = 1;
+      for (uint32_t i = index_low; i < index_high; i++) {
+        if (pok_threads[i].state != POK_STATE_RUNNABLE) {
+          printf("%s %d (%d/%s)", first ? "" : ",", i, pok_threads[i].priority,
+                 state_names[pok_threads[i].state]);
+          first = 0;
+        }
+      }
+      printf("\n");
+    }
+  }
+#endif
+  return elected;
+}
+#endif // POK_NEEDS_SCHED_STATIC
 
 uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
                            const uint32_t prev_thread,

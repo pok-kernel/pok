@@ -14,7 +14,7 @@
 #define POK_CONFIG_PARTITIONS_NTHREADS                                         \
   { 3, 2 }
 #define POK_CONFIG_PARTITIONS_SCHEDULER                                        \
-  { POK_SCHED_RMS, POK_SCHED_RR }
+  { POK_SCHED_STATIC, POK_SCHED_RR }
 #define POK_CONFIG_PARTITIONS_SIZE                                             \
   { 133120, 133120 }
 #define POK_CONFIG_PROGRAM_NAME                                                \
@@ -31,7 +31,7 @@
 #define POK_NEEDS_LOCKOBJECTS 1
 #define POK_NEEDS_PARTITIONS 1
 #define POK_NEEDS_SCHED 1
-#define POK_NEEDS_SCHED_RMS 1
+#define POK_NEEDS_SCHED_STATIC 1
 #define POK_NEEDS_THREADS 1
 #define POK_NEEDS_THREAD_SLEEP 1
 #define POK_NEEDS_THREAD_SUSPEND 1

@@ -18,7 +18,7 @@ partitions:
     - name: pr1
       features: [timer, console, libc, debug]
       semaphores: 1
-      scheduler: rms
+      scheduler: static
       threads:
           count: 3
           features: [sleep, suspend]

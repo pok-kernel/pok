@@ -413,20 +413,28 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
   }
 
 #ifdef POK_NEEDS_DEBUG
-  if (res != IDLE_THREAD) {
-    printf("--- scheduling thread: %d {%d} --- ", res, pok_threads[res].period);
-    from = index_low;
-    while (from <= index_high) {
-      if (pok_threads[from].state == POK_STATE_RUNNABLE) {
-        printf(" %d {%d} ,", from, pok_threads[from].period);
+  static const char *states[] = {
+      "stopped",      "runnable", "waiting", "lock", "waiting next activation",
+      "delayed start"};
+  if (res != IDLE_THREAD || current_thread != IDLE_THREAD) {
+    if (res == IDLE_THREAD) {
+      printf("--- scheduling idle thread\n\t\t");
+    } else {
+      printf("--- scheduling thread: %d {%d} --- ", res,
+             pok_threads[res].period);
+      from = index_low;
+      while (from <= index_high) {
+        if (pok_threads[from].state == POK_STATE_RUNNABLE) {
+          printf(" %d {%d} ,", from, pok_threads[from].period);
+        }
+        from++;
       }
-      from++;
+      printf(" are runnable; \n\t\t");
     }
-    printf(" are runnable; \n\t\t");
     from = index_low;
     while (from <= index_high) {
       if (pok_threads[from].state != POK_STATE_RUNNABLE) {
-        printf(" %d (state = %d)", from, pok_threads[from].state);
+        printf(" %d (%s)", from, states[pok_threads[from].state]);
       }
       from++;
     }

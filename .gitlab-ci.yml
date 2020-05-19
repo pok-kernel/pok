@@ -44,4 +44,5 @@ test_utils:
     - apt -y update
     - apt -y install python3 python3-yaml
   script:
+    - python3 misc/gen_dependencies --test
     - python3 misc/gen_deployment --test

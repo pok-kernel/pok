@@ -1,0 +1,64 @@
+# Used to generate dependencies.h
+
+domain: libpok
+
+always:
+    dependencies:
+        config_funcs: [memcpy, streq, strlen]
+
+deployment:
+    condition:
+        before: "#if defined POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE && defined GENERATED_CODE_PATH"
+        after: "#endif // POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE && GENERATED_CODE_PATH"
+
+optimized:
+    condition:
+        before: "#ifdef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE"
+        else: "#else // POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE"
+        after: "#endif // POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE"
+    dependencies:
+        libc_stdio:
+            config_funcs: [printf, vprintf, getchar]
+        libc_stdlib:
+            config_funcs: [rand, malloc, calloc, free]
+            needs: [allocator]
+        string:
+            config_funcs: [memset, memcmp, strcmp, strncmp, strcpy, strncpy]
+        protocols_des:
+            config_funcs: [memcmp]
+        arinc653_process:
+            config_funcs: [strcpy, strcmp]
+            needs: [threads, thread_id]
+        arinc653_partition:
+            needs: [partitions]
+        arinc653_queuing:
+            needs: [ports_queuing]
+        arinc653_sampling:
+            needs: [ports_sampling]
+        arinc653_event:
+            config_funcs: [strncmp]
+        arinc653_buffer:
+            needs: [middleware, buffers]
+        arinc653_blackboard:
+            needs: [middleware, blackboards]
+        arinc653_semaphore:
+            config_funcs: [strcmp]
+            needs: [semaphores]
+        arinc653_error:
+            funcs: [time_get]
+        mutexes:
+            funcs: [time_get]
+        events:
+            funcs: [time_get]
+        buffers:
+            funcs: [time_get]
+        blackboards:
+            funcs: [time_get]
+        time:
+            funcs: [time_get]
+
+unoptimized:
+    dependencies:
+        needs: [semaphore, threads, ports_queuing, partitions, buffers, blackboards, semaphores, allocator]
+        config_funcs: [memset, memcmp, strcmp, strncmp, strcpy, strncpy, itoa, atoi, udivdi3, umoddi3,
+            rand, malloc, calloc, free]

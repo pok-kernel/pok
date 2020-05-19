@@ -38,6 +38,11 @@ $(OBJ_DIR)/%.o: %.S
 	$(CC) -c $(CFLAGS) -DASM_SOURCE=1 $< -o $@
 	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK "; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi
 
+%.o: %.c
+	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[CC] $< "
+	$(CC) -c $(CFLAGS) $(COPTS) $< -o $@
+	if test $$? -eq 0; then $(ECHO) $(ECHO_FLAGS) $(ECHO_GREEN) " OK"; else $(ECHO) $(ECHO_FLAGS) $(ECHO_RED) " KO"; fi
+
 $(OBJ_DIR)/%.o: %.c
 	$(ECHO) $(ECHO_FLAGS) $(ECHO_FLAGS_ONELINE) "[CC] $< "
 ifneq ($(OBJ_DIR),.)

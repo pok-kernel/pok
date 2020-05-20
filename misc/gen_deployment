@@ -224,7 +224,7 @@ build-kernel:
 	$(CD) kernel && $(MAKE)
 
 partitions:
-	for d in $(PARTDIRS); do $(MAKE) -C $$d; done
+	for d in $(PARTDIRS); do $(MAKE) -C $$d clean all; done
 
 clean: common-clean
 	$(RM) node_impl

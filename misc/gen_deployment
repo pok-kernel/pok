@@ -119,10 +119,12 @@ def has_feature(config, feature):
     True
     >>> has_feature(config, "kernel.debug")
     False
+    >>> has_feature(config, "nonexistent.exit")
+    False
     """
     words = feature.rsplit(".", 1)
-    opts = get_option(config, ".".join(words[:-1] + ["features"]))
-    if type(opts[0]) == list:
+    opts = get_option_or(config, ".".join(words[:-1] + ["features"]), [])
+    if opts and type(opts[0]) == list:
         return [o != None and words[-1] in o for o in opts]
     return words[-1] in opts
 

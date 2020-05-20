@@ -307,10 +307,13 @@ def gen_kernel_deployment_h(fd, config):
     if sum(lockobjects):
         needs.add("LOCKOBJECTS")
         configs["NB_LOCKOBJECTS"] =  sum(lockobjects)
-    for (partopt, need) in [("debug", "DEBUG"), ("console", "CONSOLE"), ("timer", "TIME"),
+    for (partopt, need) in [("console", "CONSOLE"), ("timer", "TIME"),
                             ("shutdown", "SHUTDOWN"), ("threads.sleep", "THREAD_SLEEP"),
                             ("threads.suspend", "THREAD_SUSPEND")]:
         if any_has_feature(config, "partitions.{}".format(partopt)):
+            needs.add(need)
+    for (opt, need) in [("debug", "DEBUG")]:
+        if has_feature(config, "kernel.{}".format(opt)):
             needs.add(need)
     configs["PARTITIONS_SIZE"] = c_list(option_value(config, "partitions.size", decode=to_bytes))
     partitions = option_value(config, "partitions.name")

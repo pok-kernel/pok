@@ -16,7 +16,7 @@ target:
 
 partitions:
     - name: pr1
-      features: [timer, console, libc, debug]
+      features: [timer, console, libc]
       mutexes: 1
       threads:
           count: 3
@@ -31,6 +31,7 @@ partitions:
       objects: ["main.o", "activity.o"]
 
 kernel:
+    features: [debug]
     scheduler:
         major_frame: 53s
         slots:

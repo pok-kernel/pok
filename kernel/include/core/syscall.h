@@ -100,7 +100,7 @@ typedef enum {
   POK_SYSCALL_RTL8929_CLEAR = 705,
   POK_SYSCALL_RTL8929_INIT = 706,
 #endif
-#if POK_NEEDS_DEBUG
+#if POK_NEEDS_SHUTDOWN
   POK_SYSCALL_SHUTDOWN = 707
 #endif
 } pok_syscall_id_t;

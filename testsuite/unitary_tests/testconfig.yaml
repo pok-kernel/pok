@@ -25,3 +25,5 @@ tests: !mux
         dir: hello_world_shutdown_qemu
     test_modulo_div_64:
         dir: test_modulo_div_64
+    test_assert:
+        dir: assert

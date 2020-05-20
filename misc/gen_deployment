@@ -193,14 +193,14 @@ def add(fd, msg = "", prefix = None):
     for line in msg:
         fd.write("{}{}\n".format(prefix, line))
 
-def gen_main_makefile(fd, config, arch, bsp):
+def gen_main_makefile(fd, config, arch, bsp, pok_root):
     """Generate the main Makefile."""
     partitions = option_value(config, "partitions.name")
     add(fd, GENERATED_MSG, "#")
 
     add(fd,
         """
-export POK_PATH=$(CURDIR)/../../
+export POK_PATH=$(CURDIR)/{pok_root}
 export ARCH={arch}
 export BSP={bsp}
 
@@ -237,14 +237,15 @@ include $(POK_PATH)/misc/mk/rules-common.mk
 include $(POK_PATH)/misc/mk/rules-main.mk
 include $(POK_PATH)/misc/mk/install-rules.mk
 """.format(arch=arch, bsp=bsp, partitions=" ".join(partitions),
+           pok_root=pok_root,
            partitions_elf=" ".join("{}/{}.elf".format(p, p) for p in partitions)))
 
-def gen_kernel_makefile(fd, config, arch, bsp):
+def gen_kernel_makefile(fd, config, arch, bsp, pok_root):
     """Generate the kernel Makefile."""
     add(fd, GENERATED_MSG, "#")
 
     add(fd, """
-export POK_PATH=$(CURDIR)/../../../
+export POK_PATH=$(CURDIR)/../{pok_root}
 export ARCH={arch}
 export BSP={bsp}
 export DEPLOYMENT_HEADER=$(CURDIR)/deployment.h
@@ -263,7 +264,7 @@ clean: common-clean kernel-clean
 include $(POK_PATH)/misc/mk/common-$(ARCH).mk
 include $(POK_PATH)/misc/mk/rules-common.mk
 include $(POK_PATH)/misc/mk/rules-kernel.mk
-""".format(arch=arch, bsp=bsp))
+""".format(arch=arch, bsp=bsp, pok_root=pok_root))
 
 def c_list(l, is_symbol = False):
     """Return a C list initializer, for integers or strings. Strings
@@ -354,12 +355,12 @@ def gen_kernel_deployment_h(fd, config):
 
     add(fd, ["", "#endif // {}".format(guard)])
 
-def gen_partition_makefile(fd, config, arch, bsp):
+def gen_partition_makefile(fd, config, arch, bsp, pok_root):
     """Generate a partition Makefile."""
     add(fd, GENERATED_MSG, "#")
 
     add(fd, """
-export POK_PATH=$(CURDIR)/../../../
+export POK_PATH=$(CURDIR)/../{pok_root}
 export ARCH={arch}
 export BSP={bsp}
 export DEPLOYMENT_HEADER=$(CURDIR)/deployment.h
@@ -379,6 +380,7 @@ include $(POK_PATH)/misc/mk/common-$(ARCH).mk
 include $(POK_PATH)/misc/mk/rules-common.mk
 include $(POK_PATH)/misc/mk/rules-partition.mk
 """.format(arch=arch, bsp=bsp, name=option_value(config, "name"),
+               pok_root=pok_root,
                objects=" ".join(option_value(config, "objects"))))
 
 def gen_partition_deployment_h(fd, config):
@@ -405,15 +407,15 @@ def open_and_format(filename):
     """Open a file for writing through clang-format."""
     return os.popen("clang-format > {}".format(filename), "w")
 
-def gen_files(config):
+def gen_files(config, pok_root):
     arch = option_value(config, "target.arch")
     bsp = option_value(config, "target.bsp")
     with open("Makefile", "w") as fd:
-        gen_main_makefile(fd, config, arch, bsp)
+        gen_main_makefile(fd, config, arch, bsp, pok_root)
     try: os.mkdir("kernel", 0o755)
     except FileExistsError: pass
     with open("kernel/Makefile", "w") as fd:
-        gen_kernel_makefile(fd, config, arch, bsp)
+        gen_kernel_makefile(fd, config, arch, bsp, pok_root)
     with open_and_format("kernel/deployment.h") as fd:
         gen_kernel_deployment_h(fd, config)
     for partition in option_value(config, "partitions"):
@@ -421,9 +423,15 @@ def gen_files(config):
         try: os.mkdir(name)
         except FileExistsError: pass
         with open("{}/Makefile".format(name), "w") as fd:
-            gen_partition_makefile(fd, partition, arch, bsp)
+            gen_partition_makefile(fd, partition, arch, bsp, pok_root)
         with open_and_format("{}/deployment.h".format(name)) as fd:
             gen_partition_deployment_h(fd, partition)
+
+def pok_root():
+    pok_root = ".."
+    while not os.path.exists(os.path.join(pok_root, "libpok")):
+        pok_root = os.path.join("..", pok_root)
+    return pok_root
 
 def main():
     if sys.argv[1] == "--test":
@@ -431,7 +439,7 @@ def main():
         doctest.testmod()
         return
     config = yaml.safe_load(open(sys.argv[1]))
-    gen_files(config)
+    gen_files(config, pok_root())
 
 if __name__ == '__main__':
     main()

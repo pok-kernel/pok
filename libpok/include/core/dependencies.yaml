@@ -52,6 +52,8 @@ conditional:
             needs: [semaphores]
         arinc653_error:
             funcs: [time_get]
+        assert:
+            needs: [shutdown, debug]
         mutexes:
             funcs: [time_get]
         events:

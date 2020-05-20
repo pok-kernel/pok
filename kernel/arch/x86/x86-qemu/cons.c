@@ -12,6 +12,8 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
+#include <dependencies.h>
+
 #include <errno.h>
 
 #include <arch/x86/ioports.h>
@@ -26,7 +28,6 @@
 
 static const int screen_w = 80;
 static const int screen_h = 25;
-static const int tab_size = 8;
 static char *const vga_base = (char *)0xb8000;
 struct s_cons g_cons;
 
@@ -57,6 +58,7 @@ void read_serial(char *a) {
 
 void pok_cons_print_char(const char c) {
 #ifdef POK_NEEDS_CONSOLE
+  static const int tab_size = 8;
   char *ptr;
   static struct s_cons
       local_curs; /* Local copy of the curent cursor position */

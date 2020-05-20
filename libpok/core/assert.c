@@ -12,19 +12,19 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-/**
- * \file kernel/arch/x86/x86-qemu/shutdown.c
- * \brief This file implements a shutdown function for x86-qemu BSP.
- * \author Romain Guilloteau
- */
+#ifdef POK_NEEDS_ASSERT
 
-#include <dependencies.h>
+#include <core/dependencies.h>
 
-#ifdef POK_NEEDS_SHUTDOWN
-
-#include <arch/x86/ioports.h>
+#include <assert.h>
 #include <core/shutdown.h>
+#include <libc/stdio.h>
 
-void pok_shutdown() { outw(0x604, 0x2000); }
+void __pok_assert_failed(const char *assertion, const char *file,
+                         unsigned int line, const char *function) {
+  printf("%s:%u: %s%sAssertion `%s' failed.\n", file, line,
+         function ? function : "", function ? ": " : "", assertion);
+  pok_shutdown();
+}
 
 #endif

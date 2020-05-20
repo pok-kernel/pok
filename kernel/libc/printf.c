@@ -12,6 +12,8 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
+#include <dependencies.h>
+
 #if defined(POK_NEEDS_DEBUG) || defined(POK_NEEDS_INSTRUMENTATION) ||          \
     defined(POK_NEEDS_COVERAGE_INFOS)
 

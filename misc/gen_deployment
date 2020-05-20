@@ -307,12 +307,12 @@ def gen_kernel_deployment_h(fd, config):
     if sum(lockobjects):
         needs.add("LOCKOBJECTS")
         configs["NB_LOCKOBJECTS"] =  sum(lockobjects)
-    for (partopt, need) in [("console", "CONSOLE"), ("timer", "TIME"),
-                            ("shutdown", "SHUTDOWN"), ("threads.sleep", "THREAD_SLEEP"),
-                            ("threads.suspend", "THREAD_SUSPEND")]:
+    for (partopt, need) in [("console", "CONSOLE"), ("timer", "TIME"), ("assert", "DEBUG"),
+                            ("assert", "SHUTDOWN"), ("shutdown", "SHUTDOWN"),
+                            ("threads.sleep", "THREAD_SLEEP"), ("threads.suspend", "THREAD_SUSPEND")]:
         if any_has_feature(config, "partitions.{}".format(partopt)):
             needs.add(need)
-    for (opt, need) in [("debug", "DEBUG")]:
+    for (opt, need) in [("assert", "ASSERT"),("debug", "DEBUG")]:
         if has_feature(config, "kernel.{}".format(opt)):
             needs.add(need)
     configs["PARTITIONS_SIZE"] = c_list(option_value(config, "partitions.size", decode=to_bytes))
@@ -395,7 +395,7 @@ def gen_partition_deployment_h(fd, config):
              "#define {}".format(guard), ""])
 
     needs = set()
-    for (opt, need) in [("debug", "DEBUG"), ("console", "CONSOLE"), ("timer", "TIMER"),
+    for (opt, need) in [("assert", "ASSERT"), ("debug", "DEBUG"), ("console", "CONSOLE"), ("timer", "TIMER"),
                         ("libc", "LIBC_STDLIB"), ("shutdown", "SHUTDOWN")]:
         if has_feature(config, opt):
             needs.add(need)

@@ -18,6 +18,8 @@
  * \author Romain Guilloteau
  */
 
+#include <core/dependencies.h>
+
 #ifdef POK_NEEDS_SHUTDOWN
 
 #include <core/shutdown.h>

@@ -17,7 +17,8 @@ LO_OBJS=	partition.o \
 			error.o \
 			loader.o \
 			boot.o \
-			cons.o 
+			cons.o \
+			assert.o
 
 LO_DEPS=
 

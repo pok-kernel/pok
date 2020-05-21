@@ -14,8 +14,6 @@
 
 #include <core/dependencies.h>
 
-#ifdef POK_NEEDS_THREADS
-
 #include <core/syscall.h>
 #include <types.h>
 
@@ -23,5 +21,3 @@ pok_ret_t pok_thread_period() {
   return pok_syscall2(POK_SYSCALL_THREAD_PERIOD, (uint32_t)NULL,
                       (uint32_t)NULL);
 }
-
-#endif

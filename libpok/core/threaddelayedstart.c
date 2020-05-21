@@ -14,7 +14,6 @@
 
 #include <core/dependencies.h>
 
-#ifdef POK_NEEDS_THREADS
 #include <arch.h>
 #include <core/syscall.h>
 #include <core/thread.h>
@@ -25,5 +24,3 @@ pok_ret_t pok_thread_delayed_start(const uint32_t thread_id,
   return pok_syscall2(POK_SYSCALL_THREAD_DELAYED_START, (uint32_t)thread_id,
                       (uint32_t)ms);
 }
-
-#endif

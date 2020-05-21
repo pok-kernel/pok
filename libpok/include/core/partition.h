@@ -14,8 +14,6 @@
 
 #include <core/dependencies.h>
 
-#ifdef POK_NEEDS_PARTITIONS
-
 #include <core/syscall.h>
 #include <errno.h>
 #include <types.h>
@@ -50,4 +48,3 @@ typedef enum {
 #define pok_current_partition_get_start_condition(start_condition)             \
   pok_syscall2(POK_SYSCALL_PARTITION_GET_START_CONDITION,                      \
                (uint32_t)start_condition, 0)
-#endif

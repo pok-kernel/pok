@@ -17,8 +17,6 @@
 
 #include <core/dependencies.h>
 
-#ifdef POK_NEEDS_THREADS
-
 #include <core/syscall.h>
 #include <errno.h>
 #include <types.h>
@@ -93,5 +91,4 @@ pok_ret_t pok_thread_resume(const uint32_t thread_id);
  * similar to: pok_ret_t      pok_thread_stop (const uint32_t tid);
  */
 
-#endif /* __POK_NEEDS_THREADS */
 #endif /* __POK_THREAD_H__ */

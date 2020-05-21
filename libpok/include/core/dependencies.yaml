@@ -40,9 +40,7 @@ optimized:
             config_funcs: [memcmp]
         arinc653_process:
             config_funcs: [strcpy, strcmp]
-            needs: [threads, thread_id]
-        arinc653_partition:
-            needs: [partitions]
+            needs: [thread_id]
         arinc653_queuing:
             needs: [ports_queuing]
         arinc653_sampling:
@@ -71,6 +69,6 @@ optimized:
 
 unoptimized:
     dependencies:
-        needs: [semaphore, threads, ports_queuing, partitions, buffers, blackboards, semaphores, allocator]
+        needs: [semaphore, ports_queuing, buffers, blackboards, semaphores, allocator]
         config_funcs: [memset, memcmp, strcmp, strncmp, strcpy, strncpy, itoa, atoi, udivdi3, umoddi3,
             rand, malloc, calloc, free]

@@ -14,8 +14,6 @@
 
 #include <core/dependencies.h>
 
-#ifdef POK_NEEDS_THREADS
-
 #include <core/thread.h>
 #include <types.h>
 
@@ -32,5 +30,3 @@ pok_ret_t pok_thread_attr_init(pok_thread_attr_t *attr) {
 
   return POK_ERRNO_OK;
 }
-
-#endif

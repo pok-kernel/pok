@@ -12,17 +12,9 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-//#ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE
-
-#ifdef POK_NEEDS_THREADS
-
 #include <core/syscall.h>
 #include <types.h>
 
 pok_ret_t pok_thread_sleep(const pok_time_t us) {
   return pok_syscall2(POK_SYSCALL_THREAD_SLEEP, (uint32_t)us, 0);
 }
-
-#endif
-
-//#endif /* POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE */

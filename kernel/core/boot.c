@@ -35,23 +35,10 @@
 void pok_boot() {
   pok_arch_init();
   pok_bsp_init();
-
-#if defined(POK_NEEDS_TIME) || defined(POK_NEEDS_SCHED) ||                     \
-    defined(POK_NEEDS_THREADS)
   pok_time_init();
-#endif
-
-#ifdef POK_NEEDS_PARTITIONS
   pok_partition_init();
-#endif
-
-#ifdef POK_NEEDS_THREADS
   pok_thread_init();
-#endif
-
-#if defined(POK_NEEDS_SCHED) || defined(POK_NEEDS_THREADS)
   pok_sched_init();
-#endif
 
 #if (defined POK_NEEDS_LOCKOBJ) || defined(POK_NEEDS_PORTS_QUEUEING) ||        \
     defined(POK_NEEDS_PORTS_SAMPLING)
@@ -80,13 +67,4 @@ void pok_boot() {
 #endif
 
   pok_arch_preempt_enable();
-
-#ifndef POK_NEEDS_PARTITIONS
-  /**
-   * If we don't use partitioning service, we execute a main
-   * function. In that case, POK is acting like an executive,
-   * not a real kernel
-   */
-  main();
-#endif
 }

@@ -38,7 +38,6 @@ void pok_debug_print_current_state() {
   printf("-------------\n");
   printf("Kernel thread        : %d\n", KERNEL_THREAD);
   printf("Idle thread          : %d\n", IDLE_THREAD);
-#ifdef POK_NEEDS_PARTITIONS
   printf("Current partition    : %d\n", POK_SCHED_CURRENT_PARTITION);
   printf("Thread index         : %d\n", POK_CURRENT_PARTITION.thread_index);
   printf("Thread low           : %d\n", POK_CURRENT_PARTITION.thread_index_low);
@@ -62,7 +61,6 @@ void pok_debug_print_current_state() {
   }
   printf("\n");
   printf("-------------\n");
-#endif
   printf("Current thread    : %d\n", POK_SCHED_CURRENT_THREAD);
   printf("Period            : %d\n", POK_CURRENT_THREAD.period);
   printf("Deadline          : %d\n", POK_CURRENT_THREAD.deadline);

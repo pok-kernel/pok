@@ -16,13 +16,7 @@
  * \file partition.c
  * \brief This file provides functions for partitioning services
  * \author Julien Delange
- *
- * The definition of useful structures can be found in partition.h
- * header file. To enable partitioning services, you must set the
- * POK_NEEDS_PARTITIONS maccro.
  */
-
-#ifdef POK_NEEDS_PARTITIONS
 
 #include <arch.h>
 #include <bsp.h>
@@ -494,6 +488,4 @@ pok_ret_t pok_partition_restart_thread(const uint32_t tid) {
   pok_sched();
   return (POK_ERRNO_OK);
 }
-#endif
-
 #endif

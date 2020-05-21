@@ -26,8 +26,6 @@
 #include <errno.h>
 #include <libc.h>
 
-#ifdef POK_NEEDS_THREADS
-
 extern char _idlestack;
 
 /**
@@ -81,5 +79,3 @@ void pok_context_reset(uint32_t stack_size, uint32_t stack_addr) {
   *(uint32_t *)(ctx - NPC_OFFSET) = entry + 4;
   *(uint32_t *)(ctx - I1_OFFSET) = id;
 }
-
-#endif

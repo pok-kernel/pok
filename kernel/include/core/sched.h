@@ -15,16 +15,12 @@
 #ifndef __POK_SCHED_H__
 #define __POK_SCHED_H__
 
-#if defined(POK_NEEDS_SCHED) || defined(POK_NEEDS_THREADS)
-
 #include <core/schedvalues.h>
 #include <errno.h>
 #include <types.h>
 
-#ifdef POK_NEEDS_PARTITIONS
 extern uint8_t pok_current_partition;
 #define POK_SCHED_CURRENT_PARTITION pok_current_partition
-#endif
 
 extern uint32_t current_thread;
 #define POK_SCHED_CURRENT_THREAD current_thread
@@ -74,13 +70,8 @@ void pok_sched_lock_current_thread_timed(const uint64_t time);
 void pok_sched_stop_thread(const uint32_t tid);
 void pok_sched_stop_self(void);
 pok_ret_t pok_sched_end_period();
-
-#ifdef POK_NEEDS_PARTITIONS
 void pok_sched_activate_error_thread(void);
-#endif
 
 uint32_t pok_sched_get_current(uint32_t *thread_id);
-
-#endif /* POK_NEEDS.... */
 
 #endif /* !__POK_SCHED_H__ */

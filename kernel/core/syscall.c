@@ -227,7 +227,6 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
 
 #endif
 
-#ifdef POK_NEEDS_PARTITIONS
   case POK_SYSCALL_PARTITION_SET_MODE:
     return pok_partition_set_mode_current((pok_partition_mode_t)args->arg1);
     break;
@@ -279,7 +278,6 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
     return pok_current_partition_get_start_condition(
         (pok_start_condition_t *)(args->arg1 + infos->base_addr));
     break;
-#endif
 
 #ifdef POK_NEEDS_ERROR_HANDLING
   case POK_SYSCALL_ERROR_HANDLER_CREATE:

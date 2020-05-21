@@ -86,7 +86,6 @@ void pok_kernel_error(uint32_t error) {
 }
 #endif
 
-#ifdef POK_NEEDS_PARTITIONS
 #ifndef POK_USE_GENERATED_PARTITION_ERROR_HANDLER
 void pok_partition_error(uint8_t partition, uint32_t error) {
 #ifdef POK_NEEDS_DEBUG
@@ -100,7 +99,6 @@ void pok_partition_error(uint8_t partition, uint32_t error) {
   return;
 }
 #endif /* POK_USE_GENERATED_PARTITION_ERROR_HANDLER */
-#endif /* POK_NEEDS_PARTITIONS */
 
 #ifndef POK_USE_GENERATED_KERNEL_ERROR_CALLBACK
 void pok_error_kernel_callback() {
@@ -114,7 +112,6 @@ void pok_error_kernel_callback() {
 }
 #endif /* POK_USE_GENERATED_KERNEL_ERROR_CALLBACK */
 
-#ifdef POK_NEEDS_PARTITIONS
 #ifndef POK_USE_GENERATED_PARTITION_ERROR_CALLBACK
 void pok_error_partition_callback(uint32_t partition) {
 #ifdef POK_NEEDS_DEBUG
@@ -162,7 +159,5 @@ pok_ret_t pok_error_get(pok_error_status_t *status) {
     return POK_ERRNO_UNAVAILABLE;
   }
 }
-
-#endif /* POK_NEEDS_PARTITIONS */
 
 #endif

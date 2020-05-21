@@ -15,8 +15,6 @@
 #ifndef __POK_THREAD_H__
 #define __POK_THREAD_H__
 
-#ifdef POK_NEEDS_THREADS
-
 #include <core/sched.h>
 #include <errno.h>
 #include <types.h>
@@ -98,17 +96,12 @@ pok_ret_t pok_thread_get_status(const uint32_t id, pok_thread_attr_t *attr);
 pok_ret_t pok_thread_set_priority(const uint32_t id, const uint32_t priority);
 pok_ret_t pok_thread_resume(const uint32_t id);
 pok_ret_t pok_thread_suspend_target(const uint32_t id);
-
-#ifdef POK_NEEDS_PARTITIONS
 pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
                                       const pok_thread_attr_t *attr,
                                       const uint8_t partition_id);
-#endif
 
 extern pok_thread_t pok_threads[POK_CONFIG_NB_THREADS];
 
 #define POK_CURRENT_THREAD pok_threads[POK_SCHED_CURRENT_THREAD]
-
-#endif /* __POK_NEEDS_THREADS */
 
 #endif /* __POK_THREAD_H__ */

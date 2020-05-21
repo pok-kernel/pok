@@ -21,14 +21,6 @@
 #include "sysdesc.h"
 #include "tss.h"
 
-#ifndef POK_NEEDS_THREADS
-#define POK_CONFIG_NB_THREADS 0
-#endif
-
-#ifndef POK_NEEDS_PARTITIONS
-#define POK_CONFIG_NB_PARTITIONS 0
-#endif
-
 #define GDT_SIZE 256
 
 gdt_entry_t pok_gdt[GDT_SIZE];

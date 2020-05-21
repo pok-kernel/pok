@@ -44,7 +44,6 @@ pok_ret_t pok_lockobj_init() {
 #if POK_CONFIG_NB_LOCKOBJECTS > 0
   uint8_t i;
 
-#ifdef POK_NEEDS_PARTITIONS
 #ifdef POK_NEEDS_ERROR_HANDLING
   uint32_t total_lockobjects;
 
@@ -57,7 +56,6 @@ pok_ret_t pok_lockobj_init() {
   if (total_lockobjects != POK_CONFIG_NB_LOCKOBJECTS) {
     pok_kernel_error(POK_ERROR_KIND_KERNEL_CONFIG);
   }
-#endif
 #endif
 
   for (i = 0; i < POK_CONFIG_NB_LOCKOBJECTS; i++) {

@@ -19,8 +19,6 @@
 
 #include "thread.h"
 
-#ifdef POK_NEEDS_THREADS
-
 extern void pok_arch_thread_start(void);
 
 uint32_t pok_context_create(uint32_t id, uint32_t stack_size, uint32_t entry) {
@@ -62,5 +60,3 @@ uint32_t pok_context_reset(uint32_t stack_size, uint32_t stack_addr) {
   sp->sp = (uint32_t)&sp->back_chain;
   return 0;
 }
-
-#endif

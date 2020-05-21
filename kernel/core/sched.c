@@ -18,8 +18,6 @@
  **\\author Julien Delange
  */
 
-#if defined(POK_NEEDS_SCHED) || defined(POK_NEEDS_THREADS)
-
 #include <arch.h>
 #include <types.h>
 
@@ -27,9 +25,7 @@
 #include <core/thread.h>
 #include <core/time.h>
 
-#ifdef POK_NEEDS_PARTITIONS
 #include <core/partition.h>
-#endif
 
 #ifdef POK_NEEDS_MIDDLEWARE
 #include <middleware/port.h>
@@ -50,7 +46,6 @@ static const char *state_names[] = {
     "delayed start"};
 #endif
 
-#ifdef POK_NEEDS_PARTITIONS
 extern pok_partition_t pok_partitions[];
 
 /**
@@ -60,7 +55,6 @@ extern pok_partition_t pok_partitions[];
 uint8_t pok_current_partition;
 
 void pok_sched_partition_switch();
-#endif
 
 #if defined(POK_NEEDS_PORTS_SAMPLING) || defined(POK_NEEDS_PORTS_QUEUEING)
 extern void pok_port_flushall(void);
@@ -90,7 +84,6 @@ void pok_sched_thread_switch(void);
  */
 
 void pok_sched_init(void) {
-#ifdef POK_NEEDS_PARTITIONS
 #if defined(POK_NEEDS_ERROR_HANDLING) || defined(POK_NEEDS_DEBUG)
   /*
    * We check that the total time of time frame
@@ -114,7 +107,6 @@ void pok_sched_init(void) {
 #endif
   }
 #endif
-#endif
 
   pok_sched_current_slot = 0;
   pok_sched_next_major_frame = POK_CONFIG_SCHEDULING_MAJOR_FRAME;
@@ -135,7 +127,6 @@ uint8_t pok_sched_get_priority_max(const pok_sched_t sched_type) {
   return 255;
 }
 
-#ifdef POK_NEEDS_PARTITIONS
 uint8_t pok_elect_partition() {
   uint8_t next_partition = POK_SCHED_CURRENT_PARTITION;
 #if POK_CONFIG_NB_PARTITIONS > 1
@@ -195,9 +186,7 @@ uint8_t pok_elect_partition() {
 
   return next_partition;
 }
-#endif /* POK_NEEDS_PARTITIONS */
 
-#ifdef POK_NEEDS_PARTITIONS
 uint32_t pok_elect_thread(uint8_t new_partition_id) {
   uint64_t now = POK_GETTICK();
   pok_partition_t *new_partition = &(pok_partitions[new_partition_id]);
@@ -304,9 +293,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
 
   return (elected);
 }
-#endif /* POK_NEEDS_PARTITIONS */
 
-#ifdef POK_NEEDS_PARTITIONS
 void pok_sched() {
   uint32_t elected_thread = 0;
   uint8_t elected_partition = POK_SCHED_CURRENT_PARTITION;
@@ -344,28 +331,6 @@ void pok_sched() {
   }
   pok_sched_context_switch(elected_thread);
 }
-#else
-void pok_sched_thread_switch() {
-  int i;
-  uint64_t now;
-  uint32_t elected;
-
-  now = POK_GETTICK();
-  for (i = 0; i <= POK_CONFIG_NB_THREADS; ++i) {
-    if ((pok_threads[i].state == POK_STATE_WAITING) &&
-        (pok_threads[i].wakeup_time <= now)) {
-      pok_threads[i].state = POK_STATE_RUNNABLE;
-    }
-  }
-
-  elected = pok_sched_part_election(0, POK_CONFIG_NB_THREADS);
-  /*
-   *  FIXME : current debug session about exceptions-handled
-  printf ("switch to thread %d\n", elected);
-  */
-  pok_sched_context_switch(elected);
-}
-#endif /* POK_NEEDS_PARTITIONS */
 
 /*
  * Context-switch function to switch from one thread to another
@@ -589,7 +554,7 @@ pok_ret_t pok_sched_end_period() {
   return POK_ERRNO_OK;
 }
 
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 void pok_sched_activate_error_thread(void) {
   uint32_t error_thread = pok_partitions[pok_current_partition].thread_error;
   if (error_thread != 0) {
@@ -602,9 +567,7 @@ void pok_sched_activate_error_thread(void) {
     pok_sched_context_switch(error_thread);
   }
 }
-#endif
-
-#ifdef POK_NEEDS_PARTITIONS
+#endif // POK_NEEDS_ERROR_HANDLING
 
 uint32_t pok_sched_get_current(uint32_t *thread_id) {
 #if defined(POK_NEEDS_ERROR_HANDLING)
@@ -618,6 +581,3 @@ uint32_t pok_sched_get_current(uint32_t *thread_id) {
   *thread_id = POK_SCHED_CURRENT_THREAD;
   return POK_ERRNO_OK;
 }
-#endif
-
-#endif /* __POK_NEEDS_SCHED */

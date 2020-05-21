@@ -19,11 +19,7 @@
  * \date 2008-2009
  *
  * Contains all needed stuff to load partitions (elf files).
- * This needs the partitioning service (POK_NEEDS_PARTITIONS must
- * be defined) to work.
  */
-
-#ifdef POK_NEEDS_PARTITIONS
 
 #include <core/cpio.h>
 #include <core/error.h>
@@ -114,5 +110,3 @@ void pok_loader_load_partition(const uint8_t part_id, uint32_t offset,
 
   *entry = (uint32_t)elf_entry;
 }
-
-#endif /* POK_NEEDS_PARTITIONS */

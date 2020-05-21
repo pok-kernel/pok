@@ -38,9 +38,7 @@ static inline void set_msr(unsigned int val) {
 
 pok_ret_t pok_arch_init() {
   set_msr(MSR_IP);
-#if POK_NEEDS_PARTITIONS
   pok_arch_space_init();
-#endif
 
   return (POK_ERRNO_OK);
 }

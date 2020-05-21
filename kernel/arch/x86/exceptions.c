@@ -98,7 +98,7 @@ static void dump_registers(interrupt_frame *frame) {
 
 INTERRUPT_HANDLER(exception_divide_error) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise divide by zero error, current thread=%d\n",
@@ -114,7 +114,7 @@ INTERRUPT_HANDLER(exception_divide_error) {
 
 INTERRUPT_HANDLER(exception_debug) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise debug fault\n");
@@ -133,7 +133,7 @@ INTERRUPT_HANDLER(exception_debug) {
 
 INTERRUPT_HANDLER(exception_nmi) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception NMI fault\n");
@@ -152,7 +152,7 @@ INTERRUPT_HANDLER(exception_nmi) {
 
 INTERRUPT_HANDLER(exception_breakpoint) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception breakpoint fault\n");
@@ -170,7 +170,7 @@ INTERRUPT_HANDLER(exception_breakpoint) {
 
 INTERRUPT_HANDLER(exception_overflow) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception overflow fault\n");
@@ -188,7 +188,7 @@ INTERRUPT_HANDLER(exception_overflow) {
 
 INTERRUPT_HANDLER(exception_boundrange) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception bound range fault\n");
@@ -206,7 +206,7 @@ INTERRUPT_HANDLER(exception_boundrange) {
 
 INTERRUPT_HANDLER(exception_invalidopcode) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception invalid opcode fault, current thread: %d\n",
@@ -225,7 +225,7 @@ INTERRUPT_HANDLER(exception_invalidopcode) {
 
 INTERRUPT_HANDLER(exception_nomath_coproc) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception no math coprocessor fault\n");
@@ -245,7 +245,7 @@ INTERRUPT_HANDLER(exception_nomath_coproc) {
 
 INTERRUPT_HANDLER_errorcode(exception_doublefault) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception double fault\n");
@@ -263,7 +263,7 @@ INTERRUPT_HANDLER_errorcode(exception_doublefault) {
 
 INTERRUPT_HANDLER(exception_copseg_overrun) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception copseg overrun fault\n");
@@ -281,7 +281,7 @@ INTERRUPT_HANDLER(exception_copseg_overrun) {
 
 INTERRUPT_HANDLER_errorcode(exception_invalid_tss) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception invalid tss fault\n");
@@ -299,7 +299,7 @@ INTERRUPT_HANDLER_errorcode(exception_invalid_tss) {
 
 INTERRUPT_HANDLER_errorcode(exception_segment_not_present) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception segment not present fault %d\n",
@@ -318,7 +318,7 @@ INTERRUPT_HANDLER_errorcode(exception_segment_not_present) {
 
 INTERRUPT_HANDLER_errorcode(exception_stackseg_fault) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception stack segment fault\n");
@@ -336,7 +336,7 @@ INTERRUPT_HANDLER_errorcode(exception_stackseg_fault) {
 
 INTERRUPT_HANDLER_errorcode(exception_general_protection) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf(
@@ -356,7 +356,7 @@ INTERRUPT_HANDLER_errorcode(exception_general_protection) {
 
 INTERRUPT_HANDLER_errorcode(exception_pagefault) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception pagefault fault\n");
 #endif
@@ -373,7 +373,7 @@ INTERRUPT_HANDLER_errorcode(exception_pagefault) {
 
 INTERRUPT_HANDLER(exception_fpu_fault) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception FPU fault\n");
@@ -391,7 +391,7 @@ INTERRUPT_HANDLER(exception_fpu_fault) {
 
 INTERRUPT_HANDLER_errorcode(exception_alignement_check) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception alignment fault\n");
@@ -409,7 +409,7 @@ INTERRUPT_HANDLER_errorcode(exception_alignement_check) {
 
 INTERRUPT_HANDLER(exception_machine_check) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception machine check fault\n");
@@ -427,7 +427,7 @@ INTERRUPT_HANDLER(exception_machine_check) {
 
 INTERRUPT_HANDLER(exception_simd_fault) {
   (void)frame;
-#if defined(POK_NEEDS_PARTITIONS) && defined(POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception SIMD fault\n");

@@ -27,8 +27,6 @@
 
 #include "thread.h"
 
-#ifdef POK_NEEDS_THREADS
-
 uint32_t pok_context_create(uint32_t thread_id, uint32_t stack_size,
                             uint32_t entry) {
   start_context_t *sp;
@@ -86,5 +84,3 @@ void pok_context_reset(uint32_t stack_size, uint32_t stack_addr) {
   sp->entry = entry;
   sp->id = id;
 }
-
-#endif

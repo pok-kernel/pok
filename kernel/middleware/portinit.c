@@ -23,7 +23,6 @@ extern pok_port_t pok_ports[POK_CONFIG_NB_PORTS];
 void pok_port_init(void) {
   uint8_t i;
 
-#ifdef POK_NEEDS_PARTITIONS
 #if defined(POK_NEEDS_DEBUG) || defined(POK_NEEDS_ERROR_HANDLING)
   for (i = 0; i < POK_CONFIG_NB_PORTS; i++) {
     if ((((uint8_t[])POK_CONFIG_PARTITIONS_PORTS)[i]) >=
@@ -37,7 +36,6 @@ void pok_port_init(void) {
 #endif
     }
   }
-#endif
 #endif
 
   for (i = 0; i < POK_CONFIG_NB_PORTS; i++) {

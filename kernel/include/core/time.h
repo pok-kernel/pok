@@ -12,9 +12,6 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-#if defined(POK_NEEDS_TIME) || defined(POK_NEEDS_THREADS) ||                   \
-    defined(POK_NEEDS_SCHED)
-
 #ifndef __POK_TIME_H__
 #define __POK_TIME_H__
 
@@ -59,4 +56,3 @@ uint64_t pok_gettick(void);
 pok_ret_t pok_gettick_by_pointer(uint64_t *clk_val);
 
 #endif /* __POK_TIME_H__ */
-#endif /* Needs clauses */

@@ -19,9 +19,6 @@
  * \date    2008-2009
  */
 
-#if defined(POK_NEEDS_TIME) || defined(POK_NEEDS_SCHED) ||                     \
-    defined(POK_NEEDS_THREADS)
-
 #include <bsp.h>
 #include <errno.h>
 #include <types.h>
@@ -60,5 +57,3 @@ pok_ret_t pok_gettick_by_pointer(uint64_t *clk_val) {
   return POK_ERRNO_OK;
 }
 #endif
-
-#endif /* POK_NEEDS_... */

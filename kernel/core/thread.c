@@ -31,8 +31,6 @@
 
 #include <core/instrumentation.h>
 
-#ifdef POK_NEEDS_THREADS
-
 /**
  * We declare an array of threads. The amount of threads
  * is fixed by the software developper and we add two theads
@@ -70,7 +68,6 @@ void pok_thread_insert_sort(uint16_t index_low, uint16_t index_high) {
 void pok_thread_init(void) {
   uint32_t i;
 
-#ifdef POK_NEEDS_PARTITIONS
   uint32_t total_threads;
   uint8_t j;
 
@@ -89,7 +86,6 @@ void pok_thread_init(void) {
     pok_kernel_error(POK_ERROR_KIND_KERNEL_CONFIG);
 #endif
   }
-#endif
 #endif
 
   pok_threads[KERNEL_THREAD].priority = pok_sched_get_priority_min(0);
@@ -121,7 +117,6 @@ void pok_thread_init(void) {
   }
 }
 
-#ifdef POK_NEEDS_PARTITIONS
 /**
  * Create a thread inside a partition
  * Return POK_ERRNO_OK if no error.
@@ -141,6 +136,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
     return POK_ERRNO_MODE;
   }
 
+  // TODO: this looks suspicious
   if (pok_partitions[partition_id].thread_index >=
       pok_partitions[partition_id].thread_index_high) {
 #ifdef POK_NEEDS_ERROR_HANDLING
@@ -214,7 +210,6 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
 
   return POK_ERRNO_OK;
 }
-#endif
 
 /**
  * Start a thread, giving its entry call with \a entry
@@ -367,5 +362,3 @@ pok_ret_t pok_thread_suspend_target(const uint32_t id) {
   pok_threads[id].state = POK_STATE_STOPPED;
   return POK_ERRNO_OK;
 }
-
-#endif

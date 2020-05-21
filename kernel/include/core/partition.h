@@ -21,8 +21,6 @@
 #ifndef __POK_PARTITION_H__
 #define __POK_PARTITION_H__
 
-#ifdef POK_NEEDS_PARTITIONS
-
 #include <core/error.h>
 #include <core/sched.h>
 #include <core/thread.h>
@@ -189,7 +187,5 @@ pok_ret_t pok_current_partition_get_lock_level(uint32_t *lock_level);
 
 pok_ret_t pok_current_partition_get_start_condition(
     pok_start_condition_t *start_condition);
-
-#endif /* __POK_NEEDS_PARTITIONS */
 
 #endif /* __POK_PARTITION_H__ */

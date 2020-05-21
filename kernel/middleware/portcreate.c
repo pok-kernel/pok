@@ -37,14 +37,14 @@ pok_ret_t pok_port_create(char *name, const pok_port_size_t size,
   ret = POK_ERRNO_OK;
 
   if (size > POK_PORT_MAX_SIZE) {
-#if (defined POK_NEEDS_PARTITIONS) && (defined POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
     POK_ERROR_CURRENT_PARTITION(POK_ERROR_KIND_PARTITION_CONFIGURATION);
 #endif
     return POK_ERRNO_PORT;
   }
 
   if (size > pok_queue.available_size) {
-#if (defined POK_NEEDS_PARTITIONS) && (defined POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
     POK_ERROR_CURRENT_PARTITION(POK_ERROR_KIND_PARTITION_CONFIGURATION);
 #endif
     return POK_ERRNO_PORT;
@@ -52,7 +52,7 @@ pok_ret_t pok_port_create(char *name, const pok_port_size_t size,
 
   if ((direction != POK_PORT_DIRECTION_IN) &&
       (direction != POK_PORT_DIRECTION_OUT)) {
-#if (defined POK_NEEDS_PARTITIONS) && (defined POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
     POK_ERROR_CURRENT_PARTITION(POK_ERROR_KIND_PARTITION_CONFIGURATION);
 #endif
     return POK_ERRNO_PORT;
@@ -78,7 +78,7 @@ pok_ret_t pok_port_create(char *name, const pok_port_size_t size,
   }
 
   if (ret != POK_ERRNO_OK) {
-#if (defined POK_NEEDS_PARTITIONS) && (defined POK_NEEDS_ERROR_HANDLING)
+#ifdef POK_NEEDS_ERROR_HANDLING
     POK_ERROR_CURRENT_PARTITION(POK_ERROR_KIND_PARTITION_INIT);
 #endif
     return ret;

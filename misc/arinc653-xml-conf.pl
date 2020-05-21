@@ -89,7 +89,6 @@ sub header_general_purpose
    #General purpose variables
    print $header_file "\n\n";
    print $header_file "#define POK_NEEDS_GETTICK 1\n";
-   print $header_file "#define POK_NEEDS_SCHED   1\n";
    print $header_file "\n\n";
 
    #Generate POK_CONFIG_NB_THREADS
@@ -123,7 +122,6 @@ sub header_partitions_general
 
    if ($#result > 0)
    {
-      print $header_file "#define POK_NEEDS_PARTITIONS   1\n";
       print $header_file "#define POK_CONFIG_NB_PARTITIONS   " . ($#result + 1) . "\n";
    }
 }

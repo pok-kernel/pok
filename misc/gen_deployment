@@ -298,7 +298,7 @@ def gen_kernel_deployment_h(fd, config):
              "#define {}".format(guard), ""])
 
     includes = set()
-    needs = {"PARTITIONS", "THREADS", "SCHED"}
+    needs = set()
     configs = {"NB_PARTITIONS": len(option_value(config, "partitions")),
                "NB_THREADS": sum_option(config, "partitions.threads.count") + 2}
     semaphores = get_option_or(config, "partitions.semaphores", 0)
@@ -394,7 +394,7 @@ def gen_partition_deployment_h(fd, config):
     add(fd, ["", "#ifndef {}".format(guard),
              "#define {}".format(guard), ""])
 
-    needs = set(["THREADS"])
+    needs = set()
     for (opt, need) in [("debug", "DEBUG"), ("console", "CONSOLE"), ("timer", "TIMER"),
                         ("libc", "LIBC_STDLIB"), ("shutdown", "SHUTDOWN")]:
         if has_feature(config, opt):

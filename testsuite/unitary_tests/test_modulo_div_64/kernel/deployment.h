@@ -23,10 +23,7 @@
 
 #define POK_NEEDS_CONSOLE 1
 #define POK_NEEDS_DEBUG 1
-#define POK_NEEDS_PARTITIONS 1
-#define POK_NEEDS_SCHED 1
 #define POK_NEEDS_SHUTDOWN 1
-#define POK_NEEDS_THREADS 1
 #define POK_NEEDS_TIME 1
 
 typedef enum { pok_part_identifier_pr1 = 0 } pok_part_identifiers_t;

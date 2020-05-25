@@ -77,7 +77,7 @@ def generate_output(fd, config, source):
     fd.write("// will be lost.\n\n")
 
     guard = "__{}_DEPENDENCIES_H__".format(config["domain"].upper())
-    fd.write("#ifndef {}\n\n".format(guard))
+    fd.write("#ifndef {}\n#define {}\n\n".format(guard, guard))
     if "deployment" in config:
         condition = config["deployment"]["condition"]
         fd.write('{}\n#include "deployment.h"\n{}\n\n'.format(

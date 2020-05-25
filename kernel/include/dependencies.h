@@ -3,6 +3,7 @@
 // they will be lost.
 
 #ifndef __KERNEL_DEPENDENCIES_H__
+#define __KERNEL_DEPENDENCIES_H__
 
 #ifdef POK_NEEDS_ERROR_HANDLING
 

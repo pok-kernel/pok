@@ -30,7 +30,10 @@ class ExecutionTest(Test):
         build.make(self.dir, extra_args="clean")
         build.make(self.dir, env={"CC": self.compiler, "MAKEFLAGS": "-j1"})
         output = process.system_output("{} -nographic -kernel {}/pok.elf".format(self.qemu, self.dir))
-        output = output.split(b"POK kernel initialized\n", 1)[1]
+        try:
+            output = output.split(b"POK kernel initialized\n", 1)[1]
+        except IndexError:
+            raise Exception("unable to find POK kernel startup message")
         try:
             expected = open(self.expected, "rb").read().rstrip(b"\n")
         except FileNotFoundError:

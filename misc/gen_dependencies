@@ -88,14 +88,12 @@ def generate_output(fd, config, source):
             fd.write("{}\n\n".format(generate_define(var)))
     if "conditional" in config:
         fd.write("{}\n\n".format(generate_dependency_blocks(config["conditional"]["dependencies"])))
-    if "optimized" in config:
-        condition = config["optimized"]["condition"]
-        fd.write("{}\n\n{}\n\n{}\n\n".format(condition["before"],
-            generate_dependency_blocks(config["optimized"]["dependencies"]),
-            condition["else"]))
+    if "unoptimized" in config:
+        nguard = config["unoptimized"]["nguard"]
+        fd.write("#ifndef {}\n\n".format(nguard))
         for var in sorted(expand_dependencies(config["unoptimized"]["dependencies"])):
             fd.write("{}\n\n".format(generate_define(var)))
-        fd.write("{}\n\n".format(condition["after"]))
+        fd.write("#endif // {}\n\n".format(nguard))
     fd.write("#endif // {}\n".format(guard))
 
 def main():

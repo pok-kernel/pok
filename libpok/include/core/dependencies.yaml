@@ -23,11 +23,7 @@ deployment:
         before: "#if defined POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE && defined GENERATED_CODE_PATH"
         after: "#endif // POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE && GENERATED_CODE_PATH"
 
-optimized:
-    condition:
-        before: "#ifdef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE"
-        else: "#else // POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE"
-        after: "#endif // POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE"
+conditional:
     dependencies:
         libc_stdio:
             config_funcs: [printf, vprintf, getchar]
@@ -68,6 +64,7 @@ optimized:
             funcs: [time_get]
 
 unoptimized:
+    nguard: "POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE"
     dependencies:
         needs: [semaphore, ports_queuing, buffers, blackboards, semaphores, allocator]
         config_funcs: [memset, memcmp, strcmp, strncmp, strcpy, strncpy, itoa, atoi, udivdi3, umoddi3,

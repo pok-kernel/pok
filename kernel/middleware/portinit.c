@@ -23,7 +23,6 @@ extern pok_port_t pok_ports[POK_CONFIG_NB_PORTS];
 void pok_port_init(void) {
   uint8_t i;
 
-#if defined(POK_NEEDS_DEBUG) || defined(POK_NEEDS_ERROR_HANDLING)
   for (i = 0; i < POK_CONFIG_NB_PORTS; i++) {
     if ((((uint8_t[])POK_CONFIG_PARTITIONS_PORTS)[i]) >=
         POK_CONFIG_NB_PARTITIONS) {
@@ -31,12 +30,9 @@ void pok_port_init(void) {
       printf("Invalid configuration, port %d owned by an unknown partition\n",
              i);
 #endif
-#ifdef POK_NEEDS_ERROR_HANDLING
       pok_kernel_error(POK_ERROR_KIND_KERNEL_CONFIG);
-#endif
     }
   }
-#endif
 
   for (i = 0; i < POK_CONFIG_NB_PORTS; i++) {
     pok_ports[i].size = 0;

@@ -14,8 +14,6 @@
 
 #include <core/dependencies.h>
 
-#ifdef POK_NEEDS_ERROR_HANDLING
-
 #include <errno.h>
 #include <types.h>
 
@@ -68,5 +66,3 @@ void pok_error_raise_application_error(char *msg, uint32_t msg_size);
  * was not registered or if nothing was detected
  */
 pok_ret_t pok_error_get(pok_error_status_t *status);
-
-#endif

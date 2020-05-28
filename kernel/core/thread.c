@@ -78,16 +78,12 @@ void pok_thread_init(void) {
     total_threads = total_threads + pok_partitions[j].nthreads;
   }
 
-#if defined(POK_NEEDS_DEBUG) || defined(POK_NEEDS_ERROR_HANDLING)
   if (total_threads != (POK_CONFIG_NB_THREADS - 2)) {
 #ifdef POK_NEEDS_DEBUG
     printf("Error in configuration, bad number of threads\n");
 #endif
-#ifdef POK_NEEDS_ERROR_HANDLING
     pok_kernel_error(POK_ERROR_KIND_KERNEL_CONFIG);
-#endif
   }
-#endif
 
   pok_threads[KERNEL_THREAD].priority = pok_sched_get_priority_min(0);
   pok_threads[KERNEL_THREAD].base_priority = pok_sched_get_priority_min(0);
@@ -140,9 +136,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   uint32_t id = pok_partitions[partition_id].thread_index_low +
                 pok_partitions[partition_id].thread_index;
   if (id >= pok_partitions[partition_id].thread_index_high) {
-#ifdef POK_NEEDS_ERROR_HANDLING
     POK_ERROR_CURRENT_PARTITION(POK_ERROR_KIND_PARTITION_CONFIGURATION);
-#endif
     return POK_ERRNO_TOOMANY;
   }
 
@@ -239,15 +233,12 @@ pok_ret_t pok_thread_sleep_until(uint32_t us) {
 }
 #endif
 
-#if defined(POK_NEEDS_THREAD_SUSPEND) || defined(POK_NEEDS_ERROR_HANDLING)
 pok_ret_t pok_thread_suspend(void) {
   pok_sched_stop_self();
   pok_sched();
   return POK_ERRNO_OK;
 }
-#endif
 
-#ifdef POK_NEEDS_ERROR_HANDLING
 pok_ret_t pok_thread_restart(const uint32_t tid) {
   /**
    * Reinit timing values
@@ -275,7 +266,6 @@ pok_ret_t pok_thread_restart(const uint32_t tid) {
 
   return POK_ERRNO_OK;
 }
-#endif
 
 pok_ret_t pok_thread_delayed_start(const uint32_t id, const uint32_t us) {
   uint64_t ns = 1000 * ((uint64_t)us);

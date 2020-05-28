@@ -14,7 +14,6 @@
 
 #include <core/dependencies.h>
 
-#ifdef POK_NEEDS_ERROR_HANDLING
 #include <core/error.h>
 #include <core/time.h>
 #include <types.h>
@@ -41,4 +40,3 @@ void pok_error_log(const uint32_t error_id, const uint32_t thread_id) {
 
   pok_error_nb_reported++;
 }
-#endif

@@ -84,23 +84,7 @@ void pok_loader_load_partition(const uint8_t part_id, uint32_t offset,
   }
 
   if (pok_partitions[part_id].size < part_sizes[part_id]) {
-#ifdef POK_NEEDS_ERROR_HANDLING
     pok_partition_error(part_id, POK_ERROR_KIND_PARTITION_CONFIGURATION);
-#else
-#ifdef POK_NEEDS_DEBUG
-    /* We consider that even if errors are not raised, we must print an error
-     * for such error
-     * So, when we are using the debug mode, we print a fatal error.
-     */
-#include <core/debug.h>
-#include <libc.h>
-    printf("Declared size for partition %d : %d\n", part_id,
-           pok_partitions[part_id].size);
-    printf("Real size for partition %d     : %d\n", part_id,
-           part_sizes[part_id]);
-    pok_fatal("Partition size is not correct\n");
-#endif
-#endif
   }
   /*
    *  FIXME : current debug session about exceptions-handled

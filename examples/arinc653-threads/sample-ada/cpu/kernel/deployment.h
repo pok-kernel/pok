@@ -35,8 +35,6 @@
 
 #define POK_NEEDS_CONSOLE 1
 
-#define POK_NEEDS_ERROR_HANDLING 1
-
 #define POK_NEEDS_DEBUG 1
 
 /*  If you want to activate DEBUG mode, uncomment previous line*/

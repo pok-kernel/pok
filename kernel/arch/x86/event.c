@@ -28,9 +28,7 @@ idt_entry_t pok_idt[IDT_SIZE];
 pok_ret_t pok_event_init() {
   pok_idt_init();
 
-#if defined(POK_NEEDS_DEBUG) || defined(POK_NEEDS_ERROR_HANDLING)
   pok_exception_init();
-#endif
 
   pok_syscall_init();
 

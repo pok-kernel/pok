@@ -12,8 +12,6 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-#ifdef POK_NEEDS_ERROR_HANDLING
-
 #include <core/error.h>
 #include <core/syscall.h>
 #include <core/thread.h>
@@ -27,5 +25,3 @@ pok_ret_t pok_error_handler_create() {
   return (pok_syscall2(POK_SYSCALL_ERROR_HANDLER_CREATE, stack_size,
                        (uint32_t)&pok_error_handler_worker));
 }
-
-#endif

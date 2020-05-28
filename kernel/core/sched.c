@@ -84,7 +84,6 @@ void pok_sched_thread_switch(void);
  */
 
 void pok_sched_init(void) {
-#if defined(POK_NEEDS_ERROR_HANDLING) || defined(POK_NEEDS_DEBUG)
   /*
    * We check that the total time of time frame
    * corresponds to the sum of each slot
@@ -102,11 +101,8 @@ void pok_sched_init(void) {
 #ifdef POK_NEEDS_DEBUG
     printf("Major frame is not compliant with all time slots\n");
 #endif
-#ifdef POK_NEEDS_ERROR_HANDLING
     pok_kernel_error(POK_ERROR_KIND_KERNEL_CONFIG);
-#endif
   }
-#endif
 
   pok_sched_current_slot = 0;
   pok_sched_next_major_frame = POK_CONFIG_SCHEDULING_MAJOR_FRAME;
@@ -224,33 +220,26 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
   switch (new_partition->mode) {
   case POK_PARTITION_MODE_INIT_COLD:
   case POK_PARTITION_MODE_INIT_WARM:
-#ifdef POK_NEEDS_ERROR_HANDLING
     if ((new_partition->thread_error != 0) &&
         (pok_threads[new_partition->thread_error].state != POK_STATE_STOPPED)) {
       elected = new_partition->thread_error;
     } else {
       elected = new_partition->thread_main;
     }
-#endif
 
     elected = new_partition->thread_main;
     break;
 
   case POK_PARTITION_MODE_NORMAL:
-#ifdef POK_NEEDS_ERROR_HANDLING
     if ((new_partition->current_thread == new_partition->thread_error) &&
         (pok_threads[new_partition->current_thread].state ==
          POK_STATE_RUNNABLE)) {
       elected = new_partition->thread_error;
       break;
     }
-#endif
     if ((POK_SCHED_CURRENT_THREAD != IDLE_THREAD) &&
-        (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_main)
-#ifdef POK_NEEDS_ERROR_HANDLING
-        && (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_error)
-#endif
-    ) {
+        (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_main) &&
+        (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_error)) {
       if (POK_CURRENT_THREAD.remaining_time_capacity > 0) {
         POK_CURRENT_THREAD.remaining_time_capacity =
             POK_CURRENT_THREAD.remaining_time_capacity - 1;
@@ -534,12 +523,10 @@ void pok_sched_lock_current_thread_timed(const uint64_t time) {
 }
 #endif
 
-#ifdef POK_NEEDS_SCHED_STOP_SELF
 void pok_sched_stop_self(void) {
   POK_CURRENT_THREAD.state = POK_STATE_STOPPED;
   pok_sched();
 }
-#endif
 
 void pok_sched_stop_thread(const uint32_t tid) {
   pok_threads[tid].state = POK_STATE_STOPPED;
@@ -558,7 +545,6 @@ pok_ret_t pok_sched_end_period() {
   return POK_ERRNO_OK;
 }
 
-#ifdef POK_NEEDS_ERROR_HANDLING
 void pok_sched_activate_error_thread(void) {
   uint32_t error_thread = pok_partitions[pok_current_partition].thread_error;
   if (error_thread != 0) {
@@ -571,13 +557,10 @@ void pok_sched_activate_error_thread(void) {
     pok_sched_context_switch(error_thread);
   }
 }
-#endif // POK_NEEDS_ERROR_HANDLING
 
 uint32_t pok_sched_get_current(uint32_t *thread_id) {
-#if defined(POK_NEEDS_ERROR_HANDLING)
   if (pok_partitions[pok_current_partition].thread_error == 0)
     return POK_ERRNO_THREAD;
-#endif
   if (KERNEL_THREAD == POK_SCHED_CURRENT_THREAD ||
       IDLE_THREAD == POK_SCHED_CURRENT_THREAD) {
     return POK_ERRNO_THREAD;

@@ -16,9 +16,5 @@ domain: kernel
 
 conditional:
     dependencies:
-        error_handling:
-            needs: [sched_stop_self]
-        thread_suspend:
-            needs: [sched_stop_self]
         assert:
             needs: [shutdown, debug]

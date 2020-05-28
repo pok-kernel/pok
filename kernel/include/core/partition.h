@@ -92,24 +92,20 @@ typedef struct {
   uint32_t thread_index_high; /**< The high index in the threads table */
   uint32_t thread_index;      /**< The thread index */
 
-#if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_ERROR_HANDLING)
   uint8_t lockobj_index_low;  /**< The low bound in the lockobject array. */
   uint8_t lockobj_index_high; /**< The high bound in the lockobject array */
   uint8_t
       nlockobjs; /**< The amount of lockobjects reserved for the partition */
-#endif
 
 #ifdef POK_NEEDS_SCHED_HFPPS
   uint64_t payback; /**< Payback for HFPPS scheduling algorithm */
 #endif              /* POK_NEEDS_SCHED_HFPPS */
 
-#ifdef POK_NEEDS_ERROR_HANDLING
   uint32_t thread_error; /**< The thread identifier used for error handling */
   pok_error_status_t
-      error_status; /**< A pointer used to store information about errors */
-#endif
-  uint32_t thread_main;       /**< The thread identifier of the main thread
-                                 (initialization thread) */
+      error_status;     /**< A pointer used to store information about errors */
+  uint32_t thread_main; /**< The thread identifier of the main thread
+                           (initialization thread) */
   uint32_t thread_main_entry; /**< The entry-point of the main thread (useful
                                  for re-init) */
   pok_partition_mode_t mode;  /**< Current mode of the partition */

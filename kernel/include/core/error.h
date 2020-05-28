@@ -12,8 +12,6 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-#ifdef POK_NEEDS_ERROR_HANDLING
-
 #ifndef __POK_CORE_ERROR_H__
 #define __POK_CORE_ERROR_H__
 
@@ -63,7 +61,5 @@ void pok_error_raise_application_error(char *msg, uint32_t msg_size);
 pok_ret_t pok_error_get(pok_error_status_t *status);
 #define POK_ERROR_CURRENT_PARTITION(error)                                     \
   pok_partition_error(pok_current_partition, error);
-
-#endif
 
 #endif

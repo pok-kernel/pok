@@ -12,8 +12,8 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-#if defined(POK_NEEDS_ERROR_HANDLING) &&                                       \
-    (!defined(POK_USE_GENERATED_ERROR_HANDLER))
+#ifndef POK_USE_GENERATED_ERROR_HANDLER
+
 #include <core/error.h>
 #include <core/partition.h>
 #include <core/thread.h>
@@ -53,4 +53,4 @@ void pok_error_handler_worker() {
   pok_partition_set_mode(POK_PARTITION_MODE_STOPPED);
 }
 
-#endif
+#endif // !POK_USE_GENERATED_ERROR_HANDLER

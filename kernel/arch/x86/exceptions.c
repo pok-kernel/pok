@@ -17,8 +17,6 @@
  * \author     Julian Pidancet
  */
 
-#if defined(POK_NEEDS_DEBUG) || defined(POK_NEEDS_ERROR_HANDLING)
-
 #include "event.h"
 #include <arch.h>
 #include <core/debug.h>
@@ -83,22 +81,8 @@ pok_ret_t pok_exception_init() {
   return (POK_ERRNO_OK);
 }
 
-#if defined(POK_NEEDS_DEBUG) && !defined(POK_NEEDS_ERROR_HANDLING)
-static void dump_registers(interrupt_frame *frame) {
-  printf("ES: %x, DS: %x\n", frame->es, frame->ds);
-  printf("CS: %x, SS: %x\n", frame->cs, frame->ss);
-  printf("EDI: %x, ESI: %x\n", frame->edi, frame->esi);
-  printf("EBP: %x, ESP: %x\n", frame->ebp, frame->esp);
-  printf("EAX: %x, ECX: %x\n", frame->eax, frame->ecx);
-  printf("EDX: %x, EBX: %x\n", frame->edx, frame->ebx);
-  printf("EIP: %x, ErrorCode: %x\n", frame->eip, frame->error);
-  printf("EFLAGS: %x\n\n", frame->eflags);
-}
-#endif
-
 INTERRUPT_HANDLER(exception_divide_error) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise divide by zero error, current thread=%d\n",
@@ -107,14 +91,10 @@ INTERRUPT_HANDLER(exception_divide_error) {
 
   pok_error_declare(POK_ERROR_KIND_NUMERIC_ERROR);
   pok_sched_activate_error_thread();
-#else
-  pok_fatal("Divide error");
-#endif
 }
 
 INTERRUPT_HANDLER(exception_debug) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise debug fault\n");
@@ -122,18 +102,10 @@ INTERRUPT_HANDLER(exception_debug) {
 
   pok_error_declare(POK_ERROR_KIND_ILLEGAL_REQUEST);
   pok_sched_activate_error_thread();
-#else
-
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Debug fault");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_nmi) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception NMI fault\n");
@@ -141,18 +113,10 @@ INTERRUPT_HANDLER(exception_nmi) {
 
   pok_error_declare(POK_ERROR_KIND_ILLEGAL_REQUEST);
   pok_sched_activate_error_thread();
-#else
-
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("NMI Interrupt");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_breakpoint) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception breakpoint fault\n");
@@ -160,17 +124,10 @@ INTERRUPT_HANDLER(exception_breakpoint) {
 
   pok_error_declare(POK_ERROR_KIND_ILLEGAL_REQUEST);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Breakpoint");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_overflow) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception overflow fault\n");
@@ -178,17 +135,10 @@ INTERRUPT_HANDLER(exception_overflow) {
 
   pok_error_declare(POK_ERROR_KIND_STACK_OVERFLOW);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Overflow");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_boundrange) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception bound range fault\n");
@@ -196,17 +146,10 @@ INTERRUPT_HANDLER(exception_boundrange) {
 
   pok_error_declare(POK_ERROR_KIND_STACK_OVERFLOW);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Bound range exceded");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_invalidopcode) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception invalid opcode fault, current thread: %d\n",
@@ -215,17 +158,10 @@ INTERRUPT_HANDLER(exception_invalidopcode) {
 
   pok_error_declare(POK_ERROR_KIND_ILLEGAL_REQUEST);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Invalid Opcode");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_nomath_coproc) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception no math coprocessor fault\n");
@@ -233,19 +169,10 @@ INTERRUPT_HANDLER(exception_nomath_coproc) {
 
   pok_error_declare(POK_ERROR_KIND_ILLEGAL_REQUEST);
   pok_sched_activate_error_thread();
-#else
-
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Invalid No Math Coprocessor");
-#endif
-
-#endif
 }
 
 INTERRUPT_HANDLER_errorcode(exception_doublefault) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception double fault\n");
@@ -253,17 +180,10 @@ INTERRUPT_HANDLER_errorcode(exception_doublefault) {
 
   pok_partition_error(POK_SCHED_CURRENT_PARTITION,
                       POK_ERROR_KIND_PARTITION_HANDLER);
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Double Fault");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_copseg_overrun) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception copseg overrun fault\n");
@@ -271,17 +191,10 @@ INTERRUPT_HANDLER(exception_copseg_overrun) {
 
   pok_error_declare(POK_ERROR_KIND_MEMORY_VIOLATION);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Coprocessur Segment Overrun");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER_errorcode(exception_invalid_tss) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception invalid tss fault\n");
@@ -289,17 +202,10 @@ INTERRUPT_HANDLER_errorcode(exception_invalid_tss) {
 
   pok_error_declare(POK_ERROR_KIND_MEMORY_VIOLATION);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Invalid TSS");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER_errorcode(exception_segment_not_present) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception segment not present fault %d\n",
@@ -308,17 +214,10 @@ INTERRUPT_HANDLER_errorcode(exception_segment_not_present) {
 
   pok_error_declare(POK_ERROR_KIND_MEMORY_VIOLATION);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Segment Not Present");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER_errorcode(exception_stackseg_fault) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception stack segment fault\n");
@@ -326,17 +225,10 @@ INTERRUPT_HANDLER_errorcode(exception_stackseg_fault) {
 
   pok_error_declare(POK_ERROR_KIND_MEMORY_VIOLATION);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Stack-Segment Fault");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER_errorcode(exception_general_protection) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf(
@@ -346,34 +238,20 @@ INTERRUPT_HANDLER_errorcode(exception_general_protection) {
 
   pok_error_declare(POK_ERROR_KIND_ILLEGAL_REQUEST);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("General Protection Fault");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER_errorcode(exception_pagefault) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception pagefault fault\n");
 #endif
 
   pok_error_declare(POK_ERROR_KIND_MEMORY_VIOLATION);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Page Fault");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_fpu_fault) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception FPU fault\n");
@@ -381,17 +259,10 @@ INTERRUPT_HANDLER(exception_fpu_fault) {
 
   pok_error_declare(POK_ERROR_KIND_HARDWARE_FAULT);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Floating Point Exception");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER_errorcode(exception_alignement_check) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception alignment fault\n");
@@ -399,17 +270,10 @@ INTERRUPT_HANDLER_errorcode(exception_alignement_check) {
 
   pok_error_declare(POK_ERROR_KIND_HARDWARE_FAULT);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("Bad alignement");
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_machine_check) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception machine check fault\n");
@@ -417,17 +281,10 @@ INTERRUPT_HANDLER(exception_machine_check) {
 
   pok_error_declare(POK_ERROR_KIND_HARDWARE_FAULT);
   pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-  pok_fatal("Machine check error");
-  dump_registers(frame);
-#endif
-#endif
 }
 
 INTERRUPT_HANDLER(exception_simd_fault) {
   (void)frame;
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 #ifdef POK_NEEDS_DEBUG
   printf("[KERNEL] Raise exception SIMD fault\n");
@@ -435,14 +292,4 @@ INTERRUPT_HANDLER(exception_simd_fault) {
 
   pok_error_declare(POK_ERROR_KIND_HARDWARE_FAULT);
   pok_sched_activate_error_thread();
-#else
-
-#ifdef POK_NEEDS_DEBUG
-  dump_registers(frame);
-  pok_fatal("SIMD Fault");
-#endif
-
-#endif
 }
-
-#endif

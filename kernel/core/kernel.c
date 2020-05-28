@@ -12,8 +12,6 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-#ifdef POK_NEEDS_ERROR_HANDLING
-
 void pok_kernel_restart(void) {
   /*
    * Needs to be implemented
@@ -25,4 +23,3 @@ void pok_kernel_stop(void) {
    * Needs to be implemented
    */
 }
-#endif

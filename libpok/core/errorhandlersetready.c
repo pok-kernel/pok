@@ -12,7 +12,6 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-#ifdef POK_NEEDS_ERROR_HANDLING
 #include <core/error.h>
 #include <core/partition.h>
 #include <core/syscall.h>
@@ -21,5 +20,3 @@
 pok_ret_t pok_error_handler_set_ready(const pok_error_status_t *status) {
   return pok_syscall2(POK_SYSCALL_ERROR_HANDLER_SET_READY, (uint32_t)status, 0);
 }
-
-#endif

@@ -167,11 +167,9 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
     return pok_sched_end_period();
     break;
 
-#if defined(POK_NEEDS_THREAD_SUSPEND) || defined(POK_NEEDS_ERROR_HANDLING)
   case POK_SYSCALL_THREAD_SUSPEND:
     return pok_thread_suspend();
     break;
-#endif
 
 #ifdef POK_NEEDS_THREAD_ID
   case POK_SYSCALL_THREAD_ID:
@@ -203,12 +201,6 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
     return pok_thread_suspend_target(args->arg1);
     break;
 
-#ifdef POK_NEEDS_ERROR_HANDLING
-
-    /**
-     * We consider that we don't need the THREAD_RESTART
-     * syscall if we don't handle errors
-     */
   case POK_SYSCALL_THREAD_RESTART:
     return pok_partition_restart_thread(args->arg1);
     break;
@@ -224,8 +216,6 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
     pok_sched_stop_self();
     return POK_ERRNO_OK;
     break;
-
-#endif
 
   case POK_SYSCALL_PARTITION_SET_MODE:
     return pok_partition_set_mode_current((pok_partition_mode_t)args->arg1);
@@ -279,7 +269,6 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
         (pok_start_condition_t *)(args->arg1 + infos->base_addr));
     break;
 
-#ifdef POK_NEEDS_ERROR_HANDLING
   case POK_SYSCALL_ERROR_HANDLER_CREATE:
     return pok_error_thread_create(args->arg1, (void *)(args->arg2));
     break;
@@ -298,7 +287,6 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
 
     return pok_error_get((pok_error_status_t *)(args->arg1 + infos->base_addr));
     break;
-#endif
 
     /* Middleware syscalls */
 #ifdef POK_NEEDS_PORTS_SAMPLING
@@ -548,15 +536,8 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
    * in kernel of partitions, calling the error handler.
    */
   default:
-#ifdef POK_NEEDS_ERROR_HANDLING
     pok_error_declare(POK_ERROR_KIND_ILLEGAL_REQUEST);
     pok_sched_activate_error_thread();
-#else
-#ifdef POK_NEEDS_DEBUG
-    printf("Tried to use syscall %d\n", syscall_id);
-#endif
-    POK_FATAL("Unknown syscall");
-#endif
     break;
   }
 

@@ -12,8 +12,6 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
-#ifdef POK_NEEDS_ERROR_HANDLING
-
 #include <core/debug.h>
 #include <core/error.h>
 #include <core/partition.h>
@@ -159,5 +157,3 @@ pok_ret_t pok_error_get(pok_error_status_t *status) {
     return POK_ERRNO_UNAVAILABLE;
   }
 }
-
-#endif

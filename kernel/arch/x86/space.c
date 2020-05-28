@@ -86,7 +86,6 @@ uint32_t pok_space_context_create(uint8_t partition_id, uint32_t entry_rel,
   return ((uint32_t)sp);
 }
 
-#ifdef POK_NEEDS_ERROR_HANDLING
 void pok_space_context_restart(uint32_t sp, uint32_t entry,
                                uint32_t user_stack) {
   space_context_t *ct;
@@ -97,7 +96,6 @@ void pok_space_context_restart(uint32_t sp, uint32_t entry,
   ct->user_pc = entry;
   ct->user_sp = user_stack;
 }
-#endif
 
 void pok_dispatch_space(uint8_t partition_id, uint32_t user_pc,
                         uint32_t user_sp, uint32_t kernel_sp, uint32_t arg1,

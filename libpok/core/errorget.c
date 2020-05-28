@@ -14,8 +14,6 @@
 
 #include <core/dependencies.h>
 
-#ifdef POK_NEEDS_ERROR_HANDLING
-
 #include <core/error.h>
 #include <core/syscall.h>
 #include <types.h>
@@ -23,5 +21,3 @@
 pok_ret_t pok_error_get(pok_error_status_t *status) {
   return (pok_syscall2(POK_SYSCALL_ERROR_GET, (uint32_t)status, 0));
 }
-
-#endif

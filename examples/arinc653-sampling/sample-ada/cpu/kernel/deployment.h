@@ -37,8 +37,6 @@
 /*  the distributed system. This identifier is unique for each nodeIn this */
 /*  case, this identifier was deduced from thecpu processor component.*/
 
-#define POK_NEEDS_ERROR_HANDLING 1
-
 #define POK_NEEDS_GETTICK 1
 
 #define POK_NEEDS_DEBUG 1

@@ -79,7 +79,6 @@ void pok_partition_setup_scheduler(const uint8_t pid) {
  * and handle errors.
  */
 
-#ifdef POK_NEEDS_ERROR_HANDLING
 void pok_partition_reinit(const uint8_t pid) {
   uint32_t tmp;
   /*
@@ -93,13 +92,11 @@ void pok_partition_reinit(const uint8_t pid) {
       IDLE_THREAD; // breaks the rule of prev_thread not being idle, but it's
                    // just for init
 
-#ifdef POK_NEEDS_ERROR_HANDLING
   pok_partitions[pid].thread_error = 0;
   pok_partitions[pid].error_status.failed_thread = 0;
   pok_partitions[pid].error_status.failed_addr = 0;
   pok_partitions[pid].error_status.error_kind = POK_ERROR_KIND_INVALID;
   pok_partitions[pid].error_status.msg_size = 0;
-#endif
 
   pok_loader_load_partition(
       pid, pok_partitions[pid].base_addr - pok_partitions[pid].base_vaddr,
@@ -109,7 +106,6 @@ void pok_partition_reinit(const uint8_t pid) {
 
   pok_partition_setup_main_thread(pid);
 }
-#endif
 
 /**
  * Setup the main thread of partition with number \a pid
@@ -179,11 +175,9 @@ pok_ret_t pok_partition_init() {
     pok_partitions[i].nthreads =
         ((uint32_t[])POK_CONFIG_PARTITIONS_NTHREADS)[i];
 
-#ifdef POK_NEEDS_ERROR_HANDLING
     if (pok_partitions[i].nthreads <= 1) {
       pok_partition_error(i, POK_ERROR_KIND_PARTITION_CONFIGURATION);
     }
-#endif
 
 #ifdef POK_CONFIG_PARTITIONS_SCHEDULER
     pok_partitions[i].sched =
@@ -221,13 +215,11 @@ pok_ret_t pok_partition_init() {
     /* Initialize mutexes stuff */
 #endif
 
-#ifdef POK_NEEDS_ERROR_HANDLING
     pok_partitions[i].thread_error = 0;
     pok_partitions[i].error_status.failed_thread = 0;
     pok_partitions[i].error_status.failed_addr = 0;
     pok_partitions[i].error_status.error_kind = POK_ERROR_KIND_INVALID;
     pok_partitions[i].error_status.msg_size = 0;
-#endif
 
     pok_loader_load_partition(i, base_addr - base_vaddr, &program_entry);
     /*
@@ -325,7 +317,6 @@ pok_ret_t pok_partition_set_mode(const uint8_t pid,
      */
     break;
 
-#ifdef POK_NEEDS_ERROR_HANDLING
   case POK_PARTITION_MODE_STOPPED:
 
     /*
@@ -367,7 +358,6 @@ pok_ret_t pok_partition_set_mode(const uint8_t pid,
     pok_sched();
 
     break;
-#endif
 
   default:
     return POK_ERRNO_PARTITION_MODE;
@@ -380,13 +370,8 @@ pok_ret_t pok_partition_set_mode(const uint8_t pid,
  * Change the mode of the current partition (the partition being executed)
  */
 pok_ret_t pok_partition_set_mode_current(const pok_partition_mode_t mode) {
-#ifdef POK_NEEDS_ERROR_HANDLING
   if ((POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_main) &&
-      (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_error))
-#else
-  if (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_main)
-#endif
-  {
+      (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_error)) {
     return POK_ERRNO_THREAD;
   }
 
@@ -433,8 +418,6 @@ pok_ret_t pok_current_partition_get_start_condition(
   *start_condition = POK_CURRENT_PARTITION.start_condition;
   return POK_ERRNO_OK;
 }
-
-#ifdef POK_NEEDS_ERROR_HANDLING
 
 /**
  * Stop a thread inside a partition.
@@ -488,4 +471,3 @@ pok_ret_t pok_partition_restart_thread(const uint32_t tid) {
   pok_sched();
   return (POK_ERRNO_OK);
 }
-#endif

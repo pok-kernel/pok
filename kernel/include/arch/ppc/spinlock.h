@@ -15,9 +15,15 @@
 #ifndef __POK_SPINLOCK_H__
 #define __POK_SPINLOCK_H__
 
+#include <assert.h>
+
 typedef unsigned int pok_spinlock_t;
 
-#define SPIN_UNLOCK(_spin_) (_spin_) = 0
+#define SPIN_UNLOCK(_spin_)                                                    \
+  do {                                                                         \
+    assert(_spin_);                                                            \
+    (_spin_) = 0;                                                              \
+  } while (0)
 
 #define SPIN_LOCK(_spin_)                                                      \
   do {                                                                         \

@@ -24,3 +24,5 @@ tests: !mux
         dir: test_modulo_div_64
     test_assert:
         dir: assert
+    limit_threads:
+        dir: limit_threads

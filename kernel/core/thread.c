@@ -22,6 +22,7 @@
 #include <types.h>
 
 #include <arch.h>
+#include <assert.h>
 #include <core/debug.h>
 #include <core/error.h>
 #include <core/partition.h>
@@ -126,7 +127,6 @@ void pok_thread_init(void) {
 pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
                                       const pok_thread_attr_t *attr,
                                       const uint8_t partition_id) {
-  uint32_t id;
   uint32_t stack_vaddr;
   /**
    * We can create a thread only if the partition is in INIT mode
@@ -137,18 +137,19 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   }
 
   // TODO: this looks suspicious
-  if (pok_partitions[partition_id].thread_index >=
-      pok_partitions[partition_id].thread_index_high) {
+  uint32_t id = pok_partitions[partition_id].thread_index_low +
+                pok_partitions[partition_id].thread_index;
+  if (id >= pok_partitions[partition_id].thread_index_high) {
 #ifdef POK_NEEDS_ERROR_HANDLING
     POK_ERROR_CURRENT_PARTITION(POK_ERROR_KIND_PARTITION_CONFIGURATION);
 #endif
     return POK_ERRNO_TOOMANY;
   }
 
-  id = pok_partitions[partition_id].thread_index_low +
-       pok_partitions[partition_id].thread_index;
   pok_partitions[partition_id].thread_index =
       pok_partitions[partition_id].thread_index + 1;
+  pok_assert(id >= pok_partitions[partition_id].thread_index_low);
+  pok_assert(id < pok_partitions[partition_id].thread_index_high);
 
   if ((attr->priority <=
        pok_sched_get_priority_max(pok_partitions[partition_id].sched)) &&

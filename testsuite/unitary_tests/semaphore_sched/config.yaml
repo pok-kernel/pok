@@ -41,7 +41,7 @@ partitions:
       objects: ["main.o"]
 
 kernel:
-    features: ["debug"]
+    features: [assert, debug]
     scheduler:
         slots:
             - partition: pr1

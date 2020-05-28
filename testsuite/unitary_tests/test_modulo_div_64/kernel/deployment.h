@@ -21,6 +21,7 @@
 #define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION                                 \
   { 0 }
 
+#define POK_NEEDS_ASSERT 1
 #define POK_NEEDS_CONSOLE 1
 #define POK_NEEDS_DEBUG 1
 #define POK_NEEDS_SHUTDOWN 1

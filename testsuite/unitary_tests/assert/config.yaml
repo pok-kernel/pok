@@ -24,6 +24,7 @@ partitions:
       objects: ["main.o"]
 
 kernel:
+    features: [assert]
     scheduler:
         major_frame: 2s
         slots:

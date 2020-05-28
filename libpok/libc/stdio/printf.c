@@ -12,6 +12,7 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
+#include <assert.h>
 #include <core/syscall.h>
 #include <libc/stdio.h>
 #include <types.h>
@@ -38,9 +39,8 @@ struct s_file {
 };
 
 union u_arg {
-  uint32_t value;
-  uint32_t uint;
-  int sint;
+  unsigned long long uint;
+  long long sint;
   double vdouble;
   void *ptr;
 };
@@ -81,7 +81,7 @@ static void close_buffered_output(struct s_file *file) { my_fflush(file); }
  * formatting functions
  */
 
-static int conv(uint32_t n, int base, int dig[]) {
+static int conv(unsigned long long int n, int base, int dig[]) {
   int i = 0;
 
   while (n) {
@@ -92,8 +92,8 @@ static int conv(uint32_t n, int base, int dig[]) {
   return i - 1;
 }
 
-static int my_printnbr_base(uint32_t n, const char base[], int card,
-                            struct s_file *file) {
+static int my_printnbr_base(unsigned long long int n, const char base[],
+                            int card, struct s_file *file) {
   int digits[96];
   int i;
   int count;
@@ -130,7 +130,7 @@ static int print_int(union u_arg *value, struct s_file *file, int flags) {
 
 static int print_float(union u_arg *value, struct s_file *file, int flags) {
   int floor = value->vdouble;
-  uint32_t fractional = 0;
+  unsigned long int fractional = 0;
   int res = 0;
   int precision = 0;
   int decimal = 10;
@@ -209,32 +209,115 @@ static int special_char(char fmt, union u_arg *value, struct s_file *file) {
  * finally, printf
  */
 
+typedef enum {
+  SIZE_INT,
+  SIZE_LONG,
+  SIZE_LONG_LONG,
+  SIZE_SHORT,
+  SIZE_CHAR
+} integer_size_t;
+
+static integer_size_t check_size_modifier(const char **format) {
+  switch (**format) {
+  case 'h':
+    if (*++(*format) == 'h') {
+      (*format)++;
+      return SIZE_CHAR;
+    }
+    return SIZE_SHORT;
+
+  case 'l':
+    if (*++*format == 'l') {
+      (*format)++;
+      return SIZE_LONG_LONG;
+    }
+    return SIZE_LONG;
+
+  default:
+    return SIZE_INT;
+  }
+}
+
 int vprintf(const char *format, va_list args) {
-  struct s_file *file;
-  union u_arg arg;
-  int count;
+  struct s_file *file = init_buffered_output();
+  int count = 0;
 
-  count = 0;
-  arg.uint = 0;
-
-  for (file = init_buffered_output(); *format;
-       format += (*format == '%' ? 2 : 1)) {
+  for (; *format; format += 1) {
     if (*format == '%') {
       if (!*(format + 1)) {
         break;
       }
-      if (*(format + 1) != '%') {
-        switch (*(format + 1)) {
+      if (*++format != '%') {
+        union u_arg arg;
+        integer_size_t size = check_size_modifier(&format);
+        switch (*format) {
         case 'f':
           arg.vdouble = va_arg(args, double);
           break;
 
-        default:
-          arg.value = va_arg(args, uint32_t);
+        case 'd':
+        case 'i':
+          switch (size) {
+          case SIZE_LONG_LONG:
+            arg.sint = va_arg(args, long long);
+            break;
+          case SIZE_LONG:
+            arg.sint = va_arg(args, long);
+            break;
+          case SIZE_INT:
+            arg.sint = va_arg(args, int);
+            break;
+          case SIZE_SHORT:
+            arg.sint = (short)va_arg(args, int);
+            break;
+          case SIZE_CHAR:
+            arg.sint = (char)va_arg(args, int);
+            break;
+          }
           break;
+        case 'o':
+        case 'u':
+        case 'x':
+          switch (size) {
+          case SIZE_LONG_LONG:
+            arg.uint = va_arg(args, unsigned long long);
+            break;
+          case SIZE_LONG:
+            arg.uint = va_arg(args, unsigned long);
+            break;
+          case SIZE_INT:
+            arg.uint = va_arg(args, unsigned);
+            break;
+          case SIZE_SHORT:
+            arg.uint = (unsigned short)va_arg(args, unsigned int);
+            break;
+          case SIZE_CHAR:
+            arg.uint = (unsigned char)va_arg(args, unsigned int);
+            break;
+          }
+          break;
+        case 'c':
+          arg.sint = va_arg(args, int);
+          break;
+        case 's':
+          arg.ptr = va_arg(args, char *);
+          break;
+        default:
+#ifdef POK_NEEDS_ASSERT
+          // Unknown format specifier in kernel, this should not happen.
+          assert(0);
+#else
+          // If assertions are not enabled, continue as if nothing happened.
+          my_putc(*format, file);
+          ++count;
+          continue;
+#endif // POK_NEEDS_ASSERT
         }
+        count += special_char(*format, &arg, file);
+      } else {
+        my_putc(*format, file);
+        ++count;
       }
-      count += special_char(*(format + 1), &arg, file);
     } else {
       my_putc(*format, file);
       ++count;

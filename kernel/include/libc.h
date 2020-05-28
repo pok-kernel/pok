@@ -29,7 +29,7 @@ int strncmp(const char *s1, const char *s2, size_t size);
 
 #if defined(POK_NEEDS_CONSOLE) || defined(POK_NEEDS_DEBUG) ||                  \
     defined(POK_NEEDS_INSTRUMENTATION) || defined(POK_NEEDS_COVERAGE_INFOS)
-int printf(const char *format, ...);
+int printf(const char *format, ...) __attribute__((format(printf, 1, 2)));
 #endif /* NEEDS_CONSOLE or NEEDS_DEBUG */
 
 #endif

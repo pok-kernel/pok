@@ -20,10 +20,10 @@ _core_entry:
 
 	/* Enable SSE instruction set */
 	mov %cr0, %eax
-	andw $0xFFFB, %eax
+	andb $0xFB, %al
 	mov %eax, %cr0
 	mov %cr4, %eax
-	or $(3 << 9), %eax
+	orw $(3 << 9), %ax
 	mov %eax, %cr4
 
 	/* Set EFLAGS to 0 */

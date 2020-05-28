@@ -148,8 +148,8 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
 
   pok_partitions[partition_id].thread_index =
       pok_partitions[partition_id].thread_index + 1;
-  pok_assert(id >= pok_partitions[partition_id].thread_index_low);
-  pok_assert(id < pok_partitions[partition_id].thread_index_high);
+  assert(id >= pok_partitions[partition_id].thread_index_low);
+  assert(id < pok_partitions[partition_id].thread_index_high);
 
   if ((attr->priority <=
        pok_sched_get_priority_max(pok_partitions[partition_id].sched)) &&

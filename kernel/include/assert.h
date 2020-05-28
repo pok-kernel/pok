@@ -17,15 +17,15 @@
 
 #ifdef POK_NEEDS_ASSERT
 
-void __pok_assert_failed(const char *assertion, const char *file,
-                         unsigned int line, const char *function);
-#define pok_assert(expr)                                                       \
+void __assert_failed(const char *assertion, const char *file, unsigned int line,
+                     const char *function);
+#define assert(expr)                                                           \
   ((expr) ? ((void)0)                                                          \
-          : __pok_assert_failed(#expr, __FILE__, __LINE__, __FUNCTION__))
+          : __assert_failed(#expr, __FILE__, __LINE__, __FUNCTION__))
 
 #else
 
-#define pok_assert(expr) ((void)0)
+#define assert(expr) ((void)0)
 
 #endif /* POK_NEEDS_ASSERT */
 #endif /* POK_ASSERT_H */

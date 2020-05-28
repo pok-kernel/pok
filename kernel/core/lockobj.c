@@ -174,7 +174,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
   }
 
   if (pok_lockobj_unlock(obj, NULL)) {
-    pok_assert(obj->eventspin);
+    assert(obj->eventspin);
     SPIN_UNLOCK(obj->eventspin);
     return POK_ERRNO_UNAVAILABLE;
   }
@@ -187,7 +187,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
     pok_sched_lock_current_thread();
   }
 
-  pok_assert(obj->eventspin);
+  assert(obj->eventspin);
   SPIN_UNLOCK(obj->eventspin);
   pok_sched();
   obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
@@ -195,7 +195,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
   ret = pok_lockobj_lock(obj, NULL);
 
   if (ret != POK_ERRNO_OK) {
-    pok_assert(obj->eventspin);
+    assert(obj->eventspin);
     SPIN_UNLOCK(obj->eventspin);
     return ret;
   }
@@ -207,7 +207,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
     ret = POK_ERRNO_OK;
   }
 
-  pok_assert(obj->eventspin);
+  assert(obj->eventspin);
   SPIN_UNLOCK(obj->eventspin);
 
   return ret;
@@ -223,12 +223,12 @@ pok_ret_t pok_lockobj_eventsignal(pok_lockobj_t *obj) {
 
     if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT) {
       pok_sched_unlock_thread(tmp);
-      pok_assert(obj->eventspin);
+      assert(obj->eventspin);
       SPIN_UNLOCK(obj->eventspin);
       return POK_ERRNO_OK;
     }
   }
-  pok_assert(obj->eventspin);
+  assert(obj->eventspin);
   SPIN_UNLOCK(obj->eventspin);
   return POK_ERRNO_NOTFOUND;
 }
@@ -246,7 +246,7 @@ pok_ret_t pok_lockobj_eventbroadcast(pok_lockobj_t *obj) {
     }
   }
 
-  pok_assert(obj->eventspin);
+  assert(obj->eventspin);
   SPIN_UNLOCK(obj->eventspin);
 
   return POK_ERRNO_OK;
@@ -265,7 +265,7 @@ pok_ret_t pok_lockobj_lock(pok_lockobj_t *obj,
   if ((obj->current_value > 0) &&
       (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_UNLOCK)) {
     obj->current_value--;
-    pok_assert(obj->eventspin);
+    assert(obj->eventspin);
     SPIN_UNLOCK(obj->spin);
   } else {
     /*
@@ -284,7 +284,7 @@ pok_ret_t pok_lockobj_lock(pok_lockobj_t *obj,
         pok_sched_lock_current_thread_timed(timeout);
         if (POK_GETTICK() >= timeout) {
           obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
-          pok_assert(obj->eventspin);
+          assert(obj->eventspin);
           SPIN_UNLOCK(obj->spin);
           return POK_ERRNO_TIMEOUT;
         }
@@ -292,14 +292,14 @@ pok_ret_t pok_lockobj_lock(pok_lockobj_t *obj,
         pok_sched_lock_current_thread();
       }
 
-      pok_assert(obj->eventspin);
+      assert(obj->eventspin);
       SPIN_UNLOCK(obj->spin);
       pok_sched(); /* reschedule baby, reschedule !! */
       SPIN_LOCK(obj->spin);
     }
 
     obj->current_value--;
-    pok_assert(obj->eventspin);
+    assert(obj->eventspin);
     SPIN_UNLOCK(obj->spin);
     pok_sched_unlock_thread(POK_SCHED_CURRENT_THREAD);
   }
@@ -341,7 +341,7 @@ pok_ret_t pok_lockobj_unlock(pok_lockobj_t *obj,
   } while ((res != POK_SCHED_CURRENT_THREAD));
 
   obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
-  pok_assert(obj->eventspin);
+  assert(obj->eventspin);
   SPIN_UNLOCK(obj->spin);
 
   return POK_ERRNO_OK;

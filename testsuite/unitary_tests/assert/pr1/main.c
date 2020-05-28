@@ -15,8 +15,8 @@
 #include <assert.h>
 
 int main() {
-  pok_assert(1);
-  pok_assert(2 == 3);
+  assert(1);
+  assert(2 == 3);
 
   return 0;
 }

@@ -18,6 +18,14 @@ _core_entry:
 	movl $(pok_stack + STACK_SIZE - 4), %ebp
 	movl %ebp, %esp
 
+	/* Enable SSE instruction set */
+	mov %cr0, %eax
+	andw $0xFFFB, %eax
+	mov %eax, %cr0
+	mov %cr4, %eax
+	or $(3 << 9), %eax
+	mov %eax, %cr4
+
 	/* Set EFLAGS to 0 */
 	pushl $0
 	popf

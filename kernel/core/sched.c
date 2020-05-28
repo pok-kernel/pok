@@ -449,19 +449,23 @@ uint32_t pok_sched_part_static(const uint32_t index_low,
       uint32_t first = 1;
       printf("--- scheduling thread %d (priority %d)\n", elected,
              pok_threads[elected].priority);
-      printf("--- ready threads:");
       for (uint32_t i = index_low; i < index_high; i++) {
         if (pok_threads[i].state == POK_STATE_RUNNABLE) {
-          printf("%s %d (%d)", first ? "" : ",", i, pok_threads[i].priority);
-          first = 0;
+          if (i != elected) {
+            printf("%s %d (%d)", first ? "    other ready: " : ",", i,
+                   pok_threads[i].priority);
+            first = 0;
+          }
         } else {
           non_ready++;
         }
       }
-      printf("\n");
+      if (!first) {
+        printf("\n");
+      }
     }
     if (non_ready) {
-      printf("--- non-ready:");
+      printf("    non-ready:");
       uint32_t first = 1;
       for (uint32_t i = index_low; i < index_high; i++) {
         if (pok_threads[i].state != POK_STATE_RUNNABLE) {

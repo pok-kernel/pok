@@ -331,10 +331,12 @@ pok_ret_t pok_lockobj_unlock(pok_lockobj_t *obj,
   res = POK_SCHED_CURRENT_THREAD;
   res = (res + 1) % (POK_CONFIG_NB_THREADS);
 
+  uint32_t needs_resched = 0;
   do {
     if (obj->thread_state[res] == LOCKOBJ_STATE_LOCK) {
       obj->thread_state[res] = LOCKOBJ_STATE_UNLOCK;
       pok_sched_unlock_thread(res);
+      needs_resched = 1;
       break;
     }
     res = (res + 1) % (POK_CONFIG_NB_THREADS);
@@ -343,6 +345,10 @@ pok_ret_t pok_lockobj_unlock(pok_lockobj_t *obj,
   obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
   assert(obj->eventspin);
   SPIN_UNLOCK(obj->spin);
+
+  if (needs_resched) {
+    pok_sched();
+  }
 
   return POK_ERRNO_OK;
 }

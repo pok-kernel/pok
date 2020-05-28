@@ -26,3 +26,5 @@ tests: !mux
         dir: assert
     limit_threads:
         dir: limit_threads
+    semaphore_sched:
+        dir: semaphore_sched

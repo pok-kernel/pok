@@ -46,8 +46,6 @@ pok_ret_t pok_arch_idle() {
   while (1) {
     asm("hlt");
   }
-
-  return (POK_ERRNO_OK);
 }
 
 pok_ret_t pok_arch_event_register(uint8_t vector, void (*handler)(void)) {

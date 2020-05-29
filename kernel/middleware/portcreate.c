@@ -67,7 +67,6 @@ pok_ret_t pok_port_create(char *name, const pok_port_size_t size,
   }
   default: {
     return POK_ERRNO_EINVAL;
-    break;
   }
   }
 

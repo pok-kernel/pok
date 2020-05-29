@@ -361,7 +361,6 @@ pok_ret_t pok_partition_set_mode(const uint8_t pid,
 
   default:
     return POK_ERRNO_PARTITION_MODE;
-    break;
   }
   return POK_ERRNO_OK;
 }

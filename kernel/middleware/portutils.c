@@ -94,7 +94,6 @@ pok_ret_t pok_port_get(const uint32_t pid, void *data,
     }
 
     return POK_ERRNO_OK;
-    break;
 #endif
 
 #ifdef POK_NEEDS_PORTS_SAMPLING
@@ -111,7 +110,6 @@ pok_ret_t pok_port_get(const uint32_t pid, void *data,
            size);
 
     return POK_ERRNO_OK;
-    break;
 #endif
 
   default:
@@ -158,8 +156,6 @@ pok_ret_t pok_port_write(const uint8_t pid, const void *data,
     pok_ports[pid].empty = FALSE;
 
     return POK_ERRNO_OK;
-
-    break;
 #endif
 
 #ifdef POK_NEEDS_PORTS_SAMPLING
@@ -176,8 +172,6 @@ pok_ret_t pok_port_write(const uint8_t pid, const void *data,
     pok_ports[pid].last_receive = POK_GETTICK();
 
     return POK_ERRNO_OK;
-
-    break;
 #endif
 
   default:

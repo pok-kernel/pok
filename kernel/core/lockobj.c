@@ -363,18 +363,15 @@ pok_ret_t pok_lockobj_partition_wrapper(const pok_lockobj_id_t id,
   case LOCKOBJ_OPERATION_LOCK:
     ret = pok_lockobj_lock(&pok_partitions_lockobjs[id], attr);
     return ret;
-    break;
 
   case LOCKOBJ_OPERATION_UNLOCK: {
     ret = pok_lockobj_unlock(&pok_partitions_lockobjs[id], attr);
     return ret;
-    break;
   }
 
   case LOCKOBJ_OPERATION_WAIT: {
     ret = pok_lockobj_eventwait(&pok_partitions_lockobjs[id], attr->time);
     return ret;
-    break;
   }
 
   case LOCKOBJ_OPERATION_SIGNAL: {

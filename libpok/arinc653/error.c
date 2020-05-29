@@ -29,35 +29,27 @@
                case DEADLINE_MISSED: \
                   *pok_error = POK_ERROR_KIND_DEADLINE_MISSED; \
                   return 1; \
-                  break; \
                case APPLICATION_ERROR: \
                   *pok_error = POK_ERROR_KIND_APPLICATION_ERROR; \
                   return 1; \
-                  break; \
                case NUMERIC_ERROR: \
                   *pok_error = POK_ERROR_KIND_NUMERIC_ERROR; \
                   return 1; \
-                  break; \
                case ILLEGAL_REQUEST: \
                   *pok_error = POK_ERROR_KIND_ILLEGAL_REQUEST; \
                   return 1; \
-                  break; \
                case STACK_OVERFLOW: \
                   *pok_error = POK_ERROR_KIND_STACK_OVERFLOW; \
                   return 1; \
-                  break; \
                case MEMORY_VIOLATION: \
                   *pok_error = POK_ERROR_KIND_MEMORY_VIOLATION; \
                   return 1; \
-                  break; \
                case HARDWARE_FAULT: \
                   *pok_error = POK_ERROR_KIND_HARDWARE_FAULT; \
                   return 1; \
-                  break; \
                case POWER_FAIL: \
                   *pok_error = POK_ERROR_KIND_POWER_FAIL; \
                   return 1; \
-                  break; \
                default: \
                   return 0; \
             }

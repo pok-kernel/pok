@@ -21,3 +21,4 @@ __pycache__/
 sizes.c
 venv
 testsuite/unitary_tests/report.xml
+generated-code/

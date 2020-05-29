@@ -62,12 +62,13 @@ void pok_debug_print_current_state() {
   printf("\n");
   printf("-------------\n");
   printf("Current thread    : %d\n", POK_SCHED_CURRENT_THREAD);
-  printf("Period            : %d\n", POK_CURRENT_THREAD.period);
-  printf("Deadline          : %d\n", POK_CURRENT_THREAD.deadline);
+  printf("Period            : %lld\n", POK_CURRENT_THREAD.period);
+  printf("Deadline          : %lld\n", POK_CURRENT_THREAD.deadline);
   printf("Partition         : %d\n", POK_CURRENT_THREAD.partition);
   printf("sp                : 0x%x\n", POK_CURRENT_THREAD.sp);
   printf("init_stack_addr   : 0x%x\n", POK_CURRENT_THREAD.init_stack_addr);
-  printf("entry             : 0x%x\n", POK_CURRENT_THREAD.entry);
+  printf("entry             : 0x%lx\n",
+         (unsigned long int)POK_CURRENT_THREAD.entry);
 }
 
 void pok_fatal(const char *message) {

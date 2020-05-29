@@ -16,7 +16,7 @@ platform: !mux
         compiler: gcc -m32 -Wall -Wextra -Werror -O3
     x86_clang:
         qemu: qemu-system-i386
-        compiler: clang -m32 -Wall -Wextra -Werror -O3
+        compiler: clang -m32 -Wall -Wextra -Werror -Wunreachable-code-aggressive -O3
 tests: !mux
     hello_world:
         dir: hello_world_shutdown_qemu

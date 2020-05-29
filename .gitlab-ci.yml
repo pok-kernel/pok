@@ -23,8 +23,7 @@ check_headers:
   script:
     - misc/update-headers --check
 
-# This should be a proper test pass, but right now we
-# only check that we can compile without error.
+# Check that some examples compile without error or warning
 compile:
   stage: test
   image: debian:stable
@@ -33,8 +32,8 @@ compile:
     - apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc
   script:
     - make configure
-    - (cd examples/mutexes && make CC="gcc -march=pentium -Wall -Wextra -Werror")
-    - (cd examples/semaphores && make CC="gcc -march=pentium -Wall -Wextra -Werror")
+    - (cd examples/mutexes && make CC="gcc -Wall -Wextra -Werror")
+    - (cd examples/semaphores && make CC="gcc -Wall -Wextra -Werror")
 
 # Run tests for utilities
 test_utils:

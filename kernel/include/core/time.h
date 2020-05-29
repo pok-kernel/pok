@@ -53,6 +53,5 @@ typedef enum { __POK_CLOCK_REALTIME = 0 } pok_clockid_t;
 void pok_time_init(void);
 pok_ret_t pok_clock_gettime(pok_clockid_t clk_id, struct timespec *tp);
 uint64_t pok_gettick(void);
-pok_ret_t pok_gettick_by_pointer(uint64_t *clk_val);
 
 #endif /* __POK_TIME_H__ */

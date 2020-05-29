@@ -44,16 +44,3 @@ void pok_time_init(void) {
   pok_tick_counter = 0;
   pok_bsp_time_init();
 }
-
-#ifdef POK_NEEDS_GETTICK
-/**
- * Get the current ticks value, store it in
- * \a clk_val
- * Returns POK_ERRNO_OK
- * Need the GETTICK service (POK_NEEDS_GETTICKS maccro)
- */
-pok_ret_t pok_gettick_by_pointer(uint64_t *clk_val) {
-  *clk_val = POK_GETTICK();
-  return POK_ERRNO_OK;
-}
-#endif

@@ -134,8 +134,9 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
     pok_check_ptr_or_return(infos->partition, (void *)args->arg1,
                             sizeof(uint64_t));
 
-    return pok_gettick_by_pointer((uint64_t *)(args->arg1 + infos->base_addr));
-    break;
+    uint64_t *const addr = (uint64_t *)(args->arg1 + infos->base_addr);
+    *addr = pok_gettick();
+    return POK_ERRNO_OK;
 #endif
 
   case POK_SYSCALL_THREAD_CREATE:

@@ -21,7 +21,6 @@ LO_OBJS=	allocator.o \
 			errorraise.o \
 			errorhandlercreate.o \
 			errorhandlerworker.o \
-			errorhandlersetready.o \
 			errorignore.o \
 			errorconfirm.o \
 			main.o \

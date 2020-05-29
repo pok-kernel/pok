@@ -53,7 +53,6 @@ extern pok_error_report_t pok_error_reported[POK_ERROR_MAX_LOGGED];
 pok_ret_t pok_error_handler_create();
 void pok_error_ignore(const uint32_t error_id, const uint32_t thread_id);
 void pok_error_confirm(const uint32_t error_id, const uint32_t thread_id);
-pok_ret_t pok_error_handler_set_ready(const pok_error_status_t *);
 
 void pok_error_log(const uint32_t error_id, const uint32_t thread_id);
 

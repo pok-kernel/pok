@@ -164,10 +164,12 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
   SPIN_LOCK(obj->eventspin);
 
   if (obj->initialized == FALSE) {
+    SPIN_UNLOCK(obj->eventspin);
     return POK_ERRNO_LOCKOBJ_NOTREADY;
   }
 
   if (obj->kind != POK_LOCKOBJ_KIND_EVENT) {
+    SPIN_UNLOCK(obj->eventspin);
     return POK_ERRNO_EINVAL;
   }
 

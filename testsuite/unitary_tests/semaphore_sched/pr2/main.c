@@ -30,6 +30,7 @@ static void *pinger_job() {
   printf("P2T1: sleeping forever\n");
   for (;;)
     pok_thread_sleep(1000000);
+  return NULL;
 }
 
 static void *pinger_job2() {
@@ -38,6 +39,7 @@ static void *pinger_job2() {
     pok_sem_wait(sid, 0);
     printf("P2T2: got the semaphore (round %d)\n", i);
   }
+  return NULL;
 }
 
 int main() {

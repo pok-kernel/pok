@@ -25,7 +25,7 @@ partitions:
       size: 130kB
       objects: ["main.o"]
     - name: pr2
-      features: [timer, console, libc, debug]
+      features: [timer, console, libc]
       semaphores: 1
       scheduler: static
       scheduler: static
@@ -46,8 +46,8 @@ kernel:
     scheduler:
         slots:
             - partition: pr1
-              duration: 20ms
+              duration: 50ms
             - partition: pr2
-              duration: 20ms
+              duration: 50ms
             - partition: pr3
               duration: 1ms

@@ -38,6 +38,16 @@ typedef struct {
   uint32_t base_high : 8;
 } __attribute__((packed)) gdt_entry_t;
 
+// POK uses the following GDT entries:
+//   1: kernel code segment
+//   2: kernel data segment
+//   3: TSS
+//   4 + 2n: partition n code segment
+//   5 + 2n: partition n data segment
+//
+// Segments for partitions are enabled when the partition is scheduled (present
+// = 1) and disabled otherwise. Kernel segments stay enable al the time.
+
 #define GDT_CORE_CODE_SEGMENT 1
 #define GDT_CORE_DATA_SEGMENT 2
 #define GDT_TSS_SEGMENT 3

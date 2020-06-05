@@ -413,7 +413,8 @@ uint32_t pok_sched_part_static(const uint32_t index_low,
   uint32_t elected = max_prio >= 0 ? max_thread : IDLE_THREAD;
 
 #ifdef POK_NEEDS_DEBUG
-  if (elected != IDLE_THREAD || current_thread != IDLE_THREAD) {
+  if (elected != current_thread &&
+      (elected != IDLE_THREAD || current_thread != IDLE_THREAD)) {
     uint32_t non_ready = 0;
     if (elected == IDLE_THREAD) {
       printf("--- scheduling idle thread\n");

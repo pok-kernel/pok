@@ -21,7 +21,7 @@ partitions:
       scheduler: static
       threads:
           count: 3
-          features: [sleep, suspend]
+          features: [sleep]
       size: 130kB
       objects: ["main.o"]
     - name: pr2
@@ -31,6 +31,7 @@ partitions:
       scheduler: static
       threads:
           count: 3
+          features: [sleep]
       size: 130kB
       objects: ["main.o"]
     - name: pr3
@@ -45,8 +46,8 @@ kernel:
     scheduler:
         slots:
             - partition: pr1
-              duration: 0.2s
+              duration: 20ms
             - partition: pr2
-              duration: 0.1s
+              duration: 20ms
             - partition: pr3
-              duration: 0.1s
+              duration: 1ms

@@ -19,21 +19,18 @@
   { 133120, 133120, 133120 }
 #define POK_CONFIG_PROGRAM_NAME                                                \
   { "pr1/pr1.elf", "pr2/pr2.elf", "pr3/pr3.elf" }
-#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 400000000
+#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 41000000
 #define POK_CONFIG_SCHEDULING_NBSLOTS 3
 #define POK_CONFIG_SCHEDULING_SLOTS                                            \
-  { 200000000, 100000000, 100000000 }
+  { 20000000, 20000000, 1000000 }
 #define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION                                 \
   { 0, 1, 2 }
 
-#define POK_NEEDS_ASSERT 1
 #define POK_NEEDS_CONSOLE 1
-#define POK_NEEDS_DEBUG 1
 #define POK_NEEDS_LOCKOBJECTS 1
 #define POK_NEEDS_SCHED_STATIC 1
 #define POK_NEEDS_SHUTDOWN 1
 #define POK_NEEDS_THREAD_SLEEP 1
-#define POK_NEEDS_THREAD_SUSPEND 1
 #define POK_NEEDS_TIME 1
 
 typedef enum {

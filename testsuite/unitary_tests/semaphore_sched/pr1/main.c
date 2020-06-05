@@ -22,7 +22,7 @@ static uint8_t sid;
 
 static void *pinger_job() {
   for (int i = 1; i <= 5; i++) {
-    pok_thread_sleep(10000);
+    pok_thread_sleep(1000);
     printf("P1T1: I will signal semaphore (round %d)\n", i);
     pok_sem_signal(sid);
     printf("P1T1: semaphore signaled (round %d)\n", i);
@@ -30,7 +30,6 @@ static void *pinger_job() {
   printf("P1T1: sleeping forever\n");
   for (;;)
     pok_thread_sleep(1000000);
-  return NULL;
 }
 
 static void *pinger_job2() {
@@ -39,7 +38,6 @@ static void *pinger_job2() {
     pok_sem_wait(sid, 0);
     printf("P1T2: got the semaphore (round %d)\n", i);
   }
-  return NULL;
 }
 
 int main() {

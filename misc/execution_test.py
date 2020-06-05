@@ -28,7 +28,7 @@ class ExecutionTest(Test):
     @fail_on(process.CmdError)
     def test(self):
         build.make(self.dir, extra_args="clean")
-        build.make(self.dir, env={"CC": self.compiler, "MAKEFLAGS": "-j1"})
+        build.make(self.dir, env={"MAKEFLAGS": "-j1"}, extra_args="CC='{}'".format(self.compiler))
         output = process.system_output("{} -nographic -kernel {}/pok.elf".format(self.qemu, self.dir))
         try:
             output = output.split(b"POK kernel initialized\n", 1)[1]

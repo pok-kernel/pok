@@ -50,22 +50,21 @@ uint32_t pok_context_create(uint32_t thread_id, uint32_t stack_size,
   return ((uint32_t)sp);
 }
 
-__attribute__((naked)) void pok_context_switch(uint32_t *old_sp,
-                                               uint32_t new_sp) {
-  asm volatile("pushf\n\t"
-               "pushl %%cs\n\t"
-               "pushl $1f\n\t"
-               "pusha\n\t"
-               "movl %%esp,%0\n\t"
-               "movl %1,%%esp\n\t"
-               "popa\n\t"
-               "iret\n"
-               "1:\n\t"
-               "ret"
-               : "=m"(*old_sp)
-               : "r"(new_sp)
-               : "memory");
-}
+void pok_context_switch(uint32_t *old_sp, uint32_t new_sp);
+asm(".global pok_context_switch	\n"
+    "pok_context_switch:		\n"
+    "pushf				\n"
+    "pushl %cs				\n"
+    "pushl $1f				\n"
+    "pusha				\n"
+    "movl 48(%esp), %ebx		\n" /* 48(%esp) : &old_sp, 52(%esp) :
+                                               new_sp */
+    "movl %esp, (%ebx)			\n"
+    "movl 52(%esp), %esp		\n"
+    "popa				\n"
+    "iret				\n"
+    "1:				\n"
+    "ret");
 
 void pok_context_reset(uint32_t stack_size, uint32_t stack_addr) {
   start_context_t *sp;

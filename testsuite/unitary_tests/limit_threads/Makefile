@@ -25,14 +25,14 @@ build-kernel:
 	$(CD) kernel && $(MAKE)
 
 partitions:
-	for d in $(PARTDIRS); do $(MAKE) -C $$d clean all; done
+	for d in $(PARTDIRS); do $(MAKE) -C $$d clean all || exit 1; done
 
 clean: common-clean
 	$(RM) node_impl
-	for d in $(SUBDIRS); do $(MAKE) -C $$d clean; done
+	for d in $(SUBDIRS); do $(MAKE) -C $$d clean || exit 1; done
 
 distclean: clean
-	for d in $(SUBDIRS); do $(MAKE) -C $$d distclean; done
+	for d in $(SUBDIRS); do $(MAKE) -C $$d distclean || exit 1; done
 
 include $(POK_PATH)/misc/mk/rules-common.mk
 include $(POK_PATH)/misc/mk/rules-main.mk

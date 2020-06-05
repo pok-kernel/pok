@@ -62,4 +62,6 @@ pok_ret_t pok_error_get(pok_error_status_t *status);
 #define POK_ERROR_CURRENT_PARTITION(error)                                     \
   pok_partition_error(pok_current_partition, error);
 
+const char *pok_error_message(uint8_t error);
+
 #endif

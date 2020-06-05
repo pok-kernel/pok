@@ -74,9 +74,9 @@ void pok_error_ignore() { /* Do nothing at this time */
 #ifndef POK_USE_GENERATED_KERNEL_ERROR_HANDLER
 void pok_kernel_error(uint32_t error) {
 #ifdef POK_NEEDS_DEBUG
-  printf("[KERNEL] [WARNING] Error %d was raised by the kernel but no error "
-         "recovery was set\n",
-         error);
+  printf("[KERNEL] [WARNING] Error %d (%s) was raised by the kernel but no "
+         "error recovery was set\n",
+         error, pok_error_message(error));
 #else
   (void)error;
 #endif /* POK_NEEDS_DEBUG */
@@ -87,9 +87,11 @@ void pok_kernel_error(uint32_t error) {
 #ifndef POK_USE_GENERATED_PARTITION_ERROR_HANDLER
 void pok_partition_error(uint8_t partition, uint32_t error) {
 #ifdef POK_NEEDS_DEBUG
-  printf("[KERNEL] [WARNING] Error %d was raised by partition %d but no error "
-         "recovery was set\n",
-         error, partition);
+  const char *error_msg = pok_error_message(error);
+  printf("[KERNEL] [WARNING] Error %d (%s) was raised by partition %d but no "
+         "error recovery was set\n",
+         error, error_msg, partition);
+  pok_fatal(error_msg);
 #else
   (void)partition;
   (void)error;
@@ -155,5 +157,46 @@ pok_ret_t pok_error_get(pok_error_status_t *status) {
     return POK_ERRNO_OK;
   } else {
     return POK_ERRNO_UNAVAILABLE;
+  }
+}
+
+const char *pok_error_message(uint8_t error) {
+  switch (error) {
+  case POK_ERROR_KIND_INVALID:
+    return "invalid";
+  case POK_ERROR_KIND_DEADLINE_MISSED:
+    return "deadline missed";
+  case POK_ERROR_KIND_APPLICATION_ERROR:
+    return "application error";
+  case POK_ERROR_KIND_NUMERIC_ERROR:
+    return "numeric error";
+  case POK_ERROR_KIND_ILLEGAL_REQUEST:
+    return "illegal request";
+  case POK_ERROR_KIND_STACK_OVERFLOW:
+    return "stack overflow";
+  case POK_ERROR_KIND_MEMORY_VIOLATION:
+    return "memory violation";
+  case POK_ERROR_KIND_HARDWARE_FAULT:
+    return "hardware fault";
+  case POK_ERROR_KIND_POWER_FAIL:
+    return "power failure";
+  case POK_ERROR_KIND_PARTITION_CONFIGURATION:
+    return "partition configuration error";
+  case POK_ERROR_KIND_PARTITION_INIT:
+    return "partition initialization error";
+  case POK_ERROR_KIND_PARTITION_SCHEDULING:
+    return "partition scheduling error";
+  case POK_ERROR_KIND_PARTITION_HANDLER:
+    return "partition handler";
+  case POK_ERROR_KIND_PARTITION_PROCESS:
+    return "partition process";
+  case POK_ERROR_KIND_KERNEL_INIT:
+    return "kernel initialization error";
+  case POK_ERROR_KIND_KERNEL_SCHEDULING:
+    return "kernel scheduling error";
+  case POK_ERROR_KIND_KERNEL_CONFIG:
+    return "kernel configuration error";
+  default:
+    return "unknown error";
   }
 }

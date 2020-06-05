@@ -19,6 +19,7 @@
  */
 
 #include <arch.h>
+#include <assert.h>
 #include <types.h>
 
 #include <core/sched.h>
@@ -36,6 +37,12 @@
 #include <core/debug.h>
 #include <core/error.h>
 #include <core/instrumentation.h>
+
+#ifdef POK_NEEDS_LOCKOBJECTS
+#include <core/lockobj.h>
+
+extern pok_lockobj_t pok_partitions_lockobjs[];
+#endif
 
 extern pok_thread_t pok_threads[];
 
@@ -294,6 +301,19 @@ void pok_sched_context_switch(const uint32_t elected_id) {
   if (POK_SCHED_CURRENT_THREAD == elected_id) {
     return;
   }
+
+#ifdef POK_NEEDS_LOCKOBJECTS
+
+  // Check if every spin lock is unlocked before changing context
+  for (uint8_t i =
+           pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_low;
+       i < pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_high;
+       i++) {
+    assert(!pok_partitions_lockobjs[i].eventspin);
+    assert(!pok_partitions_lockobjs[i].spin);
+  }
+
+#endif
 
   current_sp = &POK_CURRENT_THREAD.sp;
   new_sp = pok_threads[elected_id].sp;

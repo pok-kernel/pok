@@ -162,10 +162,6 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
     pok_threads[id].deadline = attr->deadline;
   }
 
-#ifdef POK_NEEDS_SCHED_HFPPS
-  pok_threads[id].payback = 0;
-#endif /* POK_NEEDS_SCHED_HFPPS */
-
   if (attr->time_capacity > 0) {
     pok_threads[id].time_capacity = attr->time_capacity;
     pok_threads[id].remaining_time_capacity = attr->time_capacity;

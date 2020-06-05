@@ -95,11 +95,6 @@ typedef struct {
   uint8_t lockobj_index_low;  /**< The low bound in the lockobject array. */
   uint8_t lockobj_index_high; /**< The high bound in the lockobject array */
   uint8_t
-      nlockobjs; /**< The amount of lockobjects reserved for the partition */
-
-#ifdef POK_NEEDS_SCHED_HFPPS
-  uint64_t payback; /**< Payback for HFPPS scheduling algorithm */
-#endif              /* POK_NEEDS_SCHED_HFPPS */
 
   uint32_t thread_error; /**< The thread identifier used for error handling */
   pok_error_status_t

@@ -58,9 +58,6 @@ typedef struct {
   pok_state_t state;
   uint64_t end_time;
   uint64_t wakeup_time;
-#ifdef POK_NEEDS_SCHED_HFPPS
-  uint64_t payback; /**< Payback for HFPPS scheduling algorithm */
-#endif              /* POK_NEEDS_SCHED_HFPPS */
   void *entry;
   uint8_t partition;
   uint32_t sp;

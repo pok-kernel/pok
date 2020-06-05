@@ -196,10 +196,6 @@ pok_ret_t pok_partition_init() {
         IDLE_THREAD; // breaks the rule of prev_thread not being idle, but it's
                      // just for init
 
-#ifdef POK_NEEDS_SCHED_HFPPS
-    pok_partitions[i].payback = 0;
-#endif /* POK_NEEDS_SCHED_HFPPS */
-
     threads_index = threads_index + pok_partitions[i].nthreads;
     /* Initialize the threading stuff */
 

@@ -168,15 +168,6 @@ uint8_t pok_elect_partition() {
        pok_partitions[pok_sched_current_slot].prev_thread);
           */
     next_partition = pok_sched_slots_allocation[pok_sched_current_slot];
-
-#ifdef POK_NEEDS_SCHED_HFPPS
-    if (pok_partitions[next_partition].payback > 0) // pay back!
-    {
-      // new deadline
-      pok_sched_next_deadline -= pok_partitions[next_partition].payback;
-      pok_partitions[next_partition].payback = 0;
-    }
-#endif /* POK_NEEDS_SCHED_HFPPS */
   }
 #endif /* POK_CONFIG_NB_PARTITIONS > 1 */
 
@@ -267,48 +258,19 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
     break;
   }
 
-#ifdef POK_NEEDS_SCHED_HFPPS
-  if (pok_threads[elected].payback > 0) // pay back!
-  {
-    pok_threads[elected].remaining_time_capacity -=
-        pok_threads[elected].payback;
-    pok_threads[elected].payback = 0;
-  }
-#endif /* POK_NEEDS_SCHED_HFPPS */
-
   // computed next thread's deadline
   pok_threads[elected].end_time =
       now + pok_threads[elected].remaining_time_capacity;
 
-  return (elected);
+  return elected;
 }
 
 void pok_sched() {
   uint32_t elected_thread = 0;
   uint8_t elected_partition = POK_SCHED_CURRENT_PARTITION;
 
-#ifdef POK_NEEDS_SCHED_HFPPS
-  uint64_t now = POK_GETTICK();
-  elected_thread = current_thread;
-
-  /* if thread hasn't finished its job and its deadline is passed */
-  if (pok_threads[elected_thread].end_time <= now &&
-      pok_threads[elected_thread].remaining_time_capacity > 0) {
-    /* updates thread and partition payback */
-    pok_threads[elected_thread].payback =
-        pok_threads[elected_thread].remaining_time_capacity;
-    pok_partitions[pok_current_partition].payback =
-        pok_threads[elected_thread].remaining_time_capacity;
-    /* computes next partition deadline */
-    pok_sched_next_deadline +=
-        pok_threads[elected_thread].remaining_time_capacity;
-  } else /* overmegadirty */
-#endif   /* POK_NEEDS_SCHED_HFPPS */
-  {
-
-    elected_partition = pok_elect_partition();
-    elected_thread = pok_elect_thread(elected_partition);
-  }
+  elected_partition = pok_elect_partition();
+  elected_thread = pok_elect_thread(elected_partition);
 
   pok_current_partition = elected_partition;
   if (pok_partitions[pok_current_partition].current_thread != elected_thread) {

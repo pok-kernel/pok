@@ -69,32 +69,34 @@ typedef struct {
 
   const char *name; /**< Name of the partition */
 
-  uint32_t nthreads; /**< Number of threads inside the partition */
+  uint32_t nthreads; /**< Maximum number of threads inside the partition */
 
-  uint8_t priority; /**< Priority of the partition (unused at this time */
-  uint32_t period;  /**< Period of the partition, unused at this time */
+  uint32_t period; /**< Period of the partition, unused at this time */
 
-  pok_sched_t
-      sched; /**< The associated for the partition to schedule its threads */
+  pok_sched_t sched; /**< The associated scheduler for the partition to schedule
+                        its threads */
 
   uint32_t (*sched_func)(
       uint32_t low, uint32_t high, uint32_t prev_thread,
-      uint32_t cur_thread); /**< Scheduling function to scheduler threads */
+      uint32_t cur_thread); /**< Scheduling function to schedule threads */
 
-  uint64_t activation; /**< Last activation time of the partition */
-  uint32_t
-      prev_thread; /**< member for the scheduler (previous scheduled real thread
-                      inside the partition,i.e not the idle thread */
-  uint32_t current_thread; /**< member for the scheduler (current executed
-                              thread inside the partition */
+  uint64_t activation;  /**< Last activation time of the partition */
+  uint32_t prev_thread; /**< member for the scheduler (previous scheduled real
+                           thread inside the partition,i.e not the idle thread
+                           except at start) */
+  uint32_t current_thread; /**< member for the scheduler (currently executed
+                              thread inside the partition) */
 
-  uint32_t thread_index_low;  /**< The low index in the threads table */
-  uint32_t thread_index_high; /**< The high index in the threads table */
+  uint32_t thread_index_low;  /**< The low index in the global threads table */
+  uint32_t thread_index_high; /**< The high index in the global threads table */
   uint32_t thread_index;      /**< The thread index */
 
-  uint8_t lockobj_index_low;  /**< The low bound in the lockobject array. */
-  uint8_t lockobj_index_high; /**< The high bound in the lockobject array */
   uint8_t
+      lockobj_index_low; /**< The low bound in the global lockobject array. */
+  uint8_t
+      lockobj_index_high; /**< The high bound in the global lockobject array */
+  uint8_t
+      nlockobjs; /**< The number of lockobjects reserved for the partition */
 
   uint32_t thread_error; /**< The thread identifier used for error handling */
   pok_error_status_t

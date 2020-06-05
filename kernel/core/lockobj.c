@@ -314,6 +314,11 @@ pok_ret_t pok_lockobj_unlock(pok_lockobj_t *obj,
       obj->current_value++;
     }
   } else {
+#if POK_NEEDS_DEBUG
+    if (obj->current_value)
+      printf(
+          "[KERNEL] [DEBUG] Try to unlock a lock which is already unlocked\n");
+#endif
     obj->current_value = 1;
   }
 

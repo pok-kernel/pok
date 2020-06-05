@@ -20,7 +20,7 @@
 #include <types.h>
 
 pok_ret_t pok_thread_delayed_start(const uint32_t thread_id,
-                                   const pok_time_t ms) {
+                                   const pok_time_t us) {
   return pok_syscall2(POK_SYSCALL_THREAD_DELAYED_START, (uint32_t)thread_id,
-                      (uint32_t)ms);
+                      (uint32_t)us);
 }

@@ -37,8 +37,8 @@ typedef struct {
 
 void pok_thread_init(void);
 pok_ret_t pok_thread_create(uint32_t *thread_id, const pok_thread_attr_t *attr);
-pok_ret_t pok_thread_sleep(const pok_time_t ms);
-pok_ret_t pok_thread_sleep_until(const pok_time_t ms);
+pok_ret_t pok_thread_sleep(const pok_time_t us);
+pok_ret_t pok_thread_sleep_until(const pok_time_t us);
 pok_ret_t pok_thread_lock();
 pok_ret_t pok_thread_unlock(const uint32_t thread_id);
 unsigned int pok_thread_current(void);
@@ -52,7 +52,7 @@ pok_ret_t pok_thread_id(uint32_t *thread_id);
 void pok_thread_init(void);
 pok_ret_t pok_thread_status(const uint32_t thread_id, pok_thread_attr_t *attr);
 pok_ret_t pok_thread_delayed_start(const uint32_t thread_id,
-                                   const pok_time_t ms);
+                                   const pok_time_t us);
 pok_ret_t pok_thread_set_priority(const uint32_t thread_id,
                                   const uint32_t priority);
 pok_ret_t pok_thread_resume(const uint32_t thread_id);

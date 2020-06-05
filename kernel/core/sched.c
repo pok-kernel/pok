@@ -322,8 +322,10 @@ void pok_sched_context_switch(const uint32_t elected_id) {
      printf("switch from thread %d, sp=0x%x\n",POK_SCHED_CURRENT_THREAD,
      current_sp); printf("switch to thread %d, sp=0x%x\n",elected_id, new_sp);
      */
-  pok_space_switch(POK_CURRENT_THREAD.partition,
-                   pok_threads[elected_id].partition);
+  if (POK_CURRENT_THREAD.partition != pok_threads[elected_id].partition) {
+    pok_space_switch(POK_CURRENT_THREAD.partition,
+                     pok_threads[elected_id].partition);
+  }
 
   current_thread = elected_id;
 

@@ -175,7 +175,7 @@ pok_ret_t pok_partition_init() {
     pok_partitions[i].nthreads =
         ((uint32_t[])POK_CONFIG_PARTITIONS_NTHREADS)[i];
 
-    if (pok_partitions[i].nthreads <= 1) {
+    if (pok_partitions[i].nthreads < 1) {
       pok_partition_error(i, POK_ERROR_KIND_PARTITION_CONFIGURATION);
     }
 

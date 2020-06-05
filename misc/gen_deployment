@@ -303,7 +303,8 @@ def gen_kernel_deployment_h(fd, config):
                "NB_THREADS": sum_option(config, "partitions.threads.count") + 2}
     semaphores = get_option_or(config, "partitions.semaphores", 0)
     mutexes = get_option_or(config, "partitions.mutexes", 0)
-    lockobjects = add_lists([semaphores, mutexes])
+    events = get_option_or(config, "partitions.events", 0)
+    lockobjects = add_lists([semaphores, mutexes, events])
     if sum(lockobjects):
         needs.add("LOCKOBJECTS")
         configs["NB_LOCKOBJECTS"] =  sum(lockobjects)
@@ -401,6 +402,7 @@ def gen_partition_deployment_h(fd, config):
             needs.add(need)
     if get_option(config, "semaphores"): needs.add("SEMAPHORES")
     if get_option(config, "mutexes"): needs.add("MUTEXES")
+    if get_option(config, "events"): needs.add("EVENTS")
     for need in sorted(needs):
         add(fd, "#define POK_NEEDS_{} 1".format(need))
 

@@ -19,21 +19,17 @@
 #include <types.h>
 
 /**
- * The rate of the clock in POK
+ * The rate of the clock change in POK in Hz.
  */
 #define POK_TIMER_FREQUENCY 100000
 
 /**
- * POK timer quantum
+ * POK timer quantum in Hz. Delays and scheduling will be restricted to this
+ * precision.
  */
 #define POK_TIMER_QUANTUM 1000
 
-extern uint64_t pok_tick_counter;
-
-#define CLOCK_HANDLER                                                          \
-  pok_tick_counter += 10000;                                                   \
-  pok_sched(); // 10000 because freq (POK_TIMER_FREQUENCY) is 10e5 and time
-               // (pok_tick_counter) is in nanoseconds: 10e9/POK_TIMER_FREQUENCY
+extern volatile uint64_t pok_tick_counter;
 
 #define POK_GETTICK() pok_tick_counter
 

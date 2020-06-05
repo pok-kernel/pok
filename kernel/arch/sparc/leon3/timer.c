@@ -36,7 +36,9 @@
  */
 void timer_isr(void) {
   ack_irq(TIMER_IRQ);
-  CLOCK_HANDLER
+  pok_tick_counter += 10000;
+  pok_sched(); // 10000 because freq (POK_TIMER_FREQUENCY) is 10e5 and time
+               // (pok_tick_counter) is in nanoseconds: 10e9/POK_TIMER_FREQUENCY
   return;
 }
 

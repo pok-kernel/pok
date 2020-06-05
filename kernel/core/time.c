@@ -32,7 +32,7 @@
  * A global variable that contains the number
  * of elapsed ticks since the beginning
  */
-uint64_t pok_tick_counter = 0;
+volatile uint64_t pok_tick_counter = 0;
 
 /**
  * \brief Init the timing service.

@@ -147,9 +147,4 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
  */
 pok_ret_t pok_syscall_init();
 
-#define pok_check_ptr_or_return(pid, ptr, sz)                                  \
-  if (!pok_check_ptr_in_partition(pid, ptr, sz)) {                             \
-    return POK_ERRNO_EINVAL;                                                   \
-  }
-
 #endif /* __POK_SYSCALL_H__ */

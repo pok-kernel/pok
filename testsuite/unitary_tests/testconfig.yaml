@@ -27,3 +27,5 @@ tests: !mux
         dir: semaphore_sched
     test_printf:
         dir: test_printf
+    test_events:
+        dir: events

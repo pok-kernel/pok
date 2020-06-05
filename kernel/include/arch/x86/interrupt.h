@@ -41,8 +41,6 @@ typedef struct {
   uint32_t ss;
 } interrupt_frame;
 
-extern uint32_t pok_tss;
-
 void update_tss(interrupt_frame *frame);
 
 #define INTERRUPT_HANDLER(name)                                                \

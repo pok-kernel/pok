@@ -12,12 +12,13 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
+#include "tss.h"
 #include <arch/x86/interrupt.h>
 
 void update_tss(interrupt_frame *frame) {
-  uint32_t *esp0 = (&pok_tss) + 1;
-
-  if ((frame->cs & 0xffff) != 0x8) {
-    *esp0 = (uint32_t)frame + sizeof(interrupt_frame);
+  // Update esp0 in TSS to the given frame if we are not executing in
+  // code segment 1 (kernel).
+  if ((frame->cs & 0xffff) != (1 << 3)) {
+    pok_tss.esp0 = (uint32_t)frame + sizeof(interrupt_frame);
   }
 }

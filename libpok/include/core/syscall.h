@@ -120,21 +120,26 @@ typedef struct {
  */
 pok_ret_t pok_do_syscall(pok_syscall_id_t syscall_id, pok_syscall_args_t *args);
 
+#define pok_syscall0(sid)                                                      \
+  pok_do_syscall(sid, &((pok_syscall_args_t){0, 0, 0, 0, 0, 0}))
+
 #define pok_syscall1(sid, arg1)                                                \
-  pok_do_syscall(sid, &((pok_syscall_args_t){2, arg1, 0, 0, 0, 0}))
+  pok_do_syscall(sid, &((pok_syscall_args_t){1, arg1, 0, 0, 0, 0}))
 
 #define pok_syscall2(sid, arg1, arg2)                                          \
   pok_do_syscall(sid, &((pok_syscall_args_t){2, arg1, arg2, 0, 0, 0}))
 
 #define pok_syscall3(sid, arg1, arg2, arg3)                                    \
-  pok_do_syscall(sid, &((pok_syscall_args_t){2, arg1, arg2, arg3, 0, 0}))
+  pok_do_syscall(sid, &((pok_syscall_args_t){3, arg1, arg2, arg3, 0, 0}))
 
 #define pok_syscall4(sid, arg1, arg2, arg3, arg4)                              \
-  pok_do_syscall(sid, &((pok_syscall_args_t){2, arg1, arg2, arg3, arg4, 0}))
+  pok_do_syscall(sid, &((pok_syscall_args_t){4, arg1, arg2, arg3, arg4, 0}))
 
 #define pok_syscall5(sid, arg1, arg2, arg3, arg4, arg5)                        \
-  pok_do_syscall(sid, &((pok_syscall_args_t){2, arg1, arg2, arg3, arg4, arg5}))
+  pok_do_syscall(sid, &((pok_syscall_args_t){5, arg1, arg2, arg3, arg4, arg5}))
 #else
+
+pok_ret_t pok_syscall0(pok_syscall_id_t syscall_id);
 
 pok_ret_t pok_syscall1(pok_syscall_id_t syscall_id, uint32_t arg1);
 

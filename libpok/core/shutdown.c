@@ -30,7 +30,7 @@
 #endif
 
 void pok_shutdown() {
-  pok_syscall1(POK_SYSCALL_SHUTDOWN, 0);
+  pok_syscall0(POK_SYSCALL_SHUTDOWN);
   // The syscal should never return. If it does, this is an error, but there
   // is little we can do.
 #ifdef POK_NEEDS_DEBUG

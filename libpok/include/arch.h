@@ -25,6 +25,4 @@ __attribute__((noreturn)) void pok_division_by_zero_error(void);
 
 void pok_arch_idle(void);
 
-void pok_arch_yield();
-
 #endif /* __LIBPOK_ARCH_H__ */

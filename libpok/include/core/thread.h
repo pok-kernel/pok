@@ -41,7 +41,6 @@ pok_ret_t pok_thread_sleep(const pok_time_t ms);
 pok_ret_t pok_thread_sleep_until(const pok_time_t ms);
 pok_ret_t pok_thread_lock();
 pok_ret_t pok_thread_unlock(const uint32_t thread_id);
-pok_ret_t pok_thread_yield();
 unsigned int pok_thread_current(void);
 void pok_thread_start(void (*entry)(), uint32_t id);
 void pok_thread_switch(uint32_t elected_id);

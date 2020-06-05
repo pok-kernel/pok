@@ -63,7 +63,6 @@ int main() {
   printf("[P2] pok_thread_create (2) return=%d\n", ret);
 
   pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
-  pok_thread_wait_infinite();
 
   return 0;
 }

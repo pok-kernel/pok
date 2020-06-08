@@ -383,18 +383,17 @@ pok_ret_t pok_lockobj_partition_wrapper(const pok_lockobj_id_t id,
 
   case LOCKOBJ_OPERATION_SIGNAL: {
     ret = pok_lockobj_eventsignal(&pok_partitions_lockobjs[id]);
-    break;
+    return ret;
   }
 
   case LOCKOBJ_OPERATION_BROADCAST: {
     ret = pok_lockobj_eventbroadcast(&pok_partitions_lockobjs[id]);
-    break;
+    return ret;
   }
 
   default:
     return POK_ERRNO_EINVAL;
   }
-  return POK_ERRNO_EINVAL;
 }
 #endif
 

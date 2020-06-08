@@ -34,6 +34,7 @@ compile:
     - make configure
     - (cd examples/mutexes && make CC="gcc -Wall -Wextra -Werror")
     - (cd examples/semaphores && make CC="gcc -Wall -Wextra -Werror")
+    - (cd examples/events && make CC="gcc -Wall -Wextra -Werror")
 
 # Run tests for utilities
 test_utils:

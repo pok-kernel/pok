@@ -138,7 +138,7 @@ pok_ret_t pok_core_syscall(const pok_syscall_id_t syscall_id,
     CHECK_PTR((void *)args->arg1, sizeof(uint64_t));
 
     uint64_t *const addr = (uint64_t *)(args->arg1 + infos->base_addr);
-    *addr = pok_gettick();
+    *addr = POK_GETTICK();
     return POK_ERRNO_OK;
 #endif
 

@@ -30,7 +30,7 @@ typedef struct {
 
 pok_ret_t pok_mutex_create(pok_mutex_id_t *id, pok_mutex_attr_t *attr);
 pok_ret_t pok_mutex_lock(pok_mutex_id_t id);
-pok_ret_t pok_mutex_trylock(pok_mutex_id_t id, const uint64_t us);
+pok_ret_t pok_mutex_trylock(pok_mutex_id_t id, uint64_t timeout_us);
 pok_ret_t pok_mutex_unlock(pok_mutex_id_t id);
 
 #endif

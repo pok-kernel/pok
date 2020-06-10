@@ -104,7 +104,7 @@ typedef struct {
   pok_lockobj_operation_t operation;
   pok_lockobj_kind_t obj_kind;
   pok_lockobj_lock_kind_t lock_kind;
-  uint64_t time;
+  uint64_t timeout;
 } pok_lockobj_lockattr_t;
 
 pok_ret_t pok_lockobj_create(pok_lockobj_t *obj,

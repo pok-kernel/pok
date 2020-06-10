@@ -158,9 +158,7 @@ pok_ret_t pok_lockobj_partition_create(pok_lockobj_id_t *id,
 }
 #endif
 
-pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
-  pok_ret_t ret;
-
+pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, uint64_t timeout) {
   SPIN_LOCK(obj->eventspin);
 
   if (obj->initialized == FALSE) {
@@ -180,8 +178,10 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
 
   obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_WAITEVENT;
 
-  if (timeout > 0) {
-    pok_sched_lock_current_thread_timed(timeout);
+  uint64_t deadline = timeout ? timeout + POK_GETTICK() : 0;
+
+  if (deadline > 0) {
+    pok_sched_lock_current_thread_timed(deadline);
   } else {
     pok_sched_lock_current_thread();
   }
@@ -191,7 +191,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
   SPIN_LOCK(obj->eventspin);
   obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
 
-  ret = pok_lockobj_lock(obj, NULL);
+  pok_ret_t ret = pok_lockobj_lock(obj, NULL);
 
   if (ret != POK_ERRNO_OK) {
     SPIN_UNLOCK(obj->eventspin);
@@ -199,7 +199,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
   }
 
   /* Here, we come back after we wait*/
-  if ((timeout != 0) && (POK_GETTICK() >= timeout)) {
+  if ((deadline != 0) && (POK_GETTICK() >= deadline)) {
     ret = POK_ERRNO_TIMEOUT;
   } else {
     ret = POK_ERRNO_OK;
@@ -248,8 +248,6 @@ pok_ret_t pok_lockobj_eventbroadcast(pok_lockobj_t *obj) {
 
 pok_ret_t pok_lockobj_lock(pok_lockobj_t *obj,
                            const pok_lockobj_lockattr_t *attr) {
-  uint64_t timeout = 0;
-
   if (obj->initialized == FALSE) {
     return POK_ERRNO_LOCKOBJ_NOTREADY;
   }
@@ -258,24 +256,21 @@ pok_ret_t pok_lockobj_lock(pok_lockobj_t *obj,
 
   if ((obj->current_value > 0) &&
       (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_UNLOCK)) {
+    // Short path: object is available right now
     obj->current_value--;
     SPIN_UNLOCK(obj->spin);
   } else {
-    /*
-     * attr->time corresponds to the timeout for the waiting object
-     */
-    if ((attr != NULL) && (attr->time > 0)) {
-      timeout = attr->time + POK_GETTICK();
-    }
+    uint64_t deadline =
+        attr != NULL && attr->timeout > 0 ? attr->timeout + POK_GETTICK() : 0;
 
     while (
         (obj->current_value == 0) ||
         (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_LOCK)) {
       obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_LOCK;
 
-      if (timeout > 0) {
-        pok_sched_lock_current_thread_timed(timeout);
-        if (POK_GETTICK() >= timeout) {
+      if (deadline > 0) {
+        pok_sched_lock_current_thread_timed(deadline);
+        if (POK_GETTICK() >= deadline) {
           obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
           SPIN_UNLOCK(obj->spin);
           return POK_ERRNO_TIMEOUT;
@@ -378,7 +373,7 @@ pok_ret_t pok_lockobj_partition_wrapper(const pok_lockobj_id_t id,
   }
 
   case LOCKOBJ_OPERATION_WAIT: {
-    ret = pok_lockobj_eventwait(&pok_partitions_lockobjs[id], attr->time);
+    ret = pok_lockobj_eventwait(&pok_partitions_lockobjs[id], attr->timeout);
     return ret;
   }
 

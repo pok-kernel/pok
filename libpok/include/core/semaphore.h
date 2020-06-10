@@ -28,7 +28,7 @@ pok_ret_t pok_sem_create(pok_sem_id_t *id, const pok_sem_value_t current_value,
                          const pok_sem_value_t max_value,
                          const pok_queueing_discipline_t discipline);
 
-pok_ret_t pok_sem_wait(pok_sem_id_t id, uint64_t timeout);
+pok_ret_t pok_sem_wait(pok_sem_id_t id, uint64_t timeout_us);
 
 pok_ret_t pok_sem_signal(pok_sem_id_t id);
 

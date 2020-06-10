@@ -6,25 +6,25 @@
 
 #include <core/schedvalues.h>
 
-#define POK_CONFIG_NB_LOCKOBJECTS 2
-#define POK_CONFIG_NB_PARTITIONS 3
-#define POK_CONFIG_NB_THREADS 9
+#define POK_CONFIG_NB_LOCKOBJECTS 3
+#define POK_CONFIG_NB_PARTITIONS 4
+#define POK_CONFIG_NB_THREADS 13
 #define POK_CONFIG_PARTITIONS_NLOCKOBJECTS                                     \
-  { 1, 1, 0 }
+  { 1, 1, 1, 0 }
 #define POK_CONFIG_PARTITIONS_NTHREADS                                         \
-  { 3, 3, 1 }
+  { 3, 4, 3, 1 }
 #define POK_CONFIG_PARTITIONS_SCHEDULER                                        \
-  { POK_SCHED_STATIC, POK_SCHED_STATIC, POK_SCHED_RR }
+  { POK_SCHED_STATIC, POK_SCHED_RR, POK_SCHED_STATIC, POK_SCHED_RR }
 #define POK_CONFIG_PARTITIONS_SIZE                                             \
-  { 133120, 133120, 133120 }
+  { 133120, 133120, 133120, 133120 }
 #define POK_CONFIG_PROGRAM_NAME                                                \
-  { "pr1/pr1.elf", "pr2/pr2.elf", "pr3/pr3.elf" }
-#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 101000000
-#define POK_CONFIG_SCHEDULING_NBSLOTS 3
+  { "pr1/pr1.elf", "pr2/pr2.elf", "pr3/pr3.elf", "pr4/pr4.elf" }
+#define POK_CONFIG_SCHEDULING_MAJOR_FRAME 351000000
+#define POK_CONFIG_SCHEDULING_NBSLOTS 4
 #define POK_CONFIG_SCHEDULING_SLOTS                                            \
-  { 50000000, 50000000, 1000000 }
+  { 100000000, 200000000, 50000000, 1000000 }
 #define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION                                 \
-  { 0, 1, 2 }
+  { 0, 1, 2, 3 }
 
 #define POK_NEEDS_ASSERT 1
 #define POK_NEEDS_CONSOLE 1
@@ -38,13 +38,15 @@
 typedef enum {
   pok_part_identifier_pr1 = 0,
   pok_part_identifier_pr2 = 1,
-  pok_part_identifier_pr3 = 2
+  pok_part_identifier_pr3 = 2,
+  pok_part_identifier_pr4 = 3
 } pok_part_identifiers_t;
 
 typedef enum {
   pok_part_id_pr1 = 0,
   pok_part_id_pr2 = 1,
-  pok_part_id_pr3 = 2
+  pok_part_id_pr3 = 2,
+  pok_part_id_pr4 = 3
 } pok_part_id_t;
 
 typedef enum { pok_nodes_node1 = 0 } pok_node_id_t;

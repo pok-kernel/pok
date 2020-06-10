@@ -10,9 +10,9 @@ include $(POK_PATH)/misc/mk/common-$(ARCH).mk
 
 TARGET=$(CURDIR)/pok.elf
 ARCHIVE=$(CURDIR)/partitions.cpio
-PARTITIONS=pr1/pr1.elf pr2/pr2.elf pr3/pr3.elf
+PARTITIONS=pr1/pr1.elf pr2/pr2.elf pr3/pr3.elf pr4/pr4.elf
 KERNEL=kernel/kernel.lo
-PARTDIRS=pr1 pr2 pr3
+PARTDIRS=pr1 pr2 pr3 pr4
 SUBDIRS=kernel $(PARTDIRS)
 
 all: build-regular

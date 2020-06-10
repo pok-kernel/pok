@@ -27,14 +27,22 @@ partitions:
     - name: pr2
       features: [timer, console, libc]
       semaphores: 1
-      scheduler: static
+      scheduler: RR
+      threads:
+          count: 4
+          features: [sleep]
+      size: 130kB
+      objects: ["main.o"]
+    - name: pr3
+      features: [timer, console, libc]
+      semaphores: 1
       scheduler: static
       threads:
           count: 3
           features: [sleep]
       size: 130kB
       objects: ["main.o"]
-    - name: pr3
+    - name: pr4
       features: [console, shutdown]
       threads:
           count: 1
@@ -46,8 +54,10 @@ kernel:
     scheduler:
         slots:
             - partition: pr1
-              duration: 50ms
+              duration: 100ms
             - partition: pr2
-              duration: 50ms
+              duration: 200ms
             - partition: pr3
+              duration: 50ms
+            - partition: pr4
               duration: 1ms

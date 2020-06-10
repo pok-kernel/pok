@@ -22,7 +22,9 @@
 #include <errno.h>
 #include <types.h>
 
-#define POK_SEMAPHORE_DISCIPLINE_FIFO 1
+// Find the first thread blocked by increasing the thread number at each
+// iteration (modulo the number of threads)
+#define POK_SEMAPHORE_DISCIPLINE_DEFAULT 1
 
 pok_ret_t pok_sem_create(pok_sem_id_t *id, const pok_sem_value_t current_value,
                          const pok_sem_value_t max_value,

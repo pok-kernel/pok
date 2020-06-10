@@ -22,7 +22,7 @@ static uint8_t sid;
 
 static void *pinger_job() {
   for (int i = 1; i <= 5; i++) {
-    pok_thread_sleep(1000);
+    pok_thread_sleep(10000);
     printf("P1T1: I will signal semaphore (round %d)\n", i);
     pok_sem_signal(sid);
     printf("P1T1: semaphore signaled (round %d)\n", i);
@@ -47,7 +47,7 @@ int main() {
   pok_ret_t ret;
   pok_thread_attr_t tattr;
 
-  ret = pok_sem_create(&sid, 0, 50, POK_SEMAPHORE_DISCIPLINE_FIFO);
+  ret = pok_sem_create(&sid, 0, 50, POK_SEMAPHORE_DISCIPLINE_DEFAULT);
   printf("[P1] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.priority = 40;

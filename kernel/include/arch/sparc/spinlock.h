@@ -21,7 +21,11 @@
 
 typedef unsigned int pok_spinlock_t;
 
-#define SPIN_UNLOCK(_spin_) (_spin_) = 0
+#define SPIN_UNLOCK(_spin_)                                                    \
+  do {                                                                         \
+    assert(_spin_);                                                            \
+    (_spin_) = 0;                                                              \
+  } while (0)
 
 #define SPIN_LOCK(_spin_)                                                      \
   do {                                                                         \

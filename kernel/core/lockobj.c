@@ -188,6 +188,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, const uint64_t timeout) {
 
   SPIN_UNLOCK(obj->eventspin);
   pok_sched();
+  SPIN_LOCK(obj->eventspin);
   obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
 
   ret = pok_lockobj_lock(obj, NULL);

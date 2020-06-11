@@ -18,7 +18,10 @@
 typedef unsigned char pok_spinlock_t;
 
 #define SPIN_UNLOCK(_spin_)                                                    \
-  { (_spin_) = 0; }
+  do {                                                                         \
+    assert(_spin_);                                                            \
+    (_spin_) = 0;                                                              \
+  } while (0)
 
 #define SPIN_LOCK(_spin_)                                                      \
   asm volatile("mov $1, %%al           \n\t"                                   \

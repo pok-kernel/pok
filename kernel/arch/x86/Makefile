@@ -7,6 +7,7 @@ include $(TOPDIR)/misc/mk/config.mk
 LO_TARGET=	x86.lo
 
 LO_OBJS=	arch.o                 \
+		start_ap.o	       \
 		gdt.o                  \
 		event.o                \
 		thread.o               \

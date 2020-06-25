@@ -8,8 +8,6 @@ multiboot_header:
   .long   0x1BADB002                      /* magic */
   .long   0x00000000                      /* flags */
   .long   - 0x00000000 - 0x1BADB002       /* check */
-  .long	  multiboot_header
-  .long	  _core_entry
 
 .section .text
 

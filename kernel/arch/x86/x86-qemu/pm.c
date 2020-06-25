@@ -27,7 +27,6 @@
 
 #define ALIGN_UP(boundary, val) (val + (boundary - 1)) & (~(boundary - 1))
 
-extern void *__pok_begin;
 extern void *__pok_end;
 
 extern uint32_t pok_multiboot_magic;

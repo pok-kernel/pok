@@ -19,15 +19,16 @@
  * \brief   Provides generic architecture interface for x86 architecture
  */
 
-#include <core/partition.h>
-#include <errno.h>
-
 #include "event.h"
 #include "gdt.h"
+#include <arch/x86/multiprocessing.h>
+#include <core/partition.h>
+#include <errno.h>
 
 pok_ret_t pok_arch_init() {
   pok_gdt_init();
   pok_event_init();
+  pok_multiprocessing_init();
 
   return (POK_ERRNO_OK);
 }

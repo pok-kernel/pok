@@ -15,7 +15,8 @@ LO_OBJS=	arch.o                 \
 		interrupt.o            \
 		pci.o                  \
 		exceptions.o           \
-		divisionbyzeroerror.o
+		divisionbyzeroerror.o  \
+		multiprocessing.o
 
 LO_DEPS=	$(BSP)/$(BSP).lo
 

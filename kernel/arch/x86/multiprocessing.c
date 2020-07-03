@@ -115,6 +115,7 @@ void pok_multiprocessing_init() {
     // MP was found, the system is MultiProcessing Compliant
     mp_floating *mp_float = (mp_floating *)mp;
     int proc_enable_number = 0;
+    int proc_number = 0;
     processor_entry *current_proc;
     io_apic_entry *current_io_apic;
     uint32_t current_addr =
@@ -132,6 +133,7 @@ void pok_multiprocessing_init() {
 
         if (READ_BIT(current_proc->cpu_flags, 0))
           proc_enable_number++;
+        proc_number++;
 
         current_addr += 20;
         break;
@@ -147,6 +149,7 @@ void pok_multiprocessing_init() {
         break;
       }
     }
+
     printf("LAPIC at %x\n", mp_float->conf_table->lapic_addr);
 
     if (proc_enable_number == 1)

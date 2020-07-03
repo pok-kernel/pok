@@ -7,6 +7,7 @@
 #include <core/schedvalues.h>
 
 #define POK_CONFIG_NB_LOCKOBJECTS 2
+#define POK_CONFIG_NB_MAX_PROCESSORS 1
 #define POK_CONFIG_NB_PARTITIONS 3
 #define POK_CONFIG_NB_THREADS 10
 #define POK_CONFIG_PARTITIONS_NLOCKOBJECTS                                     \

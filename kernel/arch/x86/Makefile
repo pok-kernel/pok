@@ -10,6 +10,7 @@ LO_OBJS=	arch.o                 \
 		start_ap.o	       \
 		gdt.o                  \
 		event.o                \
+		ipi.o		       \
 		thread.o               \
 		space.o                \
 		syscalls.o             \

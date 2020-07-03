@@ -20,7 +20,9 @@
  */
 
 #include "event.h"
+#include <arch.h>
 #include <arch/x86/ioports.h>
+#include <arch/x86/ipi.h>
 #include <arch/x86/multiprocessing.h>
 #include <assert.h>
 #include <core/time.h>
@@ -109,17 +111,12 @@ void setup_test(void) { *incr_var = 1; }
  */
 void main_ap(void) {
   asm("lock incw %0" : "=m"(*incr_var) : "m"(*incr_var));
-  uint32_t cr = 0;
-  asm("mov %cr0, %eax \n\t");
-  asm("mov %%eax, %0" : "=m"(cr) : : "%eax");
-  // Check Protected Enable bit
-  assert(READ_BIT(cr, 0));
-  // Check SSE activation
-  assert(~READ_BIT(cr, 2));
-  asm("mov %cr4, %eax \n\t");
-  asm("mov %%eax, %0" : "=m"(cr) : : "%eax");
-  assert(READ_BIT(cr, 9));
-  assert(READ_BIT(cr, 10));
+
+  pok_event_init();
+  pok_arch_preempt_enable();
+  printf("check_apic: %d\n", check_apic());
+  enable_apic();
+  printf("check_apic: %d\n", check_apic());
 }
 
 /**
@@ -227,6 +224,7 @@ void pok_multiprocessing_init() {
     realmode_setup();
 
     setup_test();
+    pok_ipi_init();
 
     // Send INIT IPI
     *(uint32_t *)(mp_float->conf_table->lapic_addr + 0x300) =
@@ -246,6 +244,9 @@ void pok_multiprocessing_init() {
     // Wait 1 second (OSDEV delay)
     for (char i = 0; i < 19; i++)
       pok_x86_wait_mp(0xffff);
+
+    pok_send_ipi(1, lapic_address);
+    pok_x86_wait_mp(0xffff);
 
     // Check if each core have incremented incr_var
     printf("incr_var: %hhd\n", *incr_var);

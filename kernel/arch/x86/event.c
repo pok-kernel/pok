@@ -35,11 +35,16 @@ pok_ret_t pok_event_init() {
   return (POK_ERRNO_OK);
 }
 
+uint8_t bsp_init = 0;
+
 pok_ret_t pok_idt_init() {
   sysdesc_t sysdesc;
 
-  /* Clear table */
-  memset(pok_idt, 0, sizeof(idt_entry_t) * IDT_SIZE);
+  if (!bsp_init) {
+    /* Clear table */
+    memset(pok_idt, 0, sizeof(idt_entry_t) * IDT_SIZE);
+    bsp_init = 1;
+  }
 
   /* Load IDT */
   sysdesc.limit = sizeof(pok_idt);

@@ -1,3 +1,7 @@
+#define STACK_SIZE 0x4000
+
+.globl lapic_address
+
 .code16
 .section .text.realmode
 enter_protected_mode:
@@ -31,11 +35,25 @@ protected_mode:
 	orw $(3 << 9), %ax
 	mov %eax, %cr4
 
+    /* Allocate a stack to the AP:  pok_stack + LAPIC_ID * STACK_SIZE */
+    movl lapic_address, %eax
+    movl 0x20(%eax), %eax
+    shrl $24, %eax
+    movl $(STACK_SIZE), %ebx
+    mull %ebx
+    movl (stack_position), %ebx
+    addl %ebx, %eax
+    movl %eax, %ebp
+	movl %ebp, %esp
+
     call main_ap
 
 spin:
     hlt
     jmp spin
+
+stack_position:
+    .4byte pok_stack + STACK_SIZE
 
 
 .code16

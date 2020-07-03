@@ -19,6 +19,7 @@
  * processors in this case
  */
 
+#include "event.h"
 #include <arch/x86/ioports.h>
 #include <arch/x86/multiprocessing.h>
 #include <core/time.h>
@@ -27,6 +28,8 @@
 extern void *__realmode_lma_start;
 extern void *__realmode_lma_end;
 extern void *__realmode_vma_start;
+
+uint32_t lapic_address;
 
 #define PIT_BASE 0x40
 
@@ -151,6 +154,7 @@ void pok_multiprocessing_init() {
     }
 
     printf("LAPIC at %x\n", mp_float->conf_table->lapic_addr);
+    lapic_address = mp_float->conf_table->lapic_addr;
 
     if (proc_enable_number == 1)
       return;

@@ -137,7 +137,9 @@ void pok_multiprocessing_init() {
     int proc_enable_number = 0;
     int proc_number = 0;
     processor_entry *current_proc;
+    bus_entry *current_bus;
     io_apic_entry *current_io_apic;
+    apic_interrupt_entry *current_apic_interrupt;
     uint32_t current_addr =
         (uint32_t)mp_float->conf_table + sizeof(mp_conf_table_header);
     // Check every entry of the Configuration Table
@@ -157,15 +159,55 @@ void pok_multiprocessing_init() {
 
         current_addr += 20;
         break;
+
+      case 1:
+        current_bus = (bus_entry *)current_addr;
+        printf("Bus entry:\nBus ID: %hhx\nBus Type: %c%c%c%c%c%c\n\n",
+               current_bus->id, current_bus->type_string[0],
+               current_bus->type_string[1], current_bus->type_string[2],
+               current_bus->type_string[3], current_bus->type_string[4],
+               current_bus->type_string[5]);
+        current_addr += 8;
+        break;
+
       case 2:
         current_io_apic = (io_apic_entry *)current_addr;
         if (current_io_apic->enable) {
           printf("IO APIC at %x\n", current_io_apic->address);
+          uint32_t offset = 0x14;
+          *(volatile uint32_t *)current_addr = offset;
+          printf("LAPIC: %x", *(volatile uint32_t *)(current_addr + offset++));
+          *(volatile uint32_t *)current_addr = offset;
+          printf(" %x\n", *(volatile uint32_t *)(current_addr + offset));
         }
         current_addr += 8;
         break;
-      default:
+
+      case 3:
+        current_apic_interrupt = (apic_interrupt_entry *)current_addr;
+        printf("IO APIC interrupt:\nType: %hhx\nFlags: %hx\nBus ID: %hhx\nBus "
+               "IRQ: "
+               "%hhx\nAPIC: %hhx\nIDINTin: %hhx\n\n",
+               current_apic_interrupt->interrupt_type,
+               current_apic_interrupt->flags, current_apic_interrupt->bus_id,
+               current_apic_interrupt->bus_irq, current_apic_interrupt->apic_id,
+               current_apic_interrupt->apic_intin);
         current_addr += 8;
+        break;
+      case 4:
+        current_apic_interrupt = (apic_interrupt_entry *)current_addr;
+        printf(
+            "LAPIC interrupt:\nType: %hhx\nFlags: %hx\nBus ID: %hhx\nBus IRQ: "
+            "%hhx\nAPIC: %hhx\nIDINTin: %hhx\n\n",
+            current_apic_interrupt->interrupt_type,
+            current_apic_interrupt->flags, current_apic_interrupt->bus_id,
+            current_apic_interrupt->bus_irq, current_apic_interrupt->apic_id,
+            current_apic_interrupt->apic_intin);
+        current_addr += 8;
+        break;
+      default:
+        printf("Error");
+        assert(0);
         break;
       }
     }

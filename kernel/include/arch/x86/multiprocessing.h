@@ -74,6 +74,22 @@ typedef struct {
   uint32_t address;
 } __attribute__((__packed__)) io_apic_entry;
 
+typedef struct {
+  uint8_t entry_type;
+  uint8_t id;
+  char type_string[6];
+} __attribute__((__packed__)) bus_entry;
+
+typedef struct {
+  uint8_t entry;
+  uint8_t interrupt_type;
+  uint16_t flags;
+  uint8_t bus_id;
+  uint8_t bus_irq;
+  uint8_t apic_id;
+  uint8_t apic_intin;
+} __attribute__((__packed__)) apic_interrupt_entry;
+
 void pok_multiprocessing_init(void);
 
 #endif /* __POK_X86_MULTIPROCESSING__ */

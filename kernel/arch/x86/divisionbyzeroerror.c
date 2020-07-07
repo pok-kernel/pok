@@ -15,10 +15,6 @@
 #include <arch.h>
 
 void pok_division_by_zero_error() {
-  asm volatile("mov $0,%%ebx  \n\t"
-               "div %%ebx     \n\t"
-               :
-               :
-               : "%eax", "%ebx", "%edx");
+  asm volatile("int $0");
   __builtin_unreachable();
 }

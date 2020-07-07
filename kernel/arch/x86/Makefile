@@ -8,6 +8,7 @@ LO_TARGET=	x86.lo
 
 LO_OBJS=	arch.o                 \
 		start_ap.o	       \
+		ap.o		       \
 		gdt.o                  \
 		event.o                \
 		ipi.o		       \

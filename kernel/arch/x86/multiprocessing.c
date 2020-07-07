@@ -19,8 +19,6 @@
  * processors in this case
  */
 
-#include "event.h"
-#include <arch.h>
 #include <arch/x86/ioports.h>
 #include <arch/x86/ipi.h>
 #include <arch/x86/multiprocessing.h>
@@ -50,6 +48,28 @@ void pok_x86_wait_mp(uint16_t counter_init) {
     outb(PIT_BASE + 3, 0xE2);
   }
 }
+
+/**
+ * \brief This method starts the APs
+ */
+void pok_start_ap() {
+  // Send INIT IPI
+  *(uint32_t *)(lapic_address + 0x300) = 0b11001100010111111111;
+  *(uint32_t *)(lapic_address + 0x300) = 0b11001000010111111111;
+  // Wait 1 millisecond (OSDEV delay)
+  pok_x86_wait_mp(0x4AE);
+  // Send first STARTUP IPI
+  *(uint32_t *)(lapic_address + 0x300) = 0x000C4600 + (0x01);
+  // Wait 10 milliseconds (OSDEV delay)
+  pok_x86_wait_mp(0x2e9b);
+  // Send second STARTUP IPI
+  *(uint32_t *)(lapic_address + 0x300) = 0x000C4600 + (0x01);
+  // Wait 1 second (OSDEV delay)
+  for (char i = 0; i < 19; i++)
+    pok_x86_wait_mp(0xffff);
+}
+
+void setup_test(void) { *incr_var = 1; }
 
 /**
  * \brief This method looks for "_MP_" string inside EBDA memory zone, if this
@@ -90,6 +110,48 @@ int32_t search_mp_bios() {
   return 0;
 }
 
+void bus_entry_handler(uint32_t current_addr) {
+  bus_entry *current_bus = (bus_entry *)current_addr;
+  printf("Bus entry:\nBus ID: %hhx\nBus Type: %c%c%c%c%c%c\n\n",
+         current_bus->id, current_bus->type_string[0],
+         current_bus->type_string[1], current_bus->type_string[2],
+         current_bus->type_string[3], current_bus->type_string[4],
+         current_bus->type_string[5]);
+}
+
+void io_apic_entry_handler(uint32_t current_addr) {
+  io_apic_entry *current_io_apic = (io_apic_entry *)current_addr;
+  if (current_io_apic->enable) {
+    printf("IO APIC at %x\n", current_io_apic->address);
+    uint32_t offset = 0x14;
+    *(volatile uint32_t *)current_addr = offset;
+    printf("LAPIC: %x", *(volatile uint32_t *)(current_addr + offset++));
+    *(volatile uint32_t *)current_addr = offset;
+    printf(" %x\n", *(volatile uint32_t *)(current_addr + offset));
+  }
+}
+
+void io_apic_interrupt_entry_handler(uint32_t current_addr) {
+  apic_interrupt_entry *current_apic_interrupt =
+      (apic_interrupt_entry *)current_addr;
+  printf("IO APIC interrupt:\nType: %hhx\nFlags: %hx\nBus ID: %hhx\nBus "
+         "IRQ: "
+         "%hhx\nAPIC: %hhx\nIDINTin: %hhx\n\n",
+         current_apic_interrupt->interrupt_type, current_apic_interrupt->flags,
+         current_apic_interrupt->bus_id, current_apic_interrupt->bus_irq,
+         current_apic_interrupt->apic_id, current_apic_interrupt->apic_intin);
+}
+
+void lapic_interrupt_entry_handler(uint32_t current_addr) {
+  apic_interrupt_entry *current_apic_interrupt =
+      (apic_interrupt_entry *)current_addr;
+  printf("LAPIC interrupt:\nType: %hhx\nFlags: %hx\nBus ID: %hhx\nBus IRQ: "
+         "%hhx\nAPIC: %hhx\nIDINTin: %hhx\n\n",
+         current_apic_interrupt->interrupt_type, current_apic_interrupt->flags,
+         current_apic_interrupt->bus_id, current_apic_interrupt->bus_irq,
+         current_apic_interrupt->apic_id, current_apic_interrupt->apic_intin);
+}
+
 /**
  * \brief Copy realmode data and code from LMA (0x100000) to the VMA (0x1000)
  */
@@ -101,22 +163,6 @@ static void realmode_setup(void) {
 
   while (src_addr < src_end)
     *dst_addr++ = *src_addr++;
-}
-
-void setup_test(void) { *incr_var = 1; }
-
-/**
- * \brief Main method for APs
- * TODO: implements next steps (Here tests are implemented)
- */
-void main_ap(void) {
-  asm("lock incw %0" : "=m"(*incr_var) : "m"(*incr_var));
-
-  pok_event_init();
-  pok_arch_preempt_enable();
-  printf("check_apic: %d\n", check_apic());
-  enable_apic();
-  printf("check_apic: %d\n", check_apic());
 }
 
 /**
@@ -133,75 +179,41 @@ void pok_multiprocessing_init() {
     mp_floating *mp_float = (mp_floating *)mp;
     int proc_enable_number = 0;
     int proc_number = 0;
-    processor_entry *current_proc;
-    bus_entry *current_bus;
-    io_apic_entry *current_io_apic;
-    apic_interrupt_entry *current_apic_interrupt;
     uint32_t current_addr =
         (uint32_t)mp_float->conf_table + sizeof(mp_conf_table_header);
     // Check every entry of the Configuration Table
     for (int i = 0; i < mp_float->conf_table->entry_count; i++) {
       switch (*(uint8_t *)current_addr) {
-      case 0:
-        current_proc = (processor_entry *)current_addr;
-        printf("Entry type: %hhx, Proc n°%d, lapic_id=%hhx, "
-               "lapic_version=%hhx, cpu_flags=%hhx, lapic on-chip: %hhx\n",
-               current_proc->entry_type, i, current_proc->lapic_id,
-               current_proc->lapic_version, current_proc->cpu_flags,
-               READ_BIT(current_proc->feature_flags, 9));
-
+      case 0: {
+        processor_entry *current_proc = (processor_entry *)current_addr;
         if (READ_BIT(current_proc->cpu_flags, 0))
           proc_enable_number++;
         proc_number++;
 
         current_addr += 20;
         break;
+      }
 
       case 1:
-        current_bus = (bus_entry *)current_addr;
-        printf("Bus entry:\nBus ID: %hhx\nBus Type: %c%c%c%c%c%c\n\n",
-               current_bus->id, current_bus->type_string[0],
-               current_bus->type_string[1], current_bus->type_string[2],
-               current_bus->type_string[3], current_bus->type_string[4],
-               current_bus->type_string[5]);
+        bus_entry_handler(current_addr);
         current_addr += 8;
         break;
 
       case 2:
-        current_io_apic = (io_apic_entry *)current_addr;
-        if (current_io_apic->enable) {
-          printf("IO APIC at %x\n", current_io_apic->address);
-          uint32_t offset = 0x14;
-          *(volatile uint32_t *)current_addr = offset;
-          printf("LAPIC: %x", *(volatile uint32_t *)(current_addr + offset++));
-          *(volatile uint32_t *)current_addr = offset;
-          printf(" %x\n", *(volatile uint32_t *)(current_addr + offset));
-        }
+        io_apic_entry_handler(current_addr);
         current_addr += 8;
         break;
 
       case 3:
-        current_apic_interrupt = (apic_interrupt_entry *)current_addr;
-        printf("IO APIC interrupt:\nType: %hhx\nFlags: %hx\nBus ID: %hhx\nBus "
-               "IRQ: "
-               "%hhx\nAPIC: %hhx\nIDINTin: %hhx\n\n",
-               current_apic_interrupt->interrupt_type,
-               current_apic_interrupt->flags, current_apic_interrupt->bus_id,
-               current_apic_interrupt->bus_irq, current_apic_interrupt->apic_id,
-               current_apic_interrupt->apic_intin);
+        io_apic_interrupt_entry_handler(current_addr);
         current_addr += 8;
         break;
+
       case 4:
-        current_apic_interrupt = (apic_interrupt_entry *)current_addr;
-        printf(
-            "LAPIC interrupt:\nType: %hhx\nFlags: %hx\nBus ID: %hhx\nBus IRQ: "
-            "%hhx\nAPIC: %hhx\nIDINTin: %hhx\n\n",
-            current_apic_interrupt->interrupt_type,
-            current_apic_interrupt->flags, current_apic_interrupt->bus_id,
-            current_apic_interrupt->bus_irq, current_apic_interrupt->apic_id,
-            current_apic_interrupt->apic_intin);
+        lapic_interrupt_entry_handler(current_addr);
         current_addr += 8;
         break;
+
       default:
         printf("Error");
         assert(0);
@@ -210,46 +222,24 @@ void pok_multiprocessing_init() {
     }
 
     assert(proc_number <= POK_CONFIG_NB_MAX_PROCESSORS);
-
-    printf("LAPIC at %x\n", mp_float->conf_table->lapic_addr);
     lapic_address = mp_float->conf_table->lapic_addr;
 
     if (proc_enable_number == 1)
       return;
 
-    if (READ_BIT(
-            *(volatile uint32_t *)(mp_float->conf_table->lapic_addr + 0xF0), 8))
-      printf("LAPIC already enable\n");
+    if (!check_apic())
+      enable_apic();
 
     realmode_setup();
-
     setup_test();
     pok_ipi_init();
 
-    // Send INIT IPI
-    *(uint32_t *)(mp_float->conf_table->lapic_addr + 0x300) =
-        0b11001100010111111111;
-    *(uint32_t *)(mp_float->conf_table->lapic_addr + 0x300) =
-        0b11001000010111111111;
-    // Wait 1 millisecond (OSDEV delay)
-    pok_x86_wait_mp(0x4AE);
-    // Send first STARTUP IPI
-    *(uint32_t *)(mp_float->conf_table->lapic_addr + 0x300) =
-        0x000C4600 + (0x01);
-    // Wait 10 milliseconds (OSDEV delay)
-    pok_x86_wait_mp(0x2e9b);
-    // Send second STARTUP IPI
-    *(uint32_t *)(mp_float->conf_table->lapic_addr + 0x300) =
-        0x000C4600 + (0x01);
-    // Wait 1 second (OSDEV delay)
-    for (char i = 0; i < 19; i++)
-      pok_x86_wait_mp(0xffff);
+    pok_start_ap();
 
     pok_send_ipi(1, lapic_address);
     pok_x86_wait_mp(0xffff);
 
     // Check if each core have incremented incr_var
-    printf("incr_var: %hhd\n", *incr_var);
     assert(*incr_var == proc_enable_number);
   }
 }

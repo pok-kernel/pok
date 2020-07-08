@@ -22,6 +22,7 @@
 #include "event.h"
 #include <arch/x86/ioports.h>
 #include <arch/x86/multiprocessing.h>
+#include <assert.h>
 #include <core/time.h>
 #include <libc.h>
 
@@ -30,6 +31,7 @@ extern void *__realmode_lma_end;
 extern void *__realmode_vma_start;
 
 uint32_t lapic_address;
+uint8_t *incr_var = (uint8_t *)0xfff;
 
 #define PIT_BASE 0x40
 
@@ -99,11 +101,26 @@ static void realmode_setup(void) {
     *dst_addr++ = *src_addr++;
 }
 
+void setup_test(void) { *incr_var = 1; }
+
 /**
  * \brief Main method for APs
- * TODO: implements next steps
+ * TODO: implements next steps (Here tests are implemented)
  */
-void main_ap(void) {}
+void main_ap(void) {
+  asm("lock incw %0" : "=m"(*incr_var) : "m"(*incr_var));
+  uint32_t cr = 0;
+  asm("mov %cr0, %eax \n\t");
+  asm("mov %%eax, %0" : "=m"(cr) : : "%eax");
+  // Check Protected Enable bit
+  assert(READ_BIT(cr, 0));
+  // Check SSE activation
+  assert(~READ_BIT(cr, 2));
+  asm("mov %cr4, %eax \n\t");
+  asm("mov %%eax, %0" : "=m"(cr) : : "%eax");
+  assert(READ_BIT(cr, 9));
+  assert(READ_BIT(cr, 10));
+}
 
 /**
  *\brief   Check if the system is multiprocessors and configure other processors
@@ -153,6 +170,8 @@ void pok_multiprocessing_init() {
       }
     }
 
+    assert(proc_number <= POK_CONFIG_NB_MAX_PROCESSORS);
+
     printf("LAPIC at %x\n", mp_float->conf_table->lapic_addr);
     lapic_address = mp_float->conf_table->lapic_addr;
 
@@ -164,6 +183,8 @@ void pok_multiprocessing_init() {
       printf("LAPIC already enable\n");
 
     realmode_setup();
+
+    setup_test();
 
     // Send INIT IPI
     *(uint32_t *)(mp_float->conf_table->lapic_addr + 0x300) =
@@ -183,5 +204,9 @@ void pok_multiprocessing_init() {
     // Wait 1 second (OSDEV delay)
     for (char i = 0; i < 19; i++)
       pok_x86_wait_mp(0xffff);
+
+    // Check if each core have incremented incr_var
+    printf("incr_var: %hhd\n", *incr_var);
+    assert(*incr_var == proc_enable_number);
   }
 }

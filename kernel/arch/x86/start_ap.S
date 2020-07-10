@@ -55,9 +55,7 @@ spin:
 stack_position:
     .4byte pok_stack + STACK_SIZE
 
-
-.code16
-.section .data.realmode
+   .align 4
 gdt32info:
    .word gdt32_end - gdt32 - 1  # last byte in table
    .word gdt32                  # start of table

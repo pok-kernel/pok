@@ -4,32 +4,11 @@ ENTRY(_core_entry)
 
 /* Multiboot spec uses 0x00100000 as a base */
 PHYS_BASE = 0x00100000;
-REAL_BASE = 0x1000;
+__REAL_BASE = 0x1000;
 
 SECTIONS
 {
 	. = PHYS_BASE;
-
-    __physreal_diff = . - REAL_BASE;
-    .realmode REAL_BASE : AT(ADDR(.realmode) + __physreal_diff) {
-       
-        __realmode_vma_start = .;
-
-        
-        __realmode_lma_start = LOADADDR(.realmode);
-        *(.text.realmode);
-        *(.data.realmode);
-    }
-
-    . += __physreal_diff;
-    . = ALIGN(4);
-    __realmode_vma_end = .;
-    __realmode_secsize   = ((__realmode_vma_end)-(__realmode_vma_start));
-    __realmode_secsize_l = __realmode_secsize>>2;
-    __realmode_lma_end   = __realmode_vma_start + __physreal_diff + __realmode_secsize;
-
-   
-
 
 	.text : AT(ADDR(.text))
 	{
@@ -38,11 +17,10 @@ SECTIONS
 		*(*got*)
 	}
 
-    
-    
 	.rodata : 
 	{
 		*(.rodata);
+        . = ALIGN(4);
 	}
 
     /* We want to avoid this section being placed in low memory */
@@ -50,8 +28,15 @@ SECTIONS
         *(.eh_frame*);
     }
 
+    .text.realmode __REAL_BASE : AT(ADDR(.eh_frame) + SIZEOF(.eh_frame)) {
+        *(.text.realmode);
+        . = ALIGN(4);
+    }
 
-	.data :
+    __realmode_lma_start = LOADADDR(.text.realmode);
+    __realmode_lma_end = __realmode_lma_start + SIZEOF(.text.realmode);
+
+	.data (LOADADDR(.text.realmode) + SIZEOF(.text.realmode)): AT (LOADADDR(.text.realmode) + SIZEOF(.text.realmode))
 	{
 		*(.data*) *(.bss) *(COMMON)
 
@@ -60,6 +45,7 @@ SECTIONS
 		__archive_end = .;
 		__archive2_begin = .;
 		*(.archive2)
+        . = ALIGN(4);
 		__archive2_end = .;
 	}
 
@@ -67,6 +53,7 @@ SECTIONS
 	__pok_end = . ;
 
     /DISCARD/ : {
+        *(.note.gnu.property);
         *(.note.gnu.build-id);
         *(.comment);
     }

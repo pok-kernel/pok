@@ -12,6 +12,7 @@ SECTIONS
 	{
 		*(.multiboot)
 		*(.text)
+		*(*got*)
 	}
 
 	.rodata :
@@ -21,7 +22,7 @@ SECTIONS
 
 	.data :
 	{
-		*(.data) *(.bss) *(COMMON)
+		*(.data*) *(.bss) *(COMMON)
 
 		__archive_begin = .;
 		*(.archive)
@@ -31,5 +32,6 @@ SECTIONS
 		__archive2_end = .;
 	}
 
+	/* Nothing must have a VMA greater than __pok_end symbol address */
 	__pok_end = . ;
 }

@@ -24,6 +24,7 @@
 #include <core/error.h>
 #include <core/instrumentation.h>
 #include <core/loader.h>
+#include <core/multiprocessing.h>
 #include <core/partition.h>
 #include <core/sched.h>
 #include <core/thread.h>

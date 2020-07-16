@@ -15,6 +15,7 @@
 #ifndef __POK_SCHED_H__
 #define __POK_SCHED_H__
 
+#include <core/multiprocessing.h>
 #include <core/schedvalues.h>
 #include <errno.h>
 #include <types.h>

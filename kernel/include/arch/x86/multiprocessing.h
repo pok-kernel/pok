@@ -91,5 +91,5 @@ typedef struct {
 } __attribute__((__packed__)) apic_interrupt_entry;
 
 void pok_multiprocessing_init(void);
-
-#endif /* __POK_X86_MULTIPROCESSING__ */
+uint8_t pok_get_lapic_id(void);
+#endif /* __POK_X86_MULTICORE__ */

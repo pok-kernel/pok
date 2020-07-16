@@ -22,7 +22,9 @@
 #include <arch/x86/ioports.h>
 #include <arch/x86/ipi.h>
 #include <arch/x86/multiprocessing.h>
+#include <arch/x86/spinlock.h>
 #include <assert.h>
+#include <core/partition.h>
 #include <core/time.h>
 #include <libc.h>
 
@@ -31,9 +33,21 @@ extern void *__realmode_lma_end;
 extern void *__REAL_BASE;
 
 uint32_t lapic_address;
-uint8_t *incr_var = (uint8_t *)0xfff;
+uint8_t incr_var;
+uint8_t proc_index[POK_CONFIG_NB_MAX_PROCESSORS];
+
+uint8_t start_spinlock;
+uint8_t multiprocessing_system = 0;
 
 #define PIT_BASE 0x40
+
+uint8_t pok_get_lapic_id() {
+  return (uint8_t)(*(volatile uint32_t *)(lapic_address + 0x20) >> 24);
+};
+
+uint8_t pok_get_proc_id() {
+  return multiprocessing_system ? proc_index[pok_get_lapic_id()] : 0;
+}
 
 /**
  * \brief This method uses the PIT to realize a wait. It is used to wait between
@@ -69,7 +83,7 @@ void pok_start_ap() {
     pok_x86_wait_mp(0xffff);
 }
 
-void setup_test(void) { *incr_var = 1; }
+void setup_test(void) { incr_var = 1; }
 
 /**
  * \brief This method looks for "_MP_" string inside EBDA memory zone, if this
@@ -227,6 +241,8 @@ void pok_multiprocessing_init() {
     if (proc_enable_number == 1)
       return;
 
+    multiprocessing_system = 1;
+
     if (!check_apic())
       enable_apic();
 
@@ -234,12 +250,15 @@ void pok_multiprocessing_init() {
     setup_test();
     pok_ipi_init();
 
+    proc_index[pok_get_lapic_id()] = 0;
+    start_spinlock = 0;
+
     pok_start_ap();
 
     pok_send_ipi(1, lapic_address);
     pok_x86_wait_mp(0xffff);
 
     // Check if each core have incremented incr_var
-    assert(*incr_var == proc_enable_number);
+    assert(incr_var == proc_enable_number);
   }
 }

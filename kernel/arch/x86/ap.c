@@ -16,16 +16,23 @@
 #include <arch.h>
 #include <arch/x86/ipi.h>
 #include <arch/x86/multiprocessing.h>
+#include <arch/x86/spinlock.h>
+#include <assert.h>
 #include <libc.h>
 
-extern uint8_t *incr_var;
+extern uint8_t incr_var;
+extern uint8_t start_spinlock;
+extern uint8_t proc_index[POK_CONFIG_NB_MAX_PROCESSORS];
 
 /**
  * \brief Main method for APs
  * TODO: implements next steps (Here tests are implemented)
  */
 void main_ap(void) {
-  asm("lock incw %0" : "=m"(*incr_var) : "m"(*incr_var));
+  SPIN_LOCK(start_spinlock);
+  proc_index[pok_get_lapic_id()] = incr_var;
+  incr_var++;
+  SPIN_UNLOCK(start_spinlock);
 
   pok_event_init();
   pok_arch_preempt_enable();

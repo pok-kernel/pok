@@ -65,13 +65,6 @@ static void my_fflush(struct s_file *file) {
   file->pos = 0;
 }
 
-static struct s_file *init_buffered_output(void) {
-  static struct s_file res;
-
-  res.pos = 0;
-  return &res;
-}
-
 static void my_putc(char c, struct s_file *file) {
   file->buff[file->pos++] = c;
 
@@ -236,7 +229,8 @@ static integer_size_t check_size_modifier(const char **format) {
 }
 
 int vprintf(const char *format, va_list args) {
-  struct s_file *file = init_buffered_output();
+  struct s_file file;
+  file.pos = 0;
   int count = 0;
 
   for (; *format; format += 1) {
@@ -301,23 +295,23 @@ int vprintf(const char *format, va_list args) {
           assert(0);
 #else
           // If assertions are not enabled, continue as if nothing happened.
-          my_putc(*format, file);
+          my_putc(*format, &file);
           ++count;
           continue;
 #endif // POK_NEEDS_ASSERT
         }
-        count += special_char(*format, &arg, file);
+        count += special_char(*format, &arg, &file);
       } else {
-        my_putc(*format, file);
+        my_putc(*format, &file);
         ++count;
       }
     } else {
-      my_putc(*format, file);
+      my_putc(*format, &file);
       ++count;
     }
   }
 
-  close_buffered_output(file);
+  close_buffered_output(&file);
   return count;
 }
 

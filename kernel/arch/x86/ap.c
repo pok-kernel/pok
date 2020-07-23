@@ -15,9 +15,9 @@
 #include "event.h"
 #include <arch.h>
 #include <arch/x86/ipi.h>
-#include <arch/x86/multiprocessing.h>
 #include <arch/x86/spinlock.h>
 #include <assert.h>
+#include <core/multiprocessing.h>
 #include <libc.h>
 
 extern uint8_t incr_var;
@@ -33,6 +33,8 @@ void main_ap(void) {
   proc_index[pok_get_lapic_id()] = incr_var;
   incr_var++;
   SPIN_UNLOCK(start_spinlock);
+
+  pok_gdt_init(pok_get_proc_id());
 
   pok_event_init();
   pok_arch_preempt_enable();

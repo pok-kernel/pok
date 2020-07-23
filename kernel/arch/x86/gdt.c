@@ -25,17 +25,19 @@
 
 gdt_entry_t pok_gdt[GDT_SIZE];
 
-tss_t pok_tss;
+tss_t pok_tss[POK_CONFIG_NB_MAX_PROCESSORS];
 
-pok_ret_t pok_gdt_init() {
+pok_ret_t pok_gdt_init(uint8_t proc) {
   sysdesc_t sysdesc;
 
-  /* Set null descriptor and clear table */
-  memset(pok_gdt, 0, sizeof(gdt_entry_t) * GDT_SIZE);
+  if (!proc) {
+    /* Set null descriptor and clear table */
+    memset(pok_gdt, 0, sizeof(gdt_entry_t) * GDT_SIZE);
 
-  /* Set kernel descriptors */
-  gdt_set_segment(GDT_CORE_CODE_SEGMENT, 0, ~0UL, GDTE_CODE, 0);
-  gdt_set_segment(GDT_CORE_DATA_SEGMENT, 0, ~0UL, GDTE_DATA, 0);
+    /* Set kernel descriptors */
+    gdt_set_segment(GDT_CORE_CODE_SEGMENT, 0, ~0UL, GDTE_CODE, 0);
+    gdt_set_segment(GDT_CORE_DATA_SEGMENT, 0, ~0UL, GDTE_DATA, 0);
+  }
 
   /* Load GDT */
   sysdesc.limit = sizeof(pok_gdt);
@@ -56,26 +58,26 @@ pok_ret_t pok_gdt_init() {
       : "i"(GDT_CORE_CODE_SEGMENT << 3), "i"(GDT_CORE_DATA_SEGMENT << 3)
       : "eax");
 
-  pok_tss_init();
+  pok_tss_init(proc);
 
   return (POK_ERRNO_OK);
 }
 
-int pok_tss_init() {
-  uint16_t sel = GDT_BUILD_SELECTOR(GDT_TSS_SEGMENT, 0, 0);
+int pok_tss_init(uint8_t proc) {
+  uint16_t sel = GDT_BUILD_SELECTOR(GDT_TSS_SEGMENT(proc), 0, 0);
 
-  memset(&pok_tss, 0, sizeof(tss_t));
+  memset(&pok_tss[proc], 0, sizeof(tss_t));
 
-  pok_tss.ss0 = GDT_BUILD_SELECTOR(GDT_CORE_DATA_SEGMENT, 0, 0);
+  pok_tss[proc].ss0 = GDT_BUILD_SELECTOR(GDT_CORE_DATA_SEGMENT, 0, 0);
 
-  gdt_set_system(GDT_TSS_SEGMENT, (uint32_t)&pok_tss, sizeof(tss_t), GDTE_TSS,
-                 0);
+  gdt_set_system(GDT_TSS_SEGMENT(proc), (uint32_t)&pok_tss[proc], sizeof(tss_t),
+                 GDTE_TSS, 0);
 
   asm("ltr %0" : : "m"(sel));
   return (POK_ERRNO_OK);
 }
 
-void tss_set_esp0(uint32_t esp0) { pok_tss.esp0 = esp0; }
+void tss_set_esp0(uint8_t proc, uint32_t esp0) { pok_tss[proc].esp0 = esp0; }
 
 void gdt_set_segment(uint16_t index, uint32_t base_address, uint32_t limit,
                      e_gdte_type t, int dpl) {

@@ -14,11 +14,12 @@
 
 #include "tss.h"
 #include <arch/x86/interrupt.h>
+#include <core/multiprocessing.h>
 
 void update_tss(interrupt_frame *frame) {
   // Update esp0 in TSS to the given frame if we are not executing in
   // code segment 1 (kernel).
   if ((frame->cs & 0xffff) != (1 << 3)) {
-    pok_tss.esp0 = (uint32_t)frame + sizeof(interrupt_frame);
+    pok_tss[pok_get_proc_id()].esp0 = (uint32_t)frame + sizeof(interrupt_frame);
   }
 }

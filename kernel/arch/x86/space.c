@@ -124,7 +124,7 @@ void pok_dispatch_space(uint8_t partition_id, uint32_t user_pc,
   ctx.eflags = 1 << 9;
   ctx.esp = user_sp;
 
-  tss_set_esp0(kernel_sp);
+  tss_set_esp0(0, kernel_sp);
 
   asm("mov %0, %%esp		\n"
       "pop %%es		\n"

@@ -50,18 +50,20 @@ typedef struct {
 
 #define GDT_CORE_CODE_SEGMENT 1
 #define GDT_CORE_DATA_SEGMENT 2
-#define GDT_TSS_SEGMENT 3
 
-#define GDT_PARTITION_CODE_SEGMENT(partition_id) (4 + 2 * partition_id)
-#define GDT_PARTITION_DATA_SEGMENT(partition_id) (4 + 2 * partition_id + 1)
+#define GDT_TSS_SEGMENT(proc_id) (3 + (proc_id))
+#define GDT_PARTITION_CODE_SEGMENT(partition_id)                               \
+  (3 + POK_CONFIG_NB_MAX_PROCESSORS + 2 * partition_id)
+#define GDT_PARTITION_DATA_SEGMENT(partition_id)                               \
+  (3 + POK_CONFIG_NB_MAX_PROCESSORS + 2 * partition_id + 1)
 
 #define GDT_BUILD_SELECTOR(seg, local, rpl)                                    \
   ((seg << 3) | ((local & 0x1) << 2) | (rpl & 0x3))
 
-pok_ret_t pok_gdt_init();
-int pok_tss_init();
+pok_ret_t pok_gdt_init(uint8_t proc);
+int pok_tss_init(uint8_t proc);
 
-void tss_set_esp0(uint32_t esp0);
+void tss_set_esp0(uint8_t proc, uint32_t esp0);
 
 void gdt_set_segment(uint16_t index, uint32_t base_address, uint32_t limit,
                      e_gdte_type t, int dpl);

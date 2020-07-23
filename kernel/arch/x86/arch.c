@@ -26,7 +26,7 @@
 #include <errno.h>
 
 pok_ret_t pok_arch_init() {
-  pok_gdt_init();
+  pok_gdt_init(0);
   pok_event_init();
   pok_multiprocessing_init();
 

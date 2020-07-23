@@ -13,6 +13,7 @@
 platform: !mux
     x86_gcc:
         qemu: qemu-system-i386
+        proc: 4
         compiler: gcc -m32 -Wall -Wextra -Werror -O3
 tests: !mux
     hello_world:

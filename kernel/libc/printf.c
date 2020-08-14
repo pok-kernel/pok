@@ -31,7 +31,7 @@ static const char digits[] = "0123456789abcdef";
 #define BASE_HEX 16
 #define BASE_OCT 8
 
-#define MY_BUF_SIZE 8192
+#define MY_BUF_SIZE 128
 
 /*
  * some types

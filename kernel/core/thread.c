@@ -62,6 +62,25 @@ void pok_thread_insert_sort(uint16_t index_low, uint16_t index_high) {
 }
 #endif
 
+void pok_idle_thread_init() {
+
+  for (int i = 0; i < POK_CONFIG_NB_MAX_PROCESSORS; i++) {
+
+    pok_threads[IDLE_THREAD - i].period = INFINITE_TIME_VALUE;
+    pok_threads[IDLE_THREAD - i].deadline = 0;
+    pok_threads[IDLE_THREAD - i].time_capacity = INFINITE_TIME_VALUE;
+    pok_threads[IDLE_THREAD - i].next_activation = 0;
+    pok_threads[IDLE_THREAD - i].remaining_time_capacity = INFINITE_TIME_VALUE;
+    pok_threads[IDLE_THREAD - i].wakeup_time = 0;
+    pok_threads[IDLE_THREAD - i].entry = pok_arch_idle;
+    pok_threads[IDLE_THREAD - i].base_priority = pok_sched_get_priority_min(0);
+    pok_threads[IDLE_THREAD - i].state = POK_STATE_RUNNABLE;
+
+    pok_threads[IDLE_THREAD - i].sp = pok_context_create(
+        IDLE_THREAD - i, IDLE_STACK_SIZE, (uint32_t)pok_arch_idle);
+  }
+}
+
 /**
  * Initialize threads array, put their default values
  * and so on
@@ -78,30 +97,15 @@ void pok_thread_init(void) {
     total_threads = total_threads + pok_partitions[j].nthreads;
   }
 
-  if (total_threads != (POK_CONFIG_NB_THREADS - 2)) {
+  if (total_threads !=
+      (POK_CONFIG_NB_THREADS - 1 - POK_CONFIG_NB_MAX_PROCESSORS)) {
 #ifdef POK_NEEDS_DEBUG
     printf("Error in configuration, bad number of threads\n");
 #endif
     pok_kernel_error(POK_ERROR_KIND_KERNEL_CONFIG);
   }
 
-  pok_threads[KERNEL_THREAD].priority = pok_sched_get_priority_min(0);
-  pok_threads[KERNEL_THREAD].base_priority = pok_sched_get_priority_min(0);
-  pok_threads[KERNEL_THREAD].state = POK_STATE_RUNNABLE;
-  pok_threads[KERNEL_THREAD].next_activation = 0;
-
-  pok_threads[IDLE_THREAD].period = INFINITE_TIME_VALUE;
-  pok_threads[IDLE_THREAD].deadline = 0;
-  pok_threads[IDLE_THREAD].time_capacity = INFINITE_TIME_VALUE;
-  pok_threads[IDLE_THREAD].next_activation = 0;
-  pok_threads[IDLE_THREAD].remaining_time_capacity = INFINITE_TIME_VALUE;
-  pok_threads[IDLE_THREAD].wakeup_time = 0;
-  pok_threads[IDLE_THREAD].entry = pok_arch_idle;
-  pok_threads[IDLE_THREAD].base_priority = pok_sched_get_priority_min(0);
-  pok_threads[IDLE_THREAD].state = POK_STATE_RUNNABLE;
-
-  pok_threads[IDLE_THREAD].sp =
-      pok_context_create(IDLE_THREAD, IDLE_STACK_SIZE, (uint32_t)pok_arch_idle);
+  pok_idle_thread_init();
 
   for (i = 0; i < POK_CONFIG_NB_THREADS; ++i) {
     pok_threads[i].period = INFINITE_TIME_VALUE;

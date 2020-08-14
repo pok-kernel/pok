@@ -299,8 +299,9 @@ def gen_kernel_deployment_h(fd, config):
 
     includes = set()
     needs = set()
-    configs = {"NB_MAX_PROCESSORS": get_option_or(config, "target.max_processors_number", 1),"NB_PARTITIONS": len(option_value(config, "partitions")),
-               "NB_THREADS": sum_option(config, "partitions.threads.count") + 2}
+    max_processors = get_option_or(config, "target.max_processors_number", 1)
+    configs = {"NB_MAX_PROCESSORS": max_processors,"NB_PARTITIONS": len(option_value(config, "partitions")),
+               "NB_THREADS": sum_option(config, "partitions.threads.count") + max_processors + 1}
     semaphores = get_option_or(config, "partitions.semaphores", 0)
     mutexes = get_option_or(config, "partitions.mutexes", 0)
     events = get_option_or(config, "partitions.events", 0)

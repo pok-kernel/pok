@@ -15,6 +15,7 @@
 #ifndef __POK_THREAD_H__
 #define __POK_THREAD_H__
 
+#include <core/multiprocessing.h>
 #include <core/sched.h>
 #include <errno.h>
 #include <types.h>
@@ -25,16 +26,11 @@
  * is used to save processor resources.
  */
 
-#define KERNEL_THREAD (POK_CONFIG_NB_THREADS - 2)
-#define IDLE_THREAD (POK_CONFIG_NB_THREADS - 1)
+#define KERNEL_THREAD (POK_CONFIG_NB_THREADS - 1)
+#define IDLE_THREAD (POK_CONFIG_NB_THREADS - 2 - (uint32_t)(pok_get_proc_id()))
 
 #define INFINITE_TIME_VALUE (-1)
 #define POK_THREAD_DEFAULT_TIME_CAPACITY INFINITE_TIME_VALUE
-
-/*
-#define KERNEL_THREAD		POK_CONFIG_NB_THREADS
-#define IDLE_THREAD        POK_CONFIG_NB_THREADS + 1
-*/
 
 #define POK_THREAD_MAX_PRIORITY 200
 
@@ -82,6 +78,7 @@ typedef struct {
  */
 
 void pok_thread_init(void);
+void pok_idle_thread_init(void);
 pok_ret_t pok_thread_create(uint8_t *thread_id, const pok_thread_attr_t *attr);
 pok_ret_t pok_thread_sleep(const uint32_t us);
 pok_ret_t pok_thread_sleep_until(const uint32_t us);

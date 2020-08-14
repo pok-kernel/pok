@@ -6,7 +6,7 @@
 
 #define POK_CONFIG_NB_MAX_PROCESSORS 4
 #define POK_CONFIG_NB_PARTITIONS 1
-#define POK_CONFIG_NB_THREADS 3
+#define POK_CONFIG_NB_THREADS 6
 #define POK_CONFIG_PARTITIONS_NLOCKOBJECTS                                     \
   { 0 }
 #define POK_CONFIG_PARTITIONS_NTHREADS                                         \

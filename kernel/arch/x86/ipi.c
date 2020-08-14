@@ -14,8 +14,10 @@
 
 #include "event.h"
 #include "gdt.h"
+#include <arch.h>
 #include <arch/x86/ipi.h>
-#include <arch/x86/multiprocessing.h>
+#include <core/multiprocessing.h>
+#include <core/sched.h>
 #include <errno.h>
 #include <libc.h>
 #include <types.h>
@@ -24,21 +26,31 @@
 #define IA32_APIC_BASE_MSR_ENABLE 0x800
 #define MSR_FEAT_APIC (1 << 11)
 
-INTERRUPT_HANDLER(IPI_gate) {
+extern uint32_t lapic_address;
+
+void pok_end_ipi() { *(uint32_t *)(lapic_address + 0xB0) = 1; }
+
+INTERRUPT_HANDLER_IPI(IPI_test_gate) {
   (void)frame;
   printf("Coucou!!\n");
 }
 
+INTERRUPT_HANDLER(sched_thread_gate) {
+  (void)frame;
+  pok_sched_thread();
+}
+
 pok_ret_t pok_ipi_init() {
-  pok_idt_set_gate(POK_IPI_INT_NUMBER, GDT_CORE_CODE_SEGMENT << 3,
-                   (uint32_t)IPI_gate, IDTE_INTERRUPT, 3);
+  pok_arch_event_register(POK_IPI_TEST_INT_NUMBER, IPI_test_gate);
+  pok_arch_event_register(POK_IPI_SCHED_INT_NUMBER, sched_thread_gate);
   return (POK_ERRNO_OK);
 }
 
-pok_ret_t pok_send_ipi(uint8_t dest_apic, uint32_t lapic_address) {
+pok_ret_t pok_send_ipi(uint8_t dest_group, uint8_t dest_apic,
+                       uint8_t INT_number) {
   *(uint32_t *)(lapic_address + 0x310) = (dest_apic << (32 - 8));
   *(uint32_t *)(lapic_address + 0x300) =
-      0b00000100000000000000 + POK_IPI_INT_NUMBER;
+      0b00000100000000000000 + INT_number + (dest_group << 18);
   return (POK_ERRNO_OK);
 }
 

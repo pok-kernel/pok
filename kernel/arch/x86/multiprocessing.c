@@ -21,9 +21,9 @@
 
 #include <arch/x86/ioports.h>
 #include <arch/x86/ipi.h>
-#include <arch/x86/multiprocessing.h>
 #include <arch/x86/spinlock.h>
 #include <assert.h>
+#include <core/multiprocessing.h>
 #include <core/partition.h>
 #include <core/time.h>
 #include <libc.h>
@@ -47,6 +47,10 @@ uint8_t pok_get_lapic_id() {
 
 uint8_t pok_get_proc_id() {
   return multiprocessing_system ? proc_index[pok_get_lapic_id()] : 0;
+}
+
+void pok_send_schedule_thread() {
+  pok_send_ipi(IPI_ALL_WITHOUT_SELF, 0, POK_IPI_SCHED_INT_NUMBER);
 }
 
 /**
@@ -255,7 +259,7 @@ void pok_multiprocessing_init() {
 
     pok_start_ap();
 
-    pok_send_ipi(1, lapic_address);
+    // pok_send_ipi(IPI_NOGROUP, 1, POK_IPI_TEST_INT_NUMBER);
     pok_x86_wait_mp(0xffff);
 
     // Check if each core have incremented incr_var

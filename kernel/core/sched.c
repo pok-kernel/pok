@@ -26,6 +26,8 @@
 #include <core/thread.h>
 #include <core/time.h>
 
+#include <arch.h>
+#include <arch/x86/ipi.h>
 #include <core/partition.h>
 
 #ifdef POK_NEEDS_MIDDLEWARE
@@ -274,6 +276,23 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
   return elected;
 }
 
+uint8_t new_partition;
+
+void pok_sched_thread() {
+  uint8_t elected_thread = pok_elect_thread(POK_SCHED_CURRENT_PARTITION);
+
+  if (CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) !=
+      elected_thread) {
+    if (CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) !=
+        IDLE_THREAD) {
+      PREV_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) =
+          CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]);
+    }
+    CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) =
+        elected_thread;
+  }
+  pok_sched_context_switch(elected_thread);
+}
 void pok_sched() {
   uint32_t elected_thread = 0;
   uint8_t elected_partition = POK_SCHED_CURRENT_PARTITION;

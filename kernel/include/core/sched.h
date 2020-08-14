@@ -40,6 +40,7 @@ void pok_sched_init(void); /* Initialize scheduling stuff */
 void pok_sched(void); /* Main scheduling function, this function
                        * schedules everything
                        */
+void pok_sched_thread(void);
 
 /* Get priority function, return are made according to a scheduler */
 uint8_t pok_sched_get_priority_min(const pok_sched_t sched_type);

@@ -62,6 +62,7 @@ extern pok_partition_t pok_partitions[];
  * executed
  */
 uint8_t pok_current_partition;
+rendezvous fence, barr;
 
 void pok_sched_partition_switch();
 
@@ -99,6 +100,7 @@ void pok_sched_init(void) {
    */
   uint64_t total_time;
   uint8_t slot;
+  fence = barr = 0;
 
   total_time = 0;
 
@@ -198,19 +200,23 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
   for (i = 0; i < new_partition->nthreads; i++) {
     thread = &(pok_threads[new_partition->thread_index_low + i]);
 
+    if (thread->processor_affinity == pok_get_proc_id()) {
+
 #if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_PORTS_QUEUEING) ||     \
     defined(POK_NEEDS_PORTS_SAMPLING)
-    if ((thread->state == POK_STATE_WAITING) && (thread->wakeup_time <= now)) {
-      thread->state = POK_STATE_RUNNABLE;
-    }
+      if ((thread->state == POK_STATE_WAITING) &&
+          (thread->wakeup_time <= now)) {
+        thread->state = POK_STATE_RUNNABLE;
+      }
 #endif
 
-    if ((thread->state == POK_STATE_WAIT_NEXT_ACTIVATION) &&
-        (thread->next_activation <= now)) {
-      assert(thread->time_capacity);
-      thread->state = POK_STATE_RUNNABLE;
-      thread->remaining_time_capacity = thread->time_capacity;
-      thread->next_activation = thread->next_activation + thread->period;
+      if ((thread->state == POK_STATE_WAIT_NEXT_ACTIVATION) &&
+          (thread->next_activation <= now)) {
+        assert(thread->time_capacity);
+        thread->state = POK_STATE_RUNNABLE;
+        thread->remaining_time_capacity = thread->time_capacity;
+        thread->next_activation = thread->next_activation + thread->period;
+      }
     }
   }
 
@@ -221,14 +227,18 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
   switch (new_partition->mode) {
   case POK_PARTITION_MODE_INIT_COLD:
   case POK_PARTITION_MODE_INIT_WARM:
-    if ((new_partition->thread_error != 0) &&
-        (pok_threads[new_partition->thread_error].state != POK_STATE_STOPPED)) {
-      elected = new_partition->thread_error;
-    } else {
-      elected = new_partition->thread_main;
-    }
+    if (pok_get_proc_id() == 0) {
+      if ((new_partition->thread_error != 0) &&
+          (pok_threads[new_partition->thread_error].state !=
+           POK_STATE_STOPPED)) {
+        elected = new_partition->thread_error;
+      } else {
+        elected = new_partition->thread_main;
+      }
 
-    elected = new_partition->thread_main;
+      elected = new_partition->thread_main;
+    } else
+      elected = IDLE_THREAD;
     break;
 
   case POK_PARTITION_MODE_NORMAL:
@@ -269,7 +279,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
   }
 
   // computed next thread's deadline
-  if (pok_threads[current_thread].time_capacity > 0)
+  if (pok_threads[POK_SCHED_CURRENT_THREAD].time_capacity > 0)
     pok_threads[elected].end_time =
         now + pok_threads[elected].remaining_time_capacity;
 
@@ -294,21 +304,38 @@ void pok_sched_thread() {
   pok_sched_context_switch(elected_thread);
 }
 void pok_sched() {
-  uint32_t elected_thread = 0;
   uint8_t elected_partition = POK_SCHED_CURRENT_PARTITION;
-
   elected_partition = pok_elect_partition();
-  elected_thread = pok_elect_thread(elected_partition);
+  new_partition = elected_partition != POK_SCHED_CURRENT_PARTITION;
+  POK_SCHED_CURRENT_PARTITION = elected_partition;
 
-  pok_current_partition = elected_partition;
-  if (pok_partitions[pok_current_partition].current_thread != elected_thread) {
-    if (pok_partitions[pok_current_partition].current_thread != IDLE_THREAD) {
-      pok_partitions[pok_current_partition].prev_thread =
-          pok_partitions[pok_current_partition].current_thread;
-    }
-    pok_partitions[pok_current_partition].current_thread = elected_thread;
+  if (multiprocessing_system) {
+    start_rendezvous(&fence);
+    pok_send_schedule_thread();
   }
-  pok_sched_context_switch(elected_thread);
+  pok_sched_thread();
+}
+
+void synchro_processors(const uint32_t elected_id) {
+  if (pok_get_proc_id()) {
+    join_rendezvous(&fence);
+    join_rendezvous(&barr);
+  } else {
+    if (multiprocessing_system) {
+      spin_wait_for_rendezvous(&fence, multiprocessing_system);
+      if (new_partition) {
+        pok_space_switch(POK_CURRENT_THREAD.partition,
+                         pok_threads[elected_id].partition);
+      }
+      start_rendezvous(&barr);
+      unblock_rendezvous(&fence);
+      spin_wait_for_rendezvous(&barr, multiprocessing_system);
+      unblock_rendezvous(&barr);
+    } else if (new_partition) {
+      pok_space_switch(POK_CURRENT_THREAD.partition,
+                       pok_threads[elected_id].partition);
+    }
+  }
 }
 
 /*
@@ -320,37 +347,42 @@ void pok_sched_context_switch(const uint32_t elected_id) {
   uint32_t new_sp;
 
   if (POK_SCHED_CURRENT_THREAD == elected_id) {
-    return;
-  }
+    synchro_processors(elected_id);
+
+    if (pok_get_proc_id())
+      pok_end_ipi();
+
+  } else {
 
 #ifdef POK_NEEDS_LOCKOBJECTS
 
-  // Check if every spin lock is unlocked before changing context
-  for (uint8_t i =
-           pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_low;
-       i < pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_high;
-       i++) {
-    assert(!pok_partitions_lockobjs[i].eventspin);
-    assert(!pok_partitions_lockobjs[i].spin);
-  }
+    // Check if every spin lock is unlocked before changing context
+    for (uint8_t i =
+             pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_low;
+         i < pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_high;
+         i++) {
+      assert(!pok_partitions_lockobjs[i].eventspin);
+      assert(!pok_partitions_lockobjs[i].spin);
+    }
 
 #endif
 
-  current_sp = &POK_CURRENT_THREAD.sp;
-  new_sp = pok_threads[elected_id].sp;
-  /*
-      *  FIXME : current debug session about exceptions-handled
-     printf("switch from thread %d, sp=0x%x\n",POK_SCHED_CURRENT_THREAD,
-     current_sp); printf("switch to thread %d, sp=0x%x\n",elected_id, new_sp);
-     */
-  if (POK_CURRENT_THREAD.partition != pok_threads[elected_id].partition) {
-    pok_space_switch(POK_CURRENT_THREAD.partition,
-                     pok_threads[elected_id].partition);
+    current_sp = &POK_CURRENT_THREAD.sp;
+    new_sp = pok_threads[elected_id].sp;
+
+    synchro_processors(elected_id);
+    /*
+        *  FIXME : current debug session about exceptions-handled
+       printf("switch from thread %d, sp=0x%x\n",POK_SCHED_CURRENT_THREAD,
+       current_sp); printf("switch to thread %d, sp=0x%x\n",elected_id,
+       new_sp);
+       */
+
+    POK_SCHED_CURRENT_THREAD = elected_id;
+    if (pok_get_proc_id())
+      pok_end_ipi();
+    pok_context_switch(current_sp, new_sp);
   }
-
-  current_thread = elected_id;
-
-  pok_context_switch(current_sp, new_sp);
 }
 
 #ifdef POK_NEEDS_SCHED_RMS
@@ -359,6 +391,7 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
                             const uint32_t __attribute__((unused))
                             current_thread) {
   uint32_t res;
+  uint8_t current_proc = pok_get_proc_id();
 #ifdef POK_NEEDS_DEBUG
   uint32_t from;
   from = prev_thread;
@@ -372,22 +405,28 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
       res = index_low;
     }
   } while ((res != index_low) &&
-           (pok_threads[res].state != POK_STATE_RUNNABLE));
+           ((pok_threads[res].state != POK_STATE_RUNNABLE) ||
+            (pok_threads[res].processor_affinity != current_proc)));
 
-  if ((res == index_low) && (pok_threads[res].state != POK_STATE_RUNNABLE)) {
+  if ((res == index_low) &&
+      ((pok_threads[res].state != POK_STATE_RUNNABLE) ||
+       (pok_threads[res].processor_affinity != current_proc))) {
     res = IDLE_THREAD;
   }
 
 #ifdef POK_NEEDS_DEBUG
   if (res != IDLE_THREAD || current_thread != IDLE_THREAD) {
     if (res == IDLE_THREAD) {
-      printf("--- scheduling idle thread\n\t\t");
+      printf("--- Scheduling processor: %hhd\n    scheduling idle thread\n\t\t",
+             current_proc);
     } else {
-      printf("--- scheduling thread: %d {%d} --- ", res,
-             pok_threads[res].period);
+      printf("--- Scheduling processor: %hhd\n    scheduling thread: %d {%d} "
+             "--- ",
+             current_proc, res, pok_threads[res].period);
       from = index_low;
       while (from <= index_high) {
-        if (pok_threads[from].state == POK_STATE_RUNNABLE) {
+        if (pok_threads[from].state == POK_STATE_RUNNABLE &&
+            pok_threads[from].processor_affinity == current_proc) {
           printf(" %d {%d} ,", from, pok_threads[from].period);
         }
         from++;
@@ -396,7 +435,8 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
     }
     from = index_low;
     while (from <= index_high) {
-      if (pok_threads[from].state != POK_STATE_RUNNABLE) {
+      if (pok_threads[from].state != POK_STATE_RUNNABLE &&
+          pok_threads[from].processor_affinity == current_proc) {
         printf(" %d (%s)", from, state_names[pok_threads[from].state]);
       }
       from++;
@@ -417,10 +457,15 @@ uint32_t pok_sched_part_static(const uint32_t index_low,
   uint32_t from = current_thread != IDLE_THREAD ? current_thread : prev_thread;
   int32_t max_prio = -1;
   uint32_t max_thread = current_thread;
+  uint8_t current_proc = pok_get_proc_id();
+
+  if (prev_thread == IDLE_THREAD)
+    from = index_low;
 
   uint32_t i = from;
   do {
     if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+        pok_threads[i].processor_affinity == current_proc &&
         pok_threads[i].priority > max_prio) {
       max_prio = pok_threads[i].priority;
       max_thread = i;
@@ -438,14 +483,18 @@ uint32_t pok_sched_part_static(const uint32_t index_low,
       (elected != IDLE_THREAD || current_thread != IDLE_THREAD)) {
     uint32_t non_ready = 0;
     if (elected == IDLE_THREAD) {
-      printf("--- scheduling idle thread\n");
+      printf("--- Scheduling processor: %hhd\n    scheduling idle thread\n",
+             current_proc);
       non_ready = index_high - index_low;
     } else {
       uint32_t first = 1;
-      printf("--- scheduling thread %d (priority %d)\n", elected,
-             pok_threads[elected].priority);
+      printf("--- Scheduling processor: %hhd\n    scheduling thread %d "
+             "(priority "
+             "%d)\n",
+             current_proc, elected, pok_threads[elected].priority);
       for (uint32_t i = index_low; i < index_high; i++) {
-        if (pok_threads[i].state == POK_STATE_RUNNABLE) {
+        if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+            pok_threads[i].processor_affinity == current_proc) {
           if (i != elected) {
             printf("%s %d (%d)", first ? "    other ready: " : ",", i,
                    pok_threads[i].priority);
@@ -463,7 +512,8 @@ uint32_t pok_sched_part_static(const uint32_t index_low,
       printf("    non-ready:");
       uint32_t first = 1;
       for (uint32_t i = index_low; i < index_high; i++) {
-        if (pok_threads[i].state != POK_STATE_RUNNABLE) {
+        if (pok_threads[i].state != POK_STATE_RUNNABLE &&
+            pok_threads[i].processor_affinity == current_proc) {
           printf("%s %d (%d/%s)", first ? "" : ",", i, pok_threads[i].priority,
                  state_names[pok_threads[i].state]);
           first = 0;
@@ -482,9 +532,10 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
                            const uint32_t current_thread) {
   uint32_t res;
   uint32_t from;
+  uint8_t current_proc = pok_get_proc_id();
 
   if (current_thread == IDLE_THREAD) {
-    res = prev_thread;
+    res = prev_thread != IDLE_THREAD ? prev_thread : index_low;
   } else {
     res = current_thread;
   }
@@ -493,7 +544,8 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
 
   if ((pok_threads[current_thread].remaining_time_capacity > 0 ||
        pok_threads[current_thread].time_capacity == INFINITE_TIME_VALUE) &&
-      (pok_threads[current_thread].state == POK_STATE_RUNNABLE)) {
+      (pok_threads[current_thread].state == POK_STATE_RUNNABLE) &&
+      (pok_threads[current_thread].processor_affinity == current_proc)) {
     return current_thread;
   }
 
@@ -502,9 +554,13 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
     if (res > index_high) {
       res = index_low;
     }
-  } while ((res != from) && (pok_threads[res].state != POK_STATE_RUNNABLE));
+  } while ((res != from) &&
+           ((pok_threads[res].state != POK_STATE_RUNNABLE) ||
+            (pok_threads[res].processor_affinity != current_proc)));
 
-  if ((res == from) && (pok_threads[res].state != POK_STATE_RUNNABLE)) {
+  if ((res == from) &&
+      ((pok_threads[res].state != POK_STATE_RUNNABLE) ||
+       (pok_threads[res].processor_affinity != current_proc))) {
     res = IDLE_THREAD;
   }
   return res;

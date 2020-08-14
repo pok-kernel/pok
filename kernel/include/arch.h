@@ -109,6 +109,7 @@ __attribute__((noreturn)) void pok_division_by_zero_error(void);
 #endif
 
 #ifdef POK_ARCH_X86
+#include <arch/x86/rendezvous.h>
 #include <arch/x86/spinlock.h>
 #endif
 

@@ -245,7 +245,7 @@ void pok_multiprocessing_init() {
     if (proc_enable_number == 1)
       return;
 
-    multiprocessing_system = 1;
+    multiprocessing_system = proc_enable_number;
 
     if (!check_apic())
       enable_apic();

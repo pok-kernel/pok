@@ -26,8 +26,9 @@
 #define POK_DEFAULT_STACK_SIZE 2048
 
 typedef struct {
-  uint8_t priority;
-  void *entry;
+  uint8_t priority; /* Priority is from 0 to 255 */
+  uint8_t processor_affinity;
+  void *entry; /* entrypoint of the thread  */
   uint64_t period;
   uint64_t deadline;
   uint64_t time_capacity;

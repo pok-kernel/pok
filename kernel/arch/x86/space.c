@@ -59,6 +59,7 @@ uint32_t pok_space_base_vaddr(uint32_t addr) {
 }
 
 uint32_t pok_space_context_create(uint8_t partition_id, uint32_t entry_rel,
+                                  uint8_t processor_affinity,
                                   uint32_t stack_rel, uint32_t arg1,
                                   uint32_t arg2) {
   char *stack_addr;
@@ -81,6 +82,7 @@ uint32_t pok_space_context_create(uint8_t partition_id, uint32_t entry_rel,
   sp->kernel_sp = (uint32_t)sp;
   sp->user_sp = stack_rel;
   sp->user_pc = entry_rel;
+  sp->processor_affinity = (uint32_t)processor_affinity;
   sp->partition_id = partition_id;
 
   return ((uint32_t)sp);
@@ -98,8 +100,8 @@ void pok_space_context_restart(uint32_t sp, uint32_t entry,
 }
 
 void pok_dispatch_space(uint8_t partition_id, uint32_t user_pc,
-                        uint32_t user_sp, uint32_t kernel_sp, uint32_t arg1,
-                        uint32_t arg2) {
+                        uint32_t user_sp, uint32_t processor_affinity,
+                        uint32_t kernel_sp, uint32_t arg1, uint32_t arg2) {
   interrupt_frame ctx;
   uint32_t code_sel;
   uint32_t data_sel;
@@ -124,7 +126,7 @@ void pok_dispatch_space(uint8_t partition_id, uint32_t user_pc,
   ctx.eflags = 1 << 9;
   ctx.esp = user_sp;
 
-  tss_set_esp0(0, kernel_sp);
+  tss_set_esp0(processor_affinity, kernel_sp);
 
   asm("mov %0, %%esp		\n"
       "pop %%es		\n"

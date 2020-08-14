@@ -73,6 +73,7 @@ void pok_idle_thread_init() {
     pok_threads[IDLE_THREAD - i].remaining_time_capacity = INFINITE_TIME_VALUE;
     pok_threads[IDLE_THREAD - i].wakeup_time = 0;
     pok_threads[IDLE_THREAD - i].entry = pok_arch_idle;
+    pok_threads[IDLE_THREAD - i].processor_affinity = i;
     pok_threads[IDLE_THREAD - i].base_priority = pok_sched_get_priority_min(0);
     pok_threads[IDLE_THREAD - i].state = POK_STATE_RUNNABLE;
 
@@ -115,6 +116,7 @@ void pok_thread_init(void) {
     pok_threads[i].next_activation = 0;
     pok_threads[i].wakeup_time = 0;
     pok_threads[i].state = POK_STATE_STOPPED;
+    pok_threads[i].processor_affinity = 0;
   }
 }
 
@@ -173,6 +175,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
     pok_threads[id].remaining_time_capacity = POK_THREAD_DEFAULT_TIME_CAPACITY;
     pok_threads[id].time_capacity = POK_THREAD_DEFAULT_TIME_CAPACITY;
   }
+  pok_threads[id].processor_affinity = attr->processor_affinity;
 
   stack_vaddr = pok_thread_stack_addr(
       partition_id, pok_partitions[partition_id].thread_index);
@@ -180,7 +183,8 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   pok_threads[id].state = POK_STATE_RUNNABLE;
   pok_threads[id].wakeup_time = 0;
   pok_threads[id].sp = pok_space_context_create(
-      partition_id, (uint32_t)attr->entry, stack_vaddr, 0xdead, 0xbeaf);
+      partition_id, (uint32_t)attr->entry, attr->processor_affinity,
+      stack_vaddr, 0xdead, 0xbeaf);
   /*
    *  FIXME : current debug session about exceptions-handled
   printf ("thread sp=0x%x\n", pok_threads[id].sp);
@@ -262,7 +266,8 @@ pok_ret_t pok_thread_restart(const uint32_t tid) {
    */
   pok_threads[tid].sp = pok_space_context_create(
       pok_threads[tid].partition, (uint32_t)pok_threads[tid].entry,
-      pok_threads[tid].init_stack_addr, 0xdead, 0xbeaf);
+      pok_threads[tid].processor_affinity, pok_threads[tid].init_stack_addr,
+      0xdead, 0xbeaf);
 
   return POK_ERRNO_OK;
 }
@@ -320,6 +325,7 @@ pok_ret_t pok_thread_get_status(const uint32_t id, pok_thread_attr_t *attr) {
   attr->period = pok_threads[id].period;
   attr->time_capacity = pok_threads[id].time_capacity;
   attr->stack_size = POK_USER_STACK_SIZE;
+  attr->processor_affinity = pok_threads[id].processor_affinity;
   return POK_ERRNO_OK;
 }
 

@@ -30,6 +30,7 @@ typedef struct {
   unsigned int partition_id;
   uint32_t user_pc;
   uint32_t user_sp;
+  uint32_t processor_affinity;
   uint32_t kernel_sp;
   uint32_t arg1;
   uint32_t arg2;

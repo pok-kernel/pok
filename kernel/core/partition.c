@@ -120,6 +120,7 @@ void pok_partition_setup_main_thread(const uint8_t pid) {
   attr.deadline = 0;
   attr.period = INFINITE_TIME_VALUE;
   attr.time_capacity = INFINITE_TIME_VALUE;
+  attr.processor_affinity = 0;
 
   pok_partition_thread_create(&main_thread, &attr, pid);
   pok_partitions[pid].thread_main = main_thread;

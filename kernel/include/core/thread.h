@@ -60,13 +60,15 @@ typedef struct {
   uint32_t sp;
   uint32_t init_stack_addr;
   uint8_t base_priority;
+  uint8_t processor_affinity;
   /* stack pointer
    * FIXME: this is platform-dependent code, we have to handle that ! */
 } pok_thread_t;
 
 typedef struct {
   uint8_t priority; /* Priority is from 0 to 255 */
-  void *entry;      /* entrypoint of the thread  */
+  uint8_t processor_affinity;
+  void *entry; /* entrypoint of the thread  */
   uint64_t period;
   uint64_t deadline;
   uint64_t time_capacity;

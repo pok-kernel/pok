@@ -80,9 +80,9 @@ uint64_t pok_sched_next_flush; // variable used to handle user defined
                                // flushing period, i.e. distinct from
                                // MAF and from partition slot
                                // boundaries
+
 uint8_t pok_sched_current_slot =
     0; /* Which slot are we executing at this time ?*/
-uint32_t current_thread = KERNEL_THREAD;
 
 void pok_sched_thread_switch(void);
 
@@ -170,8 +170,8 @@ uint8_t pok_elect_partition() {
        thread = %d\n", POK_SCHED_CURRENT_THREAD);
 
           printf ("new current thread = %d\n",
-       pok_partitions[pok_sched_current_slot].current_thread); printf ("new prev
-       current thread = %d\n",
+       CURRENT_THREAD(pok_partitions[pok_sched_current_slot])); printf ("new
+       prev current thread = %d\n",
        pok_partitions[pok_sched_current_slot].prev_thread);
           */
     next_partition = pok_sched_slots_allocation[pok_sched_current_slot];
@@ -230,8 +230,8 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
     break;
 
   case POK_PARTITION_MODE_NORMAL:
-    if ((new_partition->current_thread == new_partition->thread_error) &&
-        (pok_threads[new_partition->current_thread].state ==
+    if ((CURRENT_THREAD(*new_partition) == new_partition->thread_error) &&
+        (pok_threads[CURRENT_THREAD(*new_partition)].state ==
          POK_STATE_RUNNABLE)) {
       elected = new_partition->thread_error;
       break;
@@ -252,7 +252,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
     }
     elected = new_partition->sched_func(
         new_partition->thread_index_low, new_partition->thread_index_high,
-        new_partition->prev_thread, new_partition->current_thread);
+        PREV_THREAD(*new_partition), CURRENT_THREAD(*new_partition));
 #ifdef POK_NEEDS_INSTRUMENTATION
     if ((elected != IDLE_THREAD) && (elected != new_partition->thread_main)) {
       pok_instrumentation_running_task(elected);
@@ -502,12 +502,12 @@ void pok_sched_unlock_thread(const uint32_t thread_id) {
     defined(POK_NEEDS_PORTS_SAMPLING) || defined(POK_NEEDS_THREAD_SLEEP) ||    \
     defined(POK_NEEDS_THREAD_SLEEP_UNTIL)
 void pok_sched_lock_current_thread(void) {
-  pok_threads[current_thread].state = POK_STATE_LOCK;
+  pok_threads[POK_SCHED_CURRENT_THREAD].state = POK_STATE_LOCK;
 }
 
 void pok_sched_lock_current_thread_timed(const uint64_t time) {
-  pok_threads[current_thread].state = POK_STATE_WAITING;
-  pok_threads[current_thread].wakeup_time = time;
+  pok_threads[POK_SCHED_CURRENT_THREAD].state = POK_STATE_WAITING;
+  pok_threads[POK_SCHED_CURRENT_THREAD].wakeup_time = time;
 }
 #endif
 

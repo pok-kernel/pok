@@ -17,6 +17,7 @@
 #include <arch.h>
 #include <core/cons.h>
 #include <core/debug.h>
+#include <core/multiprocessing.h>
 #include <core/partition.h>
 #include <core/sched.h>
 #include <core/thread.h>
@@ -34,8 +35,10 @@ int debug_strlen(const char *str) {
 
 void pok_debug_print_current_state() {
   uint32_t i;
+  uint8_t current_proc = pok_get_proc_id();
   printf("\nCurrent state\n");
   printf("-------------\n");
+  printf("Processor            : %d\n", current_proc);
   printf("Kernel thread        : %d\n", KERNEL_THREAD);
   printf("Idle thread          : %d\n", IDLE_THREAD);
   printf("Current partition    : %d\n", POK_SCHED_CURRENT_PARTITION);
@@ -47,8 +50,8 @@ void pok_debug_print_current_state() {
   printf("Base addr            : 0x%x\n", POK_CURRENT_PARTITION.base_addr);
   printf("Base vaddr           : 0x%x\n", POK_CURRENT_PARTITION.base_vaddr);
   printf("Size                 : %d\n", POK_CURRENT_PARTITION.size);
-  printf("Current thread       : %d\n", POK_CURRENT_PARTITION.current_thread);
-  printf("Prev current thread  : %d\n", POK_CURRENT_PARTITION.prev_thread);
+  printf("Current thread       : %d\n", CURRENT_THREAD(POK_CURRENT_PARTITION));
+  printf("Prev current thread  : %d\n", PREV_THREAD(POK_CURRENT_PARTITION));
   printf("Main thread          : %d\n", POK_CURRENT_PARTITION.thread_main);
   printf("Main thread entry    : 0x%x\n",
          POK_CURRENT_PARTITION.thread_main_entry);

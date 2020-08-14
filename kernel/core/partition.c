@@ -38,6 +38,7 @@
  * \brief The array that contains ALL partitions in the system.
  */
 pok_partition_t pok_partitions[POK_CONFIG_NB_PARTITIONS];
+uint32_t current_threads[POK_CONFIG_NB_MAX_PROCESSORS] = {KERNEL_THREAD};
 
 uint8_t pok_partitions_index = 0;
 
@@ -88,8 +89,8 @@ void pok_partition_reinit(const uint8_t pid) {
   pok_partition_setup_scheduler(pid);
 
   pok_partitions[pid].thread_index = 0;
-  pok_partitions[pid].current_thread = pok_partitions[pid].thread_index_low;
-  pok_partitions[pid].prev_thread =
+  CURRENT_THREAD(pok_partitions[pid]) = pok_partitions[pid].thread_index_low;
+  PREV_THREAD(pok_partitions[pid]) =
       IDLE_THREAD; // breaks the rule of prev_thread not being idle, but it's
                    // just for init
 
@@ -193,10 +194,12 @@ pok_ret_t pok_partition_init() {
     pok_partitions[i].period = 0;
     pok_partitions[i].thread_index = 0;
     pok_partitions[i].thread_main = 0;
-    pok_partitions[i].current_thread = IDLE_THREAD;
-    pok_partitions[i].prev_thread =
-        IDLE_THREAD; // breaks the rule of prev_thread not being idle, but it's
-                     // just for init
+    for (int j = 0; j < POK_CONFIG_NB_MAX_PROCESSORS; j++) {
+      pok_partitions[i].current_thread[j] = POK_CONFIG_NB_THREADS - 2 - j;
+      pok_partitions[i].prev_thread[j] =
+          POK_CONFIG_NB_THREADS - 2 - j; // breaks the rule of prev_thread not
+                                         // being idle, but it's just for init
+    }
 
     threads_index = threads_index + pok_partitions[i].nthreads;
     /* Initialize the threading stuff */
@@ -233,7 +236,7 @@ pok_ret_t pok_partition_init() {
 #endif
 
     pok_partition_setup_main_thread(i);
-    pok_partitions[i].current_thread = pok_partitions[i].thread_main;
+    CURRENT_THREAD(pok_partitions[i]) = pok_partitions[i].thread_main;
   }
 
   return POK_ERRNO_OK;

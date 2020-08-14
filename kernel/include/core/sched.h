@@ -23,8 +23,8 @@
 extern uint8_t pok_current_partition;
 #define POK_SCHED_CURRENT_PARTITION pok_current_partition
 
-extern uint32_t current_thread;
-#define POK_SCHED_CURRENT_THREAD current_thread
+extern uint32_t current_threads[POK_CONFIG_NB_MAX_PROCESSORS];
+#define POK_SCHED_CURRENT_THREAD current_threads[pok_get_proc_id()]
 
 typedef enum {
   POK_STATE_STOPPED = 0,

@@ -22,6 +22,7 @@
 #define __POK_PARTITION_H__
 
 #include <core/error.h>
+#include <core/multiprocessing.h>
 #include <core/sched.h>
 #include <core/thread.h>
 #include <errno.h>
@@ -80,12 +81,14 @@ typedef struct {
       uint32_t low, uint32_t high, uint32_t prev_thread,
       uint32_t cur_thread); /**< Scheduling function to schedule threads */
 
-  uint64_t activation;  /**< Last activation time of the partition */
-  uint32_t prev_thread; /**< member for the scheduler (previous scheduled real
-                           thread inside the partition,i.e not the idle thread
-                           except at start) */
-  uint32_t current_thread; /**< member for the scheduler (currently executed
-                              thread inside the partition) */
+  uint64_t activation; /**< Last activation time of the partition */
+  uint32_t
+      prev_thread[POK_CONFIG_NB_MAX_PROCESSORS];         /**< member for the
+                              scheduler (previous scheduled real    thread inside the
+                              partition,i.e not the idle thread    except at start) */
+  uint32_t current_thread[POK_CONFIG_NB_MAX_PROCESSORS]; /**< member for the
+                              scheduler (currently executed thread inside the
+                              partition) */
 
   uint32_t thread_index_low;  /**< The low index in the global threads table */
   uint32_t thread_index_high; /**< The high index in the global threads table */
@@ -117,6 +120,9 @@ typedef struct {
   uint32_t lock_level;
   pok_start_condition_t start_condition;
 } pok_partition_t;
+
+#define CURRENT_THREAD(partition) (partition).current_thread[pok_get_proc_id()]
+#define PREV_THREAD(partition) (partition).prev_thread[pok_get_proc_id()]
 
 extern pok_partition_t pok_partitions[POK_CONFIG_NB_PARTITIONS];
 

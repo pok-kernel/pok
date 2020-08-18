@@ -17,13 +17,15 @@
 #include <dependencies.h>
 
 #include <assert.h>
+#include <core/multiprocessing.h>
 #include <core/shutdown.h>
 #include <libc.h>
 
 void __assert_failed(const char *assertion, const char *file, unsigned int line,
                      const char *function) {
-  printf("%s:%u: %s%sAssertion `%s' failed.\n", file, line,
-         function ? function : "", function ? ": " : "", assertion);
+  printf("%s:%u: %s%sAssertion `%s' failed on processor %d.\n", file, line,
+         function ? function : "", function ? ": " : "", assertion,
+         pok_get_proc_id());
   pok_shutdown();
 }
 

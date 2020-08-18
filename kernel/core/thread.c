@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <core/debug.h>
 #include <core/error.h>
+#include <core/multiprocessing.h>
 #include <core/partition.h>
 #include <core/sched.h>
 #include <core/thread.h>
@@ -175,6 +176,10 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
     pok_threads[id].remaining_time_capacity = POK_THREAD_DEFAULT_TIME_CAPACITY;
     pok_threads[id].time_capacity = POK_THREAD_DEFAULT_TIME_CAPACITY;
   }
+
+  assert(multiprocessing_system
+             ? attr->processor_affinity < multiprocessing_system
+             : attr->processor_affinity == 0);
   pok_threads[id].processor_affinity = attr->processor_affinity;
 
   stack_vaddr = pok_thread_stack_addr(

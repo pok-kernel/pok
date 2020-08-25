@@ -23,6 +23,7 @@
 extern uint8_t incr_var;
 extern uint8_t start_spinlock;
 extern uint8_t proc_index[POK_CONFIG_NB_MAX_PROCESSORS];
+extern int spinlocks[POK_CONFIG_NB_MAX_PROCESSORS];
 
 /**
  * \brief Main method for APs
@@ -32,6 +33,8 @@ void main_ap(void) {
   SPIN_LOCK(start_spinlock);
   proc_index[pok_get_lapic_id()] = incr_var;
   incr_var++;
+  spinlocks[0]--;
+  spinlocks[pok_get_proc_id()]++;
   SPIN_UNLOCK(start_spinlock);
 
   pok_gdt_init(pok_get_proc_id());

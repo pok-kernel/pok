@@ -35,7 +35,7 @@ extern void *__REAL_BASE;
 uint32_t lapic_address;
 uint8_t incr_var;
 uint8_t proc_index[POK_CONFIG_NB_MAX_PROCESSORS];
-
+int spinlocks[POK_CONFIG_NB_MAX_PROCESSORS] = {0};
 uint8_t start_spinlock;
 uint8_t multiprocessing_system = 0;
 
@@ -264,6 +264,9 @@ void pok_multiprocessing_init() {
 
     proc_index[pok_get_lapic_id()] = 0;
     start_spinlock = 0;
+
+    for (int i = 0; i < POK_CONFIG_NB_MAX_PROCESSORS; i++)
+      spinlocks[i] = 0;
 
     pok_start_ap();
 

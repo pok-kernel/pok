@@ -86,6 +86,8 @@ uint64_t pok_sched_next_flush; // variable used to handle user defined
 uint8_t pok_sched_current_slot =
     0; /* Which slot are we executing at this time ?*/
 
+extern int spinlocks[POK_CONFIG_NB_MAX_PROCESSORS];
+
 void pok_sched_thread_switch(void);
 
 /**
@@ -359,13 +361,7 @@ void pok_global_sched_context_switch(const uint32_t elected_id,
 #ifdef POK_NEEDS_LOCKOBJECTS
 
     // Check if every spin lock is unlocked before changing context
-    for (uint8_t i =
-             pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_low;
-         i < pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_high;
-         i++) {
-      assert(!pok_partitions_lockobjs[i].eventspin);
-      assert(!pok_partitions_lockobjs[i].spin);
-    }
+    assert(!spinlocks[pok_get_proc_id()]);
 
 #endif
 
@@ -396,13 +392,7 @@ void pok_sched_context_switch(const uint32_t elected_id,
 
 #ifdef POK_NEEDS_LOCKOBJECTS
     // Check if every spin lock is unlocked before changing context
-    for (uint8_t i =
-             pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_low;
-         i < pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_high;
-         i++) {
-      assert(!pok_partitions_lockobjs[i].eventspin);
-      assert(!pok_partitions_lockobjs[i].spin);
-    }
+    assert(!spinlocks[pok_get_proc_id()]);
 #endif
 
     current_sp = &POK_CURRENT_THREAD.sp;

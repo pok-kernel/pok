@@ -17,6 +17,7 @@
 #include <errno.h>
 
 #include <arch/x86/ioports.h>
+#include <arch/x86/spinlock.h>
 #include <core/cons.h>
 #include <core/debug.h>
 #include <libc.h>
@@ -144,12 +145,16 @@ void pok_cons_clear(void) {
   g_cons = local_curs; /* reset the global cursor to the new position */
 }
 
+uint8_t serial_spinlock = 0;
+
 pok_bool_t pok_cons_write(const char *s, size_t length) {
   int res;
   size_t i;
 
   res = 0;
   i = 0;
+
+  SPIN_LOCK(serial_spinlock);
 
   while (i < length) {
     if ((const unsigned char)s[i] == CONS_ESCAPE) {
@@ -180,6 +185,7 @@ pok_bool_t pok_cons_write(const char *s, size_t length) {
     }
     ++i;
   }
+  SPIN_UNLOCK(serial_spinlock);
   return res;
 }
 

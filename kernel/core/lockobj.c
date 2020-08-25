@@ -188,13 +188,10 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, uint64_t timeout) {
 
   SPIN_UNLOCK(obj->eventspin);
   pok_sched();
-  SPIN_LOCK(obj->eventspin);
-  obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
 
   pok_ret_t ret = pok_lockobj_lock(obj, NULL);
 
   if (ret != POK_ERRNO_OK) {
-    SPIN_UNLOCK(obj->eventspin);
     return ret;
   }
 
@@ -204,8 +201,6 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, uint64_t timeout) {
   } else {
     ret = POK_ERRNO_OK;
   }
-
-  SPIN_UNLOCK(obj->eventspin);
 
   return ret;
 }
@@ -220,6 +215,7 @@ pok_ret_t pok_lockobj_eventsignal(pok_lockobj_t *obj) {
 
     if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT) {
       pok_sched_unlock_thread(tmp);
+      obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
       SPIN_UNLOCK(obj->eventspin);
       return POK_ERRNO_OK;
     }
@@ -238,6 +234,7 @@ pok_ret_t pok_lockobj_eventbroadcast(pok_lockobj_t *obj) {
 
     if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT) {
       pok_sched_unlock_thread(tmp);
+      obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
     }
   }
 

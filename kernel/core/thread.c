@@ -239,7 +239,6 @@ pok_ret_t pok_thread_sleep_until(uint32_t us) {
 
 pok_ret_t pok_thread_suspend(void) {
   pok_sched_stop_self();
-  pok_sched();
   return POK_ERRNO_OK;
 }
 

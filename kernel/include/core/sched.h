@@ -37,10 +37,13 @@ typedef enum {
 
 void pok_sched_init(void); /* Initialize scheduling stuff */
 
-void pok_sched(void); /* Main scheduling function, this function
-                       * schedules everything
-                       */
-void pok_sched_thread(void);
+void pok_global_sched(void); /* Main scheduling function, this function
+                              * schedules everything
+                              */
+void pok_global_sched_thread(bool_t is_source_processor);
+void pok_sched_thread(bool_t is_source_processor);
+void pok_threads_schedule_one_proc(uint8_t dest);
+void pok_threads_schedule_every_proc(void);
 
 /* Get priority function, return are made according to a scheduler */
 uint8_t pok_sched_get_priority_min(const pok_sched_t sched_type);
@@ -59,7 +62,10 @@ uint32_t pok_sched_part_static(const uint32_t, const uint32_t,
                                const uint32_t current_thread);
 
 /* Context switch functions */
-void pok_sched_context_switch(const uint32_t);
+void pok_global_sched_context_switch(const uint32_t elected_id,
+                                     bool_t is_source_processor);
+void pok_sched_context_switch(const uint32_t elected_id,
+                              bool_t is_source_processor);
 void pok_partition_switch(void);
 
 /*

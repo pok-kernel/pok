@@ -35,14 +35,21 @@ INTERRUPT_HANDLER_IPI(IPI_test_gate) {
   printf("Coucou!!\n");
 }
 
+INTERRUPT_HANDLER(global_sched_thread_gate) {
+  (void)frame;
+  pok_global_sched_thread(FALSE);
+}
+
 INTERRUPT_HANDLER(sched_thread_gate) {
   (void)frame;
-  pok_sched_thread();
+  pok_sched_thread(FALSE);
 }
 
 pok_ret_t pok_ipi_init() {
   pok_arch_event_register(POK_IPI_TEST_INT_NUMBER, IPI_test_gate);
-  pok_arch_event_register(POK_IPI_SCHED_INT_NUMBER, sched_thread_gate);
+  pok_arch_event_register(POK_IPI_GLOBAL_SCHED_INT_NUMBER,
+                          global_sched_thread_gate);
+  pok_arch_event_register(POK_IPI_SCHED_THREAD_INT_NUMBER, sched_thread_gate);
   return (POK_ERRNO_OK);
 }
 

@@ -46,7 +46,7 @@ INTERRUPT_HANDLER(pit_interrupt) {
   quantum_counter += NS_INCREMENT;
   if (quantum_counter >= NS_QUANTUM) {
     quantum_counter -= NS_QUANTUM;
-    pok_sched();
+    pok_global_sched();
   }
 }
 

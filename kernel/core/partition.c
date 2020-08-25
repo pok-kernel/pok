@@ -310,7 +310,7 @@ pok_ret_t pok_partition_set_mode(const uint8_t pid,
      * this thread does not need no longer to be executed
      */
 
-    pok_sched();
+    pok_global_sched();
     /*
      * Reschedule, baby, reschedule !
      * In fact, the init thread is stopped, we need to execute
@@ -329,7 +329,7 @@ pok_ret_t pok_partition_set_mode(const uint8_t pid,
     }
 
     pok_partitions[pid].mode = mode; /* Here, we change the mode */
-    pok_sched();
+    pok_global_sched();
     break;
 
   case POK_PARTITION_MODE_INIT_WARM:
@@ -356,7 +356,7 @@ pok_ret_t pok_partition_set_mode(const uint8_t pid,
 
     pok_partition_reinit(pid);
 
-    pok_sched();
+    pok_global_sched();
 
     break;
 
@@ -443,7 +443,7 @@ pok_ret_t pok_partition_stop_thread(const uint32_t tid) {
    */
 
   pok_sched_stop_thread(id);
-  pok_sched();
+  pok_global_sched();
   return (POK_ERRNO_OK);
 }
 
@@ -468,6 +468,6 @@ pok_ret_t pok_partition_restart_thread(const uint32_t tid) {
    */
 
   pok_thread_restart(id);
-  pok_sched();
+  pok_global_sched();
   return (POK_ERRNO_OK);
 }

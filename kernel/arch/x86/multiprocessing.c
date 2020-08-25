@@ -49,8 +49,16 @@ uint8_t pok_get_proc_id() {
   return multiprocessing_system ? proc_index[pok_get_lapic_id()] : 0;
 }
 
-void pok_send_schedule_thread() {
-  pok_send_ipi(IPI_ALL_WITHOUT_SELF, 0, POK_IPI_SCHED_INT_NUMBER);
+void pok_send_global_schedule_thread() {
+  pok_send_ipi(IPI_ALL_WITHOUT_SELF, 0, POK_IPI_GLOBAL_SCHED_INT_NUMBER);
+}
+
+void pok_send_schedule_thread(uint8_t dest) {
+  pok_send_ipi(IPI_NOGROUP, dest, POK_IPI_SCHED_THREAD_INT_NUMBER);
+}
+
+void pok_send_schedule_thread_other_processors() {
+  pok_send_ipi(IPI_ALL_WITHOUT_SELF, 0, POK_IPI_SCHED_THREAD_INT_NUMBER);
 }
 
 /**

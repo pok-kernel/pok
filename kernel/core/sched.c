@@ -76,7 +76,6 @@ uint64_t pok_sched_slots[POK_CONFIG_SCHEDULING_NBSLOTS] =
 uint8_t pok_sched_slots_allocation[POK_CONFIG_SCHEDULING_NBSLOTS] =
     (uint8_t[])POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION;
 
-pok_sched_t pok_global_sched;
 uint64_t pok_sched_next_deadline;
 uint64_t pok_sched_next_major_frame;
 uint64_t pok_sched_next_flush; // variable used to handle user defined
@@ -286,9 +285,11 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
   return elected;
 }
 
+// Global scheduling with partition
+
 uint8_t new_partition;
 
-void pok_sched_thread() {
+void pok_global_sched_thread(bool_t is_source_processor) {
   uint8_t elected_thread = pok_elect_thread(POK_SCHED_CURRENT_PARTITION);
 
   if (CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) !=
@@ -301,9 +302,9 @@ void pok_sched_thread() {
     CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) =
         elected_thread;
   }
-  pok_sched_context_switch(elected_thread);
+  pok_global_sched_context_switch(elected_thread, is_source_processor);
 }
-void pok_sched() {
+void pok_global_sched() {
   uint8_t elected_partition = POK_SCHED_CURRENT_PARTITION;
   elected_partition = pok_elect_partition();
   new_partition = elected_partition != POK_SCHED_CURRENT_PARTITION;
@@ -311,13 +312,13 @@ void pok_sched() {
 
   if (multiprocessing_system) {
     start_rendezvous(&fence);
-    pok_send_schedule_thread();
+    pok_send_global_schedule_thread();
   }
-  pok_sched_thread();
+  pok_global_sched_thread(TRUE);
 }
 
-void synchro_processors(const uint32_t elected_id) {
-  if (pok_get_proc_id()) {
+void synchro_processors(const uint32_t elected_id, bool_t is_source_processor) {
+  if (!is_source_processor) {
     join_rendezvous(&fence);
     join_rendezvous(&barr);
   } else {
@@ -342,14 +343,15 @@ void synchro_processors(const uint32_t elected_id) {
  * Context-switch function to switch from one thread to another
  * Rely on architecture-dependent functionnalities (must include arch.h)
  */
-void pok_sched_context_switch(const uint32_t elected_id) {
+void pok_global_sched_context_switch(const uint32_t elected_id,
+                                     bool_t is_source_processor) {
   uint32_t *current_sp;
   uint32_t new_sp;
 
   if (POK_SCHED_CURRENT_THREAD == elected_id) {
-    synchro_processors(elected_id);
+    synchro_processors(elected_id, is_source_processor);
 
-    if (pok_get_proc_id())
+    if (!is_source_processor)
       pok_end_ipi();
 
   } else {
@@ -370,19 +372,84 @@ void pok_sched_context_switch(const uint32_t elected_id) {
     current_sp = &POK_CURRENT_THREAD.sp;
     new_sp = pok_threads[elected_id].sp;
 
-    synchro_processors(elected_id);
-    /*
-        *  FIXME : current debug session about exceptions-handled
-       printf("switch from thread %d, sp=0x%x\n",POK_SCHED_CURRENT_THREAD,
-       current_sp); printf("switch to thread %d, sp=0x%x\n",elected_id,
-       new_sp);
-       */
+    synchro_processors(elected_id, is_source_processor);
 
     POK_SCHED_CURRENT_THREAD = elected_id;
-    if (pok_get_proc_id())
+    if (!is_source_processor)
       pok_end_ipi();
     pok_context_switch(current_sp, new_sp);
   }
+}
+
+// Local thread sched
+
+void pok_sched_context_switch(const uint32_t elected_id,
+                              bool_t is_source_processor) {
+  uint32_t *current_sp;
+  uint32_t new_sp;
+
+  if (POK_SCHED_CURRENT_THREAD == elected_id) {
+    if (!is_source_processor)
+      pok_end_ipi();
+
+  } else {
+
+#ifdef POK_NEEDS_LOCKOBJECTS
+    // Check if every spin lock is unlocked before changing context
+    for (uint8_t i =
+             pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_low;
+         i < pok_partitions[POK_CURRENT_THREAD.partition].lockobj_index_high;
+         i++) {
+      assert(!pok_partitions_lockobjs[i].eventspin);
+      assert(!pok_partitions_lockobjs[i].spin);
+    }
+#endif
+
+    current_sp = &POK_CURRENT_THREAD.sp;
+    new_sp = pok_threads[elected_id].sp;
+
+    POK_SCHED_CURRENT_THREAD = elected_id;
+    if (!is_source_processor)
+      pok_end_ipi();
+    pok_context_switch(current_sp, new_sp);
+  }
+}
+
+void pok_sched_thread(bool_t is_source_processor) {
+  uint8_t elected_thread = pok_elect_thread(POK_SCHED_CURRENT_PARTITION);
+
+  if (CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) !=
+      elected_thread) {
+    if (CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) !=
+        IDLE_THREAD) {
+      PREV_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) =
+          CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]);
+    }
+    CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) =
+        elected_thread;
+  }
+  pok_sched_context_switch(elected_thread, is_source_processor);
+}
+
+// Send local thread sched
+
+void pok_threads_schedule_one_proc(uint8_t dest) {
+  if (multiprocessing_system) {
+    if (dest == pok_get_proc_id())
+      pok_sched_thread(TRUE);
+    else
+      pok_send_schedule_thread(dest);
+  } else {
+    assert(!dest);
+    pok_sched_thread(TRUE);
+  }
+}
+
+void pok_threads_schedule_every_proc() {
+  if (multiprocessing_system) {
+    pok_send_schedule_thread_other_processors();
+  }
+  pok_sched_thread(TRUE);
 }
 
 #ifdef POK_NEEDS_SCHED_RMS
@@ -588,7 +655,7 @@ void pok_sched_lock_current_thread_timed(const uint64_t time) {
 
 void pok_sched_stop_self(void) {
   POK_CURRENT_THREAD.state = POK_STATE_STOPPED;
-  pok_sched();
+  pok_sched_thread(TRUE);
 }
 
 void pok_sched_stop_thread(const uint32_t tid) {
@@ -604,7 +671,7 @@ void pok_sched_lock_thread(const uint32_t thread_id) {
 pok_ret_t pok_sched_end_period() {
   POK_CURRENT_THREAD.state = POK_STATE_WAIT_NEXT_ACTIVATION;
   POK_CURRENT_THREAD.remaining_time_capacity = 0;
-  pok_sched();
+  pok_sched_thread(TRUE);
   return POK_ERRNO_OK;
 }
 
@@ -617,7 +684,7 @@ void pok_sched_activate_error_thread(void) {
     pok_threads[error_thread].next_activation = 0;
 
     pok_threads[error_thread].state = POK_STATE_RUNNABLE;
-    pok_sched_context_switch(error_thread);
+    pok_sched_context_switch(error_thread, TRUE);
   }
 }
 

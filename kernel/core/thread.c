@@ -224,7 +224,7 @@ pok_ret_t pok_thread_sleep(uint32_t us) {
   uint64_t mytime;
   mytime = ((uint64_t)us) * 1000 + POK_GETTICK();
   pok_sched_lock_current_thread_timed(mytime);
-  pok_sched();
+  pok_sched_thread(TRUE);
   return POK_ERRNO_OK;
 }
 #endif
@@ -232,7 +232,7 @@ pok_ret_t pok_thread_sleep(uint32_t us) {
 #ifdef POK_NEEDS_THREAD_SLEEP_UNTIL
 pok_ret_t pok_thread_sleep_until(uint32_t us) {
   pok_sched_lock_current_thread_timed(((uint64_t)us) * 1000);
-  pok_sched();
+  pok_sched_thread(TRUE);
   return POK_ERRNO_OK;
 }
 #endif
@@ -292,7 +292,7 @@ pok_ret_t pok_thread_delayed_start(const uint32_t id, const uint32_t us) {
         pok_threads[id].wakeup_time = POK_GETTICK() + ns;
       }
       // the preemption is always enabled so
-      pok_sched();
+      pok_global_sched();
     } else // the partition mode is cold or warm start
     {
       pok_threads[id].state = POK_STATE_DELAYED_START;
@@ -334,7 +334,7 @@ pok_ret_t pok_thread_set_priority(const uint32_t id, const uint32_t priority) {
     return POK_ERRNO_PARAM;
   pok_threads[id].priority = priority;
   /* preemption is always enabled so ... */
-  pok_sched();
+  pok_global_sched();
   return POK_ERRNO_OK;
 }
 
@@ -345,7 +345,7 @@ pok_ret_t pok_thread_resume(const uint32_t id) {
   pok_threads[id].wakeup_time = POK_GETTICK();
   pok_threads[id].state = POK_STATE_RUNNABLE;
   /* preemption is always enabled */
-  pok_sched();
+  pok_global_sched();
   return POK_ERRNO_OK;
 }
 

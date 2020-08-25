@@ -25,7 +25,9 @@
 
 extern uint8_t multiprocessing_system;
 uint8_t pok_get_proc_id(void);
-void pok_send_schedule_thread(void);
+void pok_send_global_schedule_thread(void);
+void pok_send_schedule_thread(uint8_t dest);
+void pok_send_schedule_thread_other_processors(void);
 
 #ifdef POK_ARCH_PPC
 #endif

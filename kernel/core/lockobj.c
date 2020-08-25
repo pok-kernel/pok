@@ -190,7 +190,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, uint64_t timeout) {
   }
 
   SPIN_UNLOCK(obj->eventspin);
-  pok_sched();
+  pok_sched_thread(TRUE);
 
   pok_ret_t ret_wait;
   /* Here, we come back after we wait*/
@@ -223,7 +223,7 @@ pok_ret_t pok_lockobj_eventsignal(pok_lockobj_t *obj) {
     pok_sched_unlock_thread(tmp);
     pok_lockobj_dequeue(&obj->event_fifo);
     SPIN_UNLOCK(obj->eventspin);
-    pok_sched();
+    pok_threads_schedule_one_proc(pok_threads[tmp].processor_affinity);
     return POK_ERRNO_OK;
   }
 }
@@ -241,8 +241,9 @@ pok_ret_t pok_lockobj_eventbroadcast(pok_lockobj_t *obj) {
   }
 
   SPIN_UNLOCK(obj->eventspin);
-  if (resched)
-    pok_sched();
+  if (resched) {
+    pok_threads_schedule_every_proc();
+  }
 
   return POK_ERRNO_OK;
 }
@@ -271,7 +272,7 @@ pok_ret_t pok_lockobj_lock(pok_lockobj_t *obj,
       pok_sched_lock_current_thread();
 
     SPIN_UNLOCK(obj->spin);
-    pok_sched();
+    pok_sched_thread(TRUE);
     SPIN_LOCK(obj->spin);
 
     if ((deadline != 0) && (POK_GETTICK() >= deadline)) {
@@ -326,7 +327,7 @@ pok_ret_t pok_lockobj_unlock(pok_lockobj_t *obj,
   SPIN_UNLOCK(obj->spin);
 
   if (!IS_LOCK(obj->eventspin)) {
-    pok_sched();
+    pok_threads_schedule_one_proc(pok_threads[tmp].processor_affinity);
   }
 
   return POK_ERRNO_OK;

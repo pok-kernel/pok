@@ -38,7 +38,7 @@ static void *pinger_job() {
 
 static void *pinger_job2() {
   pok_ret_t ret;
-  for (int i = 1; i <= 10; i++) {
+  for (int i = 1; i <= 15; i++) {
     printf("P2T2: I will wait for the semaphore (round %d)\n", i);
     ret = pok_sem_wait(sid, 10000);
     if (!ret)
@@ -52,21 +52,6 @@ static void *pinger_job2() {
   return NULL;
 }
 
-static void *pinger_job3() {
-  pok_ret_t ret;
-  for (int i = 1; i <= 10; i++) {
-    printf("P2T3: I will wait for the semaphore (round %d)\n", i);
-    ret = pok_sem_wait(sid, 8000);
-    if (!ret)
-      printf("P2T3: got the semaphore (round %d)\n", i);
-    else
-      printf("P2T3: failed to get the semaphore (round %d)\n", i);
-  }
-  printf("P2T3: sleeping forever\n");
-  for (;;)
-    pok_thread_sleep(1000000);
-  return NULL;
-}
 int main() {
   uint32_t tid;
   pok_ret_t ret;
@@ -85,11 +70,6 @@ int main() {
 
   ret = pok_thread_create(&tid, &tattr);
   printf("[P2] pok_thread_create (2) return=%d\n", ret);
-
-  tattr.entry = pinger_job3;
-
-  ret = pok_thread_create(&tid, &tattr);
-  printf("[P2] pok_thread_create (3) return=%d\n", ret);
 
   pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
 

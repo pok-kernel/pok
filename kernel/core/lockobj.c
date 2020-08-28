@@ -216,13 +216,16 @@ pok_ret_t pok_lockobj_eventsignal(pok_lockobj_t *obj) {
     if (tmp == POK_SCHED_CURRENT_THREAD)
       continue;
 
-    if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT) {
-      pok_sched_unlock_thread(tmp);
-      obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
-      SPIN_UNLOCK(obj->eventspin);
-      pok_sched();
-      return POK_ERRNO_OK;
-    }
+    if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT)
+      if (pok_threads[tmp].state == POK_STATE_LOCK ||
+          (pok_threads[tmp].state == POK_STATE_WAITING &&
+           pok_threads[tmp].wakeup_time > POK_GETTICK())) {
+        pok_sched_unlock_thread(tmp);
+        obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
+        SPIN_UNLOCK(obj->eventspin);
+        pok_sched();
+        return POK_ERRNO_OK;
+      }
   }
   SPIN_UNLOCK(obj->eventspin);
   return POK_ERRNO_NOTFOUND;
@@ -237,11 +240,14 @@ pok_ret_t pok_lockobj_eventbroadcast(pok_lockobj_t *obj) {
     if (tmp == POK_SCHED_CURRENT_THREAD)
       continue;
 
-    if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT) {
-      pok_sched_unlock_thread(tmp);
-      obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
-      resched = TRUE;
-    }
+    if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT)
+      if ((pok_threads[tmp].state == POK_STATE_LOCK ||
+           (pok_threads[tmp].state == POK_STATE_WAITING &&
+            pok_threads[tmp].wakeup_time > POK_GETTICK()))) {
+        pok_sched_unlock_thread(tmp);
+        obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
+        resched = TRUE;
+      }
   }
 
   SPIN_UNLOCK(obj->eventspin);
@@ -328,12 +334,15 @@ pok_ret_t pok_lockobj_unlock(pok_lockobj_t *obj,
 
   uint32_t needs_resched = 0;
   do {
-    if (obj->thread_state[res] == LOCKOBJ_STATE_LOCK) {
-      obj->thread_state[res] = LOCKOBJ_STATE_UNLOCK;
-      pok_sched_unlock_thread(res);
-      needs_resched = 1;
-      break;
-    }
+    if (obj->thread_state[res] == LOCKOBJ_STATE_LOCK)
+      if ((pok_threads[res].state == POK_STATE_LOCK ||
+           (pok_threads[res].state == POK_STATE_WAITING &&
+            pok_threads[res].wakeup_time > POK_GETTICK()))) {
+        obj->thread_state[res] = LOCKOBJ_STATE_UNLOCK;
+        pok_sched_unlock_thread(res);
+        needs_resched = 1;
+        break;
+      }
     res = (res + 1) % (POK_CONFIG_NB_THREADS);
   } while ((res != POK_SCHED_CURRENT_THREAD));
 

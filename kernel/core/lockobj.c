@@ -189,20 +189,23 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, uint64_t timeout) {
   SPIN_UNLOCK(obj->eventspin);
   pok_sched();
 
-  pok_ret_t ret = pok_lockobj_lock(obj, NULL);
-
-  if (ret != POK_ERRNO_OK) {
-    return ret;
-  }
-
+  pok_ret_t ret_wait;
   /* Here, we come back after we wait*/
   if ((deadline != 0) && (POK_GETTICK() >= deadline)) {
-    ret = POK_ERRNO_TIMEOUT;
+    ret_wait = POK_ERRNO_TIMEOUT;
+    SPIN_LOCK(obj->eventspin);
+    obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
+    SPIN_UNLOCK(obj->eventspin);
   } else {
-    ret = POK_ERRNO_OK;
+    ret_wait = POK_ERRNO_OK;
   }
 
-  return ret;
+  pok_ret_t ret_lock = pok_lockobj_lock(obj, NULL);
+
+  if (ret_lock != POK_ERRNO_OK)
+    return ret_lock;
+  else
+    return ret_wait;
 }
 
 pok_ret_t pok_lockobj_eventsignal(pok_lockobj_t *obj) {

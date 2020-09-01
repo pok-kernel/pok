@@ -68,7 +68,6 @@ pok_ret_t pok_lockobj_init() {
 
 pok_ret_t pok_lockobj_create(pok_lockobj_t *obj,
                              const pok_lockobj_attr_t *attr) {
-  uint32_t tmp;
 
   /* Check the policy of the lockobj */
   if ((attr->locking_policy != POK_LOCKOBJ_POLICY_STANDARD) &&
@@ -86,9 +85,8 @@ pok_ret_t pok_lockobj_create(pok_lockobj_t *obj,
     return POK_ERRNO_LOCKOBJ_KIND;
   }
 
-  for (tmp = 0; tmp < POK_CONFIG_NB_THREADS; tmp++) {
-    obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
-  }
+  pok_lockobj_fifo_init(&obj->fifo);
+  pok_lockobj_fifo_init(&obj->event_fifo);
 
   obj->queueing_policy = attr->queueing_policy;
   obj->locking_policy = attr->locking_policy;
@@ -108,7 +106,6 @@ pok_ret_t pok_lockobj_create(pok_lockobj_t *obj,
 #ifdef POK_NEEDS_LOCKOBJECTS
 pok_ret_t pok_lockobj_partition_create(pok_lockobj_id_t *id,
                                        const pok_lockobj_attr_t *attr) {
-  uint8_t i;
   uint8_t pid;
   uint8_t mid;
   pok_ret_t ret;
@@ -150,10 +147,6 @@ pok_ret_t pok_lockobj_partition_create(pok_lockobj_id_t *id,
     return ret;
   }
 
-  for (i = 0; i < POK_CONFIG_NB_THREADS; i++) {
-    pok_partitions_lockobjs[mid].thread_state[i] = LOCKOBJ_STATE_UNLOCK;
-  }
-
   return POK_ERRNO_OK;
 }
 #endif
@@ -175,9 +168,13 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, uint64_t timeout) {
     SPIN_UNLOCK(obj->eventspin);
     return POK_ERRNO_UNAVAILABLE;
   }
-
-  obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_WAITEVENT;
-
+#ifdef POK_NEEDS_ASSERT
+  pok_ret_t ret =
+      pok_lockobj_enqueue(&obj->event_fifo, POK_SCHED_CURRENT_THREAD);
+  assert(!ret);
+#else
+  pok_lockobj_enqueue(&obj->event_fifo, POK_SCHED_CURRENT_THREAD);
+#endif
   uint64_t deadline = timeout ? timeout + POK_GETTICK() : 0;
 
   if (deadline > 0) {
@@ -194,7 +191,7 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, uint64_t timeout) {
   if ((deadline != 0) && (POK_GETTICK() >= deadline)) {
     ret_wait = POK_ERRNO_TIMEOUT;
     SPIN_LOCK(obj->eventspin);
-    obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
+    pok_lockobj_remove_thread(&obj->event_fifo, POK_SCHED_CURRENT_THREAD);
     SPIN_UNLOCK(obj->eventspin);
   } else {
     ret_wait = POK_ERRNO_OK;
@@ -212,23 +209,17 @@ pok_ret_t pok_lockobj_eventsignal(pok_lockobj_t *obj) {
   SPIN_LOCK(obj->eventspin);
   uint32_t tmp;
 
-  for (tmp = 0; tmp < POK_CONFIG_NB_THREADS; tmp++) {
-    if (tmp == POK_SCHED_CURRENT_THREAD)
-      continue;
-
-    if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT)
-      if (pok_threads[tmp].state == POK_STATE_LOCK ||
-          (pok_threads[tmp].state == POK_STATE_WAITING &&
-           pok_threads[tmp].wakeup_time > POK_GETTICK())) {
-        pok_sched_unlock_thread(tmp);
-        obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
-        SPIN_UNLOCK(obj->eventspin);
-        pok_sched();
-        return POK_ERRNO_OK;
-      }
+  if (pok_lockobj_fifo_is_empty(&obj->event_fifo)) {
+    SPIN_UNLOCK(obj->eventspin);
+    return POK_ERRNO_NOTFOUND;
+  } else {
+    tmp = pok_lockobj_get_head(&obj->event_fifo);
+    pok_sched_unlock_thread(tmp);
+    pok_lockobj_dequeue(&obj->event_fifo);
+    SPIN_UNLOCK(obj->eventspin);
+    pok_sched();
+    return POK_ERRNO_OK;
   }
-  SPIN_UNLOCK(obj->eventspin);
-  return POK_ERRNO_NOTFOUND;
 }
 
 pok_ret_t pok_lockobj_eventbroadcast(pok_lockobj_t *obj) {
@@ -236,18 +227,11 @@ pok_ret_t pok_lockobj_eventbroadcast(pok_lockobj_t *obj) {
   bool_t resched = FALSE;
   SPIN_LOCK(obj->eventspin);
 
-  for (tmp = 0; tmp < POK_CONFIG_NB_THREADS; tmp++) {
-    if (tmp == POK_SCHED_CURRENT_THREAD)
-      continue;
-
-    if (obj->thread_state[tmp] == LOCKOBJ_STATE_WAITEVENT)
-      if ((pok_threads[tmp].state == POK_STATE_LOCK ||
-           (pok_threads[tmp].state == POK_STATE_WAITING &&
-            pok_threads[tmp].wakeup_time > POK_GETTICK()))) {
-        pok_sched_unlock_thread(tmp);
-        obj->thread_state[tmp] = LOCKOBJ_STATE_UNLOCK;
-        resched = TRUE;
-      }
+  while (!pok_lockobj_fifo_is_empty(&obj->event_fifo)) {
+    tmp = pok_lockobj_get_head(&obj->event_fifo);
+    pok_sched_unlock_thread(tmp);
+    pok_lockobj_dequeue(&obj->event_fifo);
+    resched = TRUE;
   }
 
   SPIN_UNLOCK(obj->eventspin);
@@ -262,94 +246,79 @@ pok_ret_t pok_lockobj_lock(pok_lockobj_t *obj,
   if (obj->initialized == FALSE) {
     return POK_ERRNO_LOCKOBJ_NOTREADY;
   }
-
   SPIN_LOCK(obj->spin);
 
-  if ((obj->current_value > 0) &&
-      (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_UNLOCK)) {
+  if (obj->current_value > 0) {
     // Short path: object is available right now
+    assert(pok_lockobj_fifo_is_empty(&obj->fifo));
     obj->current_value--;
     SPIN_UNLOCK(obj->spin);
+    return POK_ERRNO_OK;
   } else {
     uint64_t deadline =
         attr != NULL && attr->timeout > 0 ? attr->timeout + POK_GETTICK() : 0;
+    pok_lockobj_enqueue(&obj->fifo, POK_SCHED_CURRENT_THREAD);
+    if (deadline > 0)
+      pok_sched_lock_current_thread_timed(deadline);
+    else
+      pok_sched_lock_current_thread();
 
-    while (
-        (obj->current_value == 0) ||
-        (obj->thread_state[POK_SCHED_CURRENT_THREAD] == LOCKOBJ_STATE_LOCK)) {
-      obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_LOCK;
-
-      if (deadline > 0) {
-        pok_sched_lock_current_thread_timed(deadline);
-        if (POK_GETTICK() >= deadline) {
-          obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
-          SPIN_UNLOCK(obj->spin);
-          return POK_ERRNO_TIMEOUT;
-        }
-      } else {
-        pok_sched_lock_current_thread();
-      }
-
-      SPIN_UNLOCK(obj->spin);
-      pok_sched(); /* reschedule baby, reschedule !! */
-      SPIN_LOCK(obj->spin);
-    }
-
-    obj->current_value--;
     SPIN_UNLOCK(obj->spin);
-    pok_sched_unlock_thread(POK_SCHED_CURRENT_THREAD);
-  }
+    pok_sched();
+    SPIN_LOCK(obj->spin);
 
-  return POK_ERRNO_OK;
+    if ((deadline != 0) && (POK_GETTICK() >= deadline)) {
+      pok_lockobj_remove_thread(&obj->fifo, POK_SCHED_CURRENT_THREAD);
+      SPIN_UNLOCK(obj->spin);
+      return POK_ERRNO_TIMEOUT;
+    } else {
+      SPIN_UNLOCK(obj->spin);
+      return POK_ERRNO_OK;
+    }
+  }
 }
 
 pok_ret_t pok_lockobj_unlock(pok_lockobj_t *obj,
                              const pok_lockobj_lockattr_t *attr) {
-  uint32_t res;
 
   (void)attr; /* unused at this time */
 
   if (obj->initialized == FALSE) {
     return POK_ERRNO_LOCKOBJ_NOTREADY;
   }
-
-  res = 0;
   SPIN_LOCK(obj->spin);
 
-  if (obj->kind == POK_LOCKOBJ_KIND_SEMAPHORE) {
-    if (obj->current_value < obj->max_value) {
-      obj->current_value++;
-    }
-  } else {
+  if (obj->current_value) {
+    assert(pok_lockobj_fifo_is_empty(&obj->fifo));
+    if (obj->kind == POK_LOCKOBJ_KIND_SEMAPHORE) {
+      if (obj->current_value < obj->max_value) {
+        obj->current_value++;
+      }
+    } else {
 #if POK_NEEDS_DEBUG
-    if (obj->current_value)
-      printf(
-          "[KERNEL] [DEBUG] Try to unlock a lock which is already unlocked\n");
+      if (obj->current_value)
+        printf("[KERNEL] [DEBUG] Try to unlock a lock which is already "
+               "unlocked\n");
 #endif
-    obj->current_value = 1;
+      obj->current_value = 1;
+    }
+    SPIN_UNLOCK(obj->spin);
+    return POK_ERRNO_OK;
   }
 
-  res = POK_SCHED_CURRENT_THREAD;
-  res = (res + 1) % (POK_CONFIG_NB_THREADS);
+  if (pok_lockobj_fifo_is_empty(&obj->fifo)) {
+    SPIN_UNLOCK(obj->spin);
+    obj->current_value = 1;
+    return 0;
+  }
 
-  uint32_t needs_resched = 0;
-  do {
-    if (obj->thread_state[res] == LOCKOBJ_STATE_LOCK)
-      if ((pok_threads[res].state == POK_STATE_LOCK ||
-           (pok_threads[res].state == POK_STATE_WAITING &&
-            pok_threads[res].wakeup_time > POK_GETTICK()))) {
-        obj->thread_state[res] = LOCKOBJ_STATE_UNLOCK;
-        pok_sched_unlock_thread(res);
-        needs_resched = 1;
-        break;
-      }
-    res = (res + 1) % (POK_CONFIG_NB_THREADS);
-  } while ((res != POK_SCHED_CURRENT_THREAD));
+  uint32_t tmp = pok_lockobj_get_head(&obj->fifo);
+  pok_lockobj_dequeue(&obj->fifo);
+  pok_sched_unlock_thread(tmp);
 
-  obj->thread_state[POK_SCHED_CURRENT_THREAD] = LOCKOBJ_STATE_UNLOCK;
   SPIN_UNLOCK(obj->spin);
 
-  if (needs_resched) {
+  if (!IS_LOCK(obj->eventspin)) {
     pok_sched();
   }
 
@@ -406,5 +375,52 @@ pok_ret_t pok_lockobj_partition_wrapper(const pok_lockobj_id_t id,
   }
 }
 #endif
+
+void pok_lockobj_fifo_init(pok_lockobj_fifo_t *fifo) {
+  fifo->head = fifo->last = 0;
+  fifo->is_empty = TRUE;
+}
+uint32_t pok_lockobj_get_head(pok_lockobj_fifo_t *fifo) {
+  return fifo->buffer[fifo->head];
+}
+pok_ret_t pok_lockobj_enqueue(pok_lockobj_fifo_t *fifo, uint32_t thread) {
+  if (!fifo->is_empty && fifo->last == fifo->head)
+    return POK_ERRNO_FULL;
+  fifo->buffer[fifo->last] = thread;
+  fifo->last = (fifo->last + 1) % POK_CONFIG_NB_THREADS;
+  fifo->is_empty = FALSE;
+  return POK_ERRNO_OK;
+}
+pok_ret_t pok_lockobj_dequeue(pok_lockobj_fifo_t *fifo) {
+  if (fifo->is_empty)
+    return POK_ERRNO_EMPTY;
+  fifo->head = (fifo->head + 1) % POK_CONFIG_NB_THREADS;
+  if (fifo->last == fifo->head)
+    fifo->is_empty = TRUE;
+  return POK_ERRNO_OK;
+}
+
+bool_t pok_lockobj_fifo_is_empty(pok_lockobj_fifo_t *fifo) {
+  return fifo->is_empty;
+}
+
+pok_ret_t pok_lockobj_remove_thread(pok_lockobj_fifo_t *fifo, uint32_t thread) {
+  uint32_t tmp = POK_CONFIG_NB_THREADS + 1;
+  for (int i = 0; i < POK_CONFIG_NB_THREADS; i++) {
+    if (fifo->buffer[i] == thread)
+      tmp = i;
+    break;
+  }
+  if (tmp == POK_CONFIG_NB_THREADS)
+    return POK_ERRNO_NOTFOUND;
+  fifo->last = (fifo->last ? (fifo->last - 1) : (POK_CONFIG_NB_THREADS - 1));
+  while (tmp != fifo->last) {
+    fifo->buffer[tmp] = fifo->buffer[(tmp + 1) % POK_CONFIG_NB_THREADS];
+    tmp = (tmp + 1) % POK_CONFIG_NB_THREADS;
+  }
+  if (fifo->last == fifo->head)
+    fifo->is_empty = TRUE;
+  return POK_ERRNO_OK;
+}
 
 #endif

@@ -45,6 +45,15 @@ typedef enum {
   POK_LOCKOBJ_POLICY_PCP = 2
 } pok_locking_policy_t;
 
+/* FIFO for lockobj policy */
+
+typedef struct {
+  uint32_t head;
+  uint32_t last;
+  bool_t is_empty;
+  uint32_t buffer[POK_CONFIG_NB_THREADS];
+} pok_lockobj_fifo_t;
+
 typedef enum {
   LOCKOBJ_STATE_LOCK = 0,
   LOCKOBJ_STATE_UNLOCK = 1,
@@ -64,8 +73,9 @@ typedef struct {
   pok_spinlock_t eventspin;
   /* spinlock to enfoce mutual exclusion */
 
-  pok_mutex_state_t thread_state[POK_CONFIG_NB_THREADS + 2];
-  /* Describe which thread is blocked in the mutex */
+  pok_lockobj_fifo_t fifo;
+  pok_lockobj_fifo_t event_fifo;
+  /* FIFO with waiting threads */
 
   pok_locking_policy_t locking_policy;
   /* Locking policy */
@@ -121,5 +131,10 @@ pok_ret_t pok_lockobj_eventsignal(pok_lockobj_t *obj);
 pok_ret_t pok_lockobj_eventbroadcast(pok_lockobj_t *obj);
 pok_ret_t pok_lockobj_partition_wrapper(const pok_lockobj_id_t id,
                                         const pok_lockobj_lockattr_t *attr);
-
+void pok_lockobj_fifo_init(pok_lockobj_fifo_t *fifo);
+uint32_t pok_lockobj_get_head(pok_lockobj_fifo_t *fifo);
+pok_ret_t pok_lockobj_enqueue(pok_lockobj_fifo_t *fifo, uint32_t thread);
+pok_ret_t pok_lockobj_dequeue(pok_lockobj_fifo_t *fifo);
+bool_t pok_lockobj_fifo_is_empty(pok_lockobj_fifo_t *fifo);
+pok_ret_t pok_lockobj_remove_thread(pok_lockobj_fifo_t *fifo, uint32_t thread);
 #endif

@@ -33,4 +33,6 @@ typedef unsigned char pok_spinlock_t;
                : "m"(_spin_)                                                   \
                : "%al")
 
+#define IS_LOCK(_spin_) (_spin_ == 1)
+
 #endif /* !__POK_SPINLOCK_H__ */

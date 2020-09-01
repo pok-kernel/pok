@@ -22,7 +22,6 @@ static uint8_t sid;
 
 static void *pinger_job() {
   for (int i = 1; i <= 5; i++) {
-    pok_thread_sleep(1000);
     printf("P3T1: I will signal semaphore (round %d)\n", i);
     pok_sem_signal(sid);
     printf("P3T1: semaphore signaled (round %d)\n", i);
@@ -30,6 +29,7 @@ static void *pinger_job() {
       pok_sem_signal(sid);
       printf("P3T1: second semaphore signaled (round %d)\n", i);
     }
+    pok_thread_sleep(5000);
   }
   printf("P3T1: sleeping forever\n");
   for (;;)

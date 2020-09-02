@@ -61,19 +61,19 @@ int main() {
   pok_thread_attr_t tattr;
 
   ret = pok_event_create(&eid);
-  printf("[P1] pok_event_create return=%d, mid=%d\n", ret, eid);
+  printf("[P2] pok_event_create return=%d, mid=%d\n", ret, eid);
 
   tattr.priority = 40;
   tattr.entry = pinger_job;
 
   ret = pok_thread_create(&tid, &tattr);
-  printf("[P1] pok_thread_create (1) return=%d\n", ret);
+  printf("[P2] pok_thread_create (1) return=%d\n", ret);
 
   tattr.priority = 42;
   tattr.entry = pinger_job2;
 
   ret = pok_thread_create(&tid, &tattr);
-  printf("[P1] pok_thread_create (2) return=%d\n", ret);
+  printf("[P2] pok_thread_create (2) return=%d\n", ret);
 
   pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);
 

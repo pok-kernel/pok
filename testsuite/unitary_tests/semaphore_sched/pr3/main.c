@@ -31,7 +31,7 @@ static void *pinger_job() {
       printf("P3T1: second semaphore signaled (round %d)\n", i);
     }
   }
-  printf("P2T1: sleeping forever\n");
+  printf("P3T1: sleeping forever\n");
   for (;;)
     pok_thread_sleep(1000000);
   return NULL;

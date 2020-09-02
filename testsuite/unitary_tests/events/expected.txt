@@ -163,9 +163,9 @@ P1T2: I will wait for the signal (round 16)
 P1T1: sleeping forever
 --- scheduling idle thread
     non-ready: 0 (1/stopped), 1 (40/waiting), 2 (42/lock), 3 (44/lock)
-[P1] pok_event_create return=0, mid=1
-[P1] pok_thread_create (1) return=0
-[P1] pok_thread_create (2) return=0
+[P2] pok_event_create return=0, mid=1
+[P2] pok_thread_create (1) return=0
+[P2] pok_thread_create (2) return=0
 --- scheduling thread 6 (priority 42)
     other ready:  5 (40)
     non-ready: 4 (1/stopped)

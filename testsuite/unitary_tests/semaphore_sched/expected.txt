@@ -178,7 +178,7 @@ P3T2: I will wait for the semaphore (round 5)
 P3T1: I will signal semaphore (round 5)
 P3T1: semaphore signaled (round 5)
 P3T1: second semaphore signaled (round 5)
-P2T1: sleeping forever
+P3T1: sleeping forever
 --- scheduling thread 9 (priority 42)
     non-ready: 7 (1/stopped), 8 (44/waiting)
 P3T2: got the semaphore (round 5)

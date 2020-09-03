@@ -29,3 +29,5 @@ tests: !mux
         dir: test_printf
     test_events:
         dir: events
+    test_mutexes:
+        dir: mutexes

@@ -88,7 +88,11 @@ pok_ret_t pok_lockobj_create(pok_lockobj_t *obj,
   pok_lockobj_fifo_init(&obj->fifo);
   pok_lockobj_fifo_init(&obj->event_fifo);
 
-  obj->queueing_policy = attr->queueing_policy;
+  if (attr->kind == POK_LOCKOBJ_KIND_EVENT) {
+    obj->queueing_policy = POK_QUEUEING_DISCIPLINE_PRIORITY;
+  } else {
+    obj->queueing_policy = attr->queueing_policy;
+  }
   obj->locking_policy = attr->locking_policy;
   obj->kind = attr->kind;
   obj->initialized = TRUE;
@@ -97,7 +101,7 @@ pok_ret_t pok_lockobj_create(pok_lockobj_t *obj,
     obj->current_value = attr->initial_value;
     obj->max_value = attr->max_value;
   } else {
-    obj->current_value = 0;
+    obj->current_value = 1;
   }
 
   return POK_ERRNO_OK;
@@ -170,10 +174,12 @@ pok_ret_t pok_lockobj_eventwait(pok_lockobj_t *obj, uint64_t timeout) {
   }
 #ifdef POK_NEEDS_ASSERT
   pok_ret_t ret =
-      pok_lockobj_enqueue(&obj->event_fifo, POK_SCHED_CURRENT_THREAD);
+      pok_lockobj_enqueue(&obj->event_fifo, POK_SCHED_CURRENT_THREAD,
+                          POK_QUEUEING_DISCIPLINE_PRIORITY);
   assert(!ret);
 #else
-  pok_lockobj_enqueue(&obj->event_fifo, POK_SCHED_CURRENT_THREAD);
+  pok_lockobj_enqueue(&obj->event_fifo, POK_SCHED_CURRENT_THREAD,
+                      POK_QUEUEING_DISCIPLINE_PRIORITY);
 #endif
   uint64_t deadline = timeout ? timeout + POK_GETTICK() : 0;
 
@@ -257,7 +263,8 @@ pok_ret_t pok_lockobj_lock(pok_lockobj_t *obj,
   } else {
     uint64_t deadline =
         attr != NULL && attr->timeout > 0 ? attr->timeout + POK_GETTICK() : 0;
-    pok_lockobj_enqueue(&obj->fifo, POK_SCHED_CURRENT_THREAD);
+    pok_lockobj_enqueue(&obj->fifo, POK_SCHED_CURRENT_THREAD,
+                        obj->queueing_policy);
     if (deadline > 0)
       pok_sched_lock_current_thread_timed(deadline);
     else
@@ -383,13 +390,34 @@ void pok_lockobj_fifo_init(pok_lockobj_fifo_t *fifo) {
 uint32_t pok_lockobj_get_head(pok_lockobj_fifo_t *fifo) {
   return fifo->buffer[fifo->head];
 }
-pok_ret_t pok_lockobj_enqueue(pok_lockobj_fifo_t *fifo, uint32_t thread) {
-  if (!fifo->is_empty && fifo->last == fifo->head)
-    return POK_ERRNO_FULL;
-  fifo->buffer[fifo->last] = thread;
-  fifo->last = (fifo->last + 1) % POK_CONFIG_NB_THREADS;
-  fifo->is_empty = FALSE;
-  return POK_ERRNO_OK;
+pok_ret_t pok_lockobj_enqueue(pok_lockobj_fifo_t *fifo, uint32_t thread,
+                              pok_queueing_discipline_t queueing_discipline) {
+  if (queueing_discipline == POK_QUEUEING_DISCIPLINE_FIFO) {
+    if (!fifo->is_empty && fifo->last == fifo->head)
+      return POK_ERRNO_FULL;
+    fifo->buffer[fifo->last] = thread;
+    fifo->last = (fifo->last + 1) % POK_CONFIG_NB_THREADS;
+    fifo->is_empty = FALSE;
+    return POK_ERRNO_OK;
+  } else if (queueing_discipline == POK_QUEUEING_DISCIPLINE_PRIORITY) {
+    uint32_t i = fifo->head;
+    while ((i != fifo->last) && (pok_threads[thread].priority <=
+                                 pok_threads[fifo->buffer[i]].priority)) {
+      i = (i + 1) % POK_CONFIG_NB_THREADS;
+    }
+    for (uint32_t j = fifo->last; j != i;
+         j = (j ? (j - 1) : (POK_CONFIG_NB_THREADS - 1))) {
+      fifo->buffer[j] = fifo->buffer[j ? (j - 1) : (POK_CONFIG_NB_THREADS - 1)];
+    }
+    fifo->buffer[i] = thread;
+    fifo->is_empty = FALSE;
+    fifo->last = (fifo->last + 1) % POK_CONFIG_NB_THREADS;
+    return POK_ERRNO_OK;
+
+  } else {
+    printf("Wrong policy\n");
+    return POK_ERRNO_PARAM;
+  }
 }
 pok_ret_t pok_lockobj_dequeue(pok_lockobj_fifo_t *fifo) {
   if (fifo->is_empty)

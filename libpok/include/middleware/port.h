@@ -17,14 +17,10 @@
 #ifndef __POK_LIBPOK_PORTS_H__
 #define __POK_LIBPOK_PORTS_H__
 
+#include <core/lockobj.h>
 #include <core/syscall.h>
 #include <errno.h>
 #include <types.h>
-
-typedef enum {
-  POK_PORT_QUEUEING_DISCIPLINE_FIFO = 1,
-  POK_PORT_QUEUEING_DISCIPLINE_PRIORITY = 2
-} pok_port_queueing_disciplines_t;
 
 typedef enum {
   POK_PORT_DIRECTION_IN = 1,

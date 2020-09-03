@@ -52,7 +52,7 @@ int main() {
   pok_thread_attr_t tattr;
 
   printf("[P3] Semaphore max value is 1\n");
-  ret = pok_sem_create(&sid, 0, 1, POK_SEMAPHORE_DISCIPLINE_DEFAULT);
+  ret = pok_sem_create(&sid, 0, 1, POK_QUEUEING_DISCIPLINE_DEFAULT);
   printf("[P3] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.priority = 44;

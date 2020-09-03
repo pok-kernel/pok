@@ -51,7 +51,6 @@ static void *pinger_job2() {
 
 static void *pinger_job3() {
   printf("Hello from P1T3!\n");
-  pok_event_unlock(eid);
   for (;;) {
     pok_event_lock(eid);
     printf("P1T3: I will wait for the signal (round %d)\n", i);

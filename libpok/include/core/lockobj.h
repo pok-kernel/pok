@@ -24,6 +24,11 @@ typedef enum {
 } pok_lockobj_kind_t;
 
 typedef enum {
+  POK_QUEUEING_DISCIPLINE_FIFO,
+  POK_QUEUEING_DISCIPLINE_PRIORITY
+} pok_queueing_discipline_t;
+
+typedef enum {
   POK_LOCKOBJ_POLICY_STANDARD = 0,
   POK_LOCKOBJ_POLICY_PIP = 1,
   POK_LOCKOBJ_POLICY_PCP = 2
@@ -56,5 +61,9 @@ typedef struct {
   pok_lockobj_lock_kind_t lock_kind;
   uint64_t timeout;
 } pok_lockobj_lockattr_t;
+
+// FIFO discipline
+#define POK_QUEUEING_DISCIPLINE_DEFAULT POK_QUEUEING_DISCIPLINE_FIFO
+#define POK_LOCKING_DISCIPLINE_DEFAULT POK_LOCKOBJ_POLICY_STANDARD
 
 #endif

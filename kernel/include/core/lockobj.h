@@ -40,12 +40,15 @@ typedef enum {
 /* All kind of lock objects we have in the kernel */
 
 typedef enum {
+  POK_QUEUEING_DISCIPLINE_FIFO,
+  POK_QUEUEING_DISCIPLINE_PRIORITY
+} pok_queueing_discipline_t;
+
+typedef enum {
   POK_LOCKOBJ_POLICY_STANDARD = 0,
   POK_LOCKOBJ_POLICY_PIP = 1,
   POK_LOCKOBJ_POLICY_PCP = 2
 } pok_locking_policy_t;
-
-/* FIFO for lockobj policy */
 
 typedef struct {
   uint32_t head;
@@ -81,7 +84,7 @@ typedef struct {
   /* Locking policy */
 
   pok_queueing_discipline_t queueing_policy;
-  /* Locking policy */
+  /* Queueing policy */
 
   pok_lockobj_kind_t kind;
 
@@ -133,7 +136,8 @@ pok_ret_t pok_lockobj_partition_wrapper(const pok_lockobj_id_t id,
                                         const pok_lockobj_lockattr_t *attr);
 void pok_lockobj_fifo_init(pok_lockobj_fifo_t *fifo);
 uint32_t pok_lockobj_get_head(pok_lockobj_fifo_t *fifo);
-pok_ret_t pok_lockobj_enqueue(pok_lockobj_fifo_t *fifo, uint32_t thread);
+pok_ret_t pok_lockobj_enqueue(pok_lockobj_fifo_t *fifo, uint32_t thread,
+                              pok_queueing_discipline_t queueing_discipline);
 pok_ret_t pok_lockobj_dequeue(pok_lockobj_fifo_t *fifo);
 bool_t pok_lockobj_fifo_is_empty(pok_lockobj_fifo_t *fifo);
 pok_ret_t pok_lockobj_remove_thread(pok_lockobj_fifo_t *fifo, uint32_t thread);

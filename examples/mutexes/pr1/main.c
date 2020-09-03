@@ -36,7 +36,8 @@ int main() {
 
   ret = pok_thread_create(&tid, &tattr);
 
-  ret = pok_mutex_create(&mid, NULL);
+  ret = pok_mutex_create(&mid, POK_QUEUEING_DISCIPLINE_DEFAULT,
+                         POK_LOCKING_DISCIPLINE_DEFAULT);
   printf("pok_mutex_create return=%d, mid=%d\n", ret, mid);
 
   pok_partition_set_mode(POK_PARTITION_MODE_NORMAL);

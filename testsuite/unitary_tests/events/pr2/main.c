@@ -38,7 +38,6 @@ static void *pinger_job2() {
   pok_ret_t ret;
   int fail = 0;
   printf("Hello from P2T2!\n");
-  pok_event_unlock(eid);
   while (fail < 5) {
     pok_event_lock(eid);
     printf("P2T2: I will wait for the signal\n");

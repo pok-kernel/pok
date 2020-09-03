@@ -58,7 +58,7 @@ int main() {
   pok_thread_attr_t tattr;
 
   printf("[P2] Semaphore start value is 1\n");
-  ret = pok_sem_create(&sid, 1, 50, POK_SEMAPHORE_DISCIPLINE_DEFAULT);
+  ret = pok_sem_create(&sid, 1, 50, POK_QUEUEING_DISCIPLINE_DEFAULT);
   printf("[P2] pok_sem_create return=%d, mid=%d\n", ret, sid);
 
   tattr.entry = pinger_job;

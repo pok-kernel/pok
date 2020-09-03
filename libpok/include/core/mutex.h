@@ -15,20 +15,13 @@
 #ifndef __POK_KERNEL_MUTEX_H__
 #define __POK_KERNEL_MUTEX_H__
 
+#include <core/lockobj.h>
 #include <errno.h>
 #include <types.h>
 
-typedef enum {
-  POK_MUTEX_POLICY_STANDARD = 0,
-  POK_MUTEX_POLICY_PIP = 1,
-  POK_MUTEX_POLICY_PCP = 2
-} pok_mutex_policy_t;
-
-typedef struct {
-  pok_mutex_policy_t policy;
-} pok_mutex_attr_t;
-
-pok_ret_t pok_mutex_create(pok_mutex_id_t *id, pok_mutex_attr_t *attr);
+pok_ret_t pok_mutex_create(pok_mutex_id_t *id,
+                           const pok_queueing_discipline_t queueing_discipline,
+                           const pok_locking_policy_t locking_policy);
 pok_ret_t pok_mutex_lock(pok_mutex_id_t id);
 pok_ret_t pok_mutex_trylock(pok_mutex_id_t id, uint64_t timeout_us);
 pok_ret_t pok_mutex_unlock(pok_mutex_id_t id);

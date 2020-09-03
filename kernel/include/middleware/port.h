@@ -29,11 +29,6 @@
 #define POK_PORT_MAX_SIZE 512
 
 typedef enum {
-  POK_PORT_QUEUEING_DISCIPLINE_FIFO = 1,
-  POK_PORT_QUEUEING_DISCIPLINE_PRIORITY = 2
-} pok_port_queueing_disciplines_t;
-
-typedef enum {
   POK_PORT_DIRECTION_IN = 1,
   POK_PORT_DIRECTION_OUT = 2
 } pok_port_directions_t;

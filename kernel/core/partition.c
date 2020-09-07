@@ -117,8 +117,8 @@ void pok_partition_setup_main_thread(const uint8_t pid) {
   attr.entry = (uint32_t *)pok_partitions[pid].thread_main_entry;
   attr.priority = 1;
   attr.deadline = 0;
-  attr.period = 0;
-  attr.time_capacity = 0;
+  attr.period = INFINITE_TIME_VALUE;
+  attr.time_capacity = INFINITE_TIME_VALUE;
 
   pok_partition_thread_create(&main_thread, &attr, pid);
   pok_partitions[pid].thread_main = main_thread;
@@ -266,7 +266,7 @@ pok_ret_t pok_partition_set_mode(const uint8_t pid,
     unsigned int i;
     for (i = 0; i < pok_partitions[pid].nthreads; i++) {
       thread = &(pok_threads[POK_CURRENT_PARTITION.thread_index_low + i]);
-      if ((long long)thread->period == -1) { //-1 <==> ARINC INFINITE_TIME_VALUE
+      if ((long long)thread->period == INFINITE_TIME_VALUE) {
         if (thread->state ==
             POK_STATE_DELAYED_START) { // delayed start, the delay is in the
                                        // wakeup time

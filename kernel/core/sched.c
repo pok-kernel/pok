@@ -205,6 +205,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
 
     if ((thread->state == POK_STATE_WAIT_NEXT_ACTIVATION) &&
         (thread->next_activation <= now)) {
+      assert(thread->time_capacity);
       thread->state = POK_STATE_RUNNABLE;
       thread->remaining_time_capacity = thread->time_capacity;
       thread->next_activation = thread->next_activation + thread->period;
@@ -266,8 +267,9 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
   }
 
   // computed next thread's deadline
-  pok_threads[elected].end_time =
-      now + pok_threads[elected].remaining_time_capacity;
+  if (pok_threads[current_thread].time_capacity > 0)
+    pok_threads[elected].end_time =
+        now + pok_threads[elected].remaining_time_capacity;
 
   return elected;
 }
@@ -470,7 +472,8 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
 
   from = res;
 
-  if ((pok_threads[current_thread].remaining_time_capacity > 0) &&
+  if ((pok_threads[current_thread].remaining_time_capacity > 0 ||
+       pok_threads[current_thread].time_capacity == INFINITE_TIME_VALUE) &&
       (pok_threads[current_thread].state == POK_STATE_RUNNABLE)) {
     return current_thread;
   }

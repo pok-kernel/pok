@@ -90,11 +90,11 @@ void pok_thread_init(void) {
   pok_threads[KERNEL_THREAD].state = POK_STATE_RUNNABLE;
   pok_threads[KERNEL_THREAD].next_activation = 0;
 
-  pok_threads[IDLE_THREAD].period = 0;
+  pok_threads[IDLE_THREAD].period = INFINITE_TIME_VALUE;
   pok_threads[IDLE_THREAD].deadline = 0;
-  pok_threads[IDLE_THREAD].time_capacity = 0;
+  pok_threads[IDLE_THREAD].time_capacity = INFINITE_TIME_VALUE;
   pok_threads[IDLE_THREAD].next_activation = 0;
-  pok_threads[IDLE_THREAD].remaining_time_capacity = 0;
+  pok_threads[IDLE_THREAD].remaining_time_capacity = INFINITE_TIME_VALUE;
   pok_threads[IDLE_THREAD].wakeup_time = 0;
   pok_threads[IDLE_THREAD].entry = pok_arch_idle;
   pok_threads[IDLE_THREAD].base_priority = pok_sched_get_priority_min(0);
@@ -104,10 +104,10 @@ void pok_thread_init(void) {
       pok_context_create(IDLE_THREAD, IDLE_STACK_SIZE, (uint32_t)pok_arch_idle);
 
   for (i = 0; i < POK_CONFIG_NB_THREADS; ++i) {
-    pok_threads[i].period = 0;
+    pok_threads[i].period = INFINITE_TIME_VALUE;
     pok_threads[i].deadline = 0;
-    pok_threads[i].time_capacity = 0;
-    pok_threads[i].remaining_time_capacity = 0;
+    pok_threads[i].time_capacity = INFINITE_TIME_VALUE;
+    pok_threads[i].remaining_time_capacity = INFINITE_TIME_VALUE;
     pok_threads[i].next_activation = 0;
     pok_threads[i].wakeup_time = 0;
     pok_threads[i].state = POK_STATE_STOPPED;
@@ -271,15 +271,14 @@ pok_ret_t pok_thread_delayed_start(const uint32_t id, const uint32_t us) {
   pok_threads[id].priority = pok_threads[id].base_priority;
   // reset stack
   pok_context_reset(POK_USER_STACK_SIZE, pok_threads[id].init_stack_addr);
-  if ((long long)pok_threads[id].period ==
-      -1) //-1 <==> ARINC INFINITE_TIME_VALUE
-  {
+  if ((long long)pok_threads[id].period == INFINITE_TIME_VALUE) {
     if (pok_partitions[pok_threads[id].partition].mode ==
         POK_PARTITION_MODE_NORMAL) {
       if (ns == 0) {
         pok_threads[id].state = POK_STATE_RUNNABLE;
-        pok_threads[id].end_time =
-            POK_GETTICK() + pok_threads[id].time_capacity;
+        if (pok_threads[id].time_capacity > 0)
+          pok_threads[id].end_time =
+              POK_GETTICK() + pok_threads[id].time_capacity;
       } else {
         pok_threads[id].state = POK_STATE_WAITING;
         pok_threads[id].wakeup_time = POK_GETTICK() + ns;

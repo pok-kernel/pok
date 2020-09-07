@@ -28,7 +28,8 @@
 #define KERNEL_THREAD (POK_CONFIG_NB_THREADS - 2)
 #define IDLE_THREAD (POK_CONFIG_NB_THREADS - 1)
 
-#define POK_THREAD_DEFAULT_TIME_CAPACITY 0
+#define INFINITE_TIME_VALUE (-1)
+#define POK_THREAD_DEFAULT_TIME_CAPACITY INFINITE_TIME_VALUE
 
 /*
 #define KERNEL_THREAD		POK_CONFIG_NB_THREADS
@@ -50,10 +51,10 @@
 
 typedef struct {
   uint8_t priority;
-  uint64_t period;
+  int64_t period;
   uint64_t deadline;
-  uint64_t time_capacity;
-  uint64_t remaining_time_capacity;
+  int64_t time_capacity;
+  int64_t remaining_time_capacity;
   uint64_t next_activation;
   pok_state_t state;
   uint64_t end_time;

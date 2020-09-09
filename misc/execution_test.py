@@ -14,6 +14,7 @@ from avocado import Test, fail_on
 from avocado.utils import build, process
 import os
 
+
 class ExecutionTest(Test):
 
     def setUp(self):
@@ -21,16 +22,18 @@ class ExecutionTest(Test):
         self.compiler = self.params.get("compiler")
         self.qemu = self.params.get("qemu")
         self.processors = self.params.get("proc")
-        if os.path.exists("/dev/kvm") and self.processors <= 1:
+        if os.path.exists("/dev/kvm"):
             self.qemu += " -accel kvm"
         self.expected = self.params.get("expected",
-          default=os.path.join(self.dir, "expected.txt"))
+                                        default=os.path.join(self.dir, "expected.txt"))
 
     @fail_on(process.CmdError)
     def test(self):
         build.make(self.dir, extra_args="clean")
-        build.make(self.dir, env={"MAKEFLAGS": "-j1"}, extra_args="CC='{}'".format(self.compiler))
-        output = process.system_output("{} -nographic -smp {} -kernel {}/pok.elf".format(self.qemu, self.processors, self.dir))
+        build.make(self.dir, env={"MAKEFLAGS": "-j1"},
+                   extra_args="CC='{}'".format(self.compiler))
+        output = process.system_output(
+            "{} -nographic -smp {} -kernel {}/pok.elf".format(self.qemu, self.processors, self.dir))
         try:
             output = output.split(b"POK kernel initialized\n", 1)[1]
         except IndexError:

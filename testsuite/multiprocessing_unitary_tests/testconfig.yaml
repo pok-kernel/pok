@@ -13,24 +13,19 @@
 platform: !mux
     x86_gcc:
         qemu: qemu-system-i386
-        proc: 1
+        proc: 4
         compiler: gcc -m32 -Wall -Wextra -Werror -O3
+        timeout: 1800 # 30 minutes per test
 tests: !mux
-    hello_world:
-        dir: hello_world_shutdown_qemu
-    test_modulo_div_64:
-        dir: test_modulo_div_64
-    test_assert:
-        dir: assert
-    limit_threads:
-        dir: limit_threads
-    semaphore_sched:
-        dir: semaphore_sched
-    test_printf:
-        dir: test_printf
-    test_events:
-        dir: events
-    test_mutexes:
-        dir: mutexes
-
-
+    events:
+      dir: events
+      affinity_max: 2
+      partitions: 3
+    mutexes:
+      dir: mutexes
+      affinity_max: 2
+      partitions: 3
+    semaphores:
+      dir: semaphore_sched
+      affinity_max: 2
+      partitions: 4

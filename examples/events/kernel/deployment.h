@@ -5,8 +5,8 @@
 #define __POK_KERNEL_GENERATED_DEPLOYMENT_H_
 
 #define POK_CONFIG_NB_LOCKOBJECTS 1
-#define POK_CONFIG_NB_MAX_PROCESSORS 1
 #define POK_CONFIG_NB_PARTITIONS 1
+#define POK_CONFIG_NB_PROCESSORS 1
 #define POK_CONFIG_NB_THREADS 5
 #define POK_CONFIG_PARTITIONS_NLOCKOBJECTS                                     \
   { 1 }
@@ -14,6 +14,8 @@
   { 3 }
 #define POK_CONFIG_PARTITIONS_SIZE                                             \
   { 133120 }
+#define POK_CONFIG_PROCESSOR_AFFINITY                                          \
+  { 1 }
 #define POK_CONFIG_PROGRAM_NAME                                                \
   { "part1/part1.elf" }
 #define POK_CONFIG_SCHEDULING_MAJOR_FRAME 2000000000

@@ -22,7 +22,7 @@ static uint8_t sid;
 
 static void *pinger_job() {
   for (int i = 1; i <= 5; i++) {
-    pok_thread_sleep(15000);
+    pok_thread_sleep(16000);
     printf("P2T1: semaphore signal (round %d)\n", i);
     pok_sem_signal(sid);
     if (i % 2) {

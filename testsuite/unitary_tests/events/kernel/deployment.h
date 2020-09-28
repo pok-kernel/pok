@@ -7,9 +7,9 @@
 #include <core/schedvalues.h>
 
 #define POK_CONFIG_NB_LOCKOBJECTS 2
-#define POK_CONFIG_NB_MAX_PROCESSORS 4
 #define POK_CONFIG_NB_PARTITIONS 3
-#define POK_CONFIG_NB_THREADS 13
+#define POK_CONFIG_NB_PROCESSORS 1
+#define POK_CONFIG_NB_THREADS 10
 #define POK_CONFIG_PARTITIONS_NLOCKOBJECTS                                     \
   { 1, 1, 0 }
 #define POK_CONFIG_PARTITIONS_NTHREADS                                         \
@@ -18,6 +18,8 @@
   { POK_SCHED_STATIC, POK_SCHED_STATIC, POK_SCHED_RR }
 #define POK_CONFIG_PARTITIONS_SIZE                                             \
   { 133120, 133120, 133120 }
+#define POK_CONFIG_PROCESSOR_AFFINITY                                          \
+  { 1, 1, 1 }
 #define POK_CONFIG_PROGRAM_NAME                                                \
   { "pr1/pr1.elf", "pr2/pr2.elf", "pr3/pr3.elf" }
 #define POK_CONFIG_SCHEDULING_MAJOR_FRAME 700000000

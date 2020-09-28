@@ -34,8 +34,8 @@ extern void *__REAL_BASE;
 
 uint32_t lapic_address;
 uint8_t incr_var;
-uint8_t proc_index[POK_CONFIG_NB_MAX_PROCESSORS];
-int spinlocks[POK_CONFIG_NB_MAX_PROCESSORS] = {0};
+uint8_t proc_index[POK_CONFIG_NB_PROCESSORS];
+int spinlocks[POK_CONFIG_NB_PROCESSORS] = {0};
 uint8_t start_spinlock;
 uint8_t multiprocessing_system = 0;
 
@@ -247,7 +247,7 @@ void pok_multiprocessing_init() {
       }
     }
 
-    assert(proc_number <= POK_CONFIG_NB_MAX_PROCESSORS);
+    assert(proc_number <= POK_CONFIG_NB_PROCESSORS);
     lapic_address = mp_float->conf_table->lapic_addr;
 
     multiprocessing_system = proc_enable_number;
@@ -262,7 +262,7 @@ void pok_multiprocessing_init() {
     proc_index[pok_get_lapic_id()] = 0;
     start_spinlock = 0;
 
-    for (int i = 0; i < POK_CONFIG_NB_MAX_PROCESSORS; i++)
+    for (int i = 0; i < POK_CONFIG_NB_PROCESSORS; i++)
       spinlocks[i] = 0;
 
     pok_start_ap();

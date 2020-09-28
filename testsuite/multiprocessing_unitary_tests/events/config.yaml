@@ -13,7 +13,7 @@
 target:
     arch: x86
     bsp: x86-qemu
-    max_processors_number: 4
+    nb_processors_number: 4
 
 partitions:
     - name: pr1

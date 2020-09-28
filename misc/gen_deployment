@@ -193,6 +193,12 @@ def add(fd, msg = "", prefix = None):
     for line in msg:
         fd.write("{}{}\n".format(prefix, line))
 
+def format_affinity(l):
+    res = 0
+    for x in l:
+        res+= 1<<x
+    return res
+
 def gen_main_makefile(fd, config, arch, bsp, pok_root):
     """Generate the main Makefile."""
     partitions = option_value(config, "partitions.name")
@@ -299,9 +305,9 @@ def gen_kernel_deployment_h(fd, config):
 
     includes = set()
     needs = set()
-    max_processors = get_option_or(config, "target.max_processors_number", 1)
-    configs = {"NB_MAX_PROCESSORS": max_processors,"NB_PARTITIONS": len(option_value(config, "partitions")),
-               "NB_THREADS": sum_option(config, "partitions.threads.count") + max_processors + 1}
+    nb_processors = get_option_or(config, "target.nb_processors_number", 1)
+    configs = {"NB_PROCESSORS": nb_processors,"NB_PARTITIONS": len(option_value(config, "partitions")),
+               "NB_THREADS": sum_option(config, "partitions.threads.count") + nb_processors + 1}
     semaphores = get_option_or(config, "partitions.semaphores", 0)
     mutexes = get_option_or(config, "partitions.mutexes", 0)
     events = get_option_or(config, "partitions.events", 0)
@@ -329,6 +335,8 @@ def gen_kernel_deployment_h(fd, config):
     configs["SCHEDULING_SLOTS"] = c_list(slots)
     allocations = [partitions.index(n) for n in option_value(config, "kernel.scheduler.slots.partition")]
     configs["SCHEDULING_SLOTS_ALLOCATION"] = c_list(allocations)
+    processor_affinity = [format_affinity(l) for l in get_option_or(config, "partitions.processor_affinity", [i for i in range(nb_processors)])]
+    configs["PROCESSOR_AFFINITY"] = c_list(processor_affinity)
     configs["PARTITIONS_NTHREADS"] = c_list(get_option_or(config, "partitions.threads.count", 1))
     configs["PARTITIONS_NLOCKOBJECTS"] = c_list(lockobjects)
     schedulers = [v.upper() for v in get_option_or(config, "partitions.scheduler", "rr")]

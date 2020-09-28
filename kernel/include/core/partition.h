@@ -83,10 +83,10 @@ typedef struct {
 
   uint64_t activation; /**< Last activation time of the partition */
   uint32_t
-      prev_thread[POK_CONFIG_NB_MAX_PROCESSORS];         /**< member for the
+      prev_thread[POK_CONFIG_NB_PROCESSORS];         /**< member for the
                               scheduler (previous scheduled real    thread inside the
                               partition,i.e not the idle thread    except at start) */
-  uint32_t current_thread[POK_CONFIG_NB_MAX_PROCESSORS]; /**< member for the
+  uint32_t current_thread[POK_CONFIG_NB_PROCESSORS]; /**< member for the
                               scheduler (currently executed thread inside the
                               partition) */
 

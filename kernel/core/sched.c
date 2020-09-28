@@ -86,7 +86,7 @@ uint64_t pok_sched_next_flush; // variable used to handle user defined
 uint8_t pok_sched_current_slot =
     0; /* Which slot are we executing at this time ?*/
 
-extern int spinlocks[POK_CONFIG_NB_MAX_PROCESSORS];
+extern int spinlocks[POK_CONFIG_NB_PROCESSORS];
 
 void pok_sched_thread_switch(void);
 

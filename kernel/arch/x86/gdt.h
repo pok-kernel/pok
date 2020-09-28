@@ -53,9 +53,9 @@ typedef struct {
 
 #define GDT_TSS_SEGMENT(proc_id) (3 + (proc_id))
 #define GDT_PARTITION_CODE_SEGMENT(partition_id)                               \
-  (3 + POK_CONFIG_NB_MAX_PROCESSORS + 2 * partition_id)
+  (3 + POK_CONFIG_NB_PROCESSORS + 2 * partition_id)
 #define GDT_PARTITION_DATA_SEGMENT(partition_id)                               \
-  (3 + POK_CONFIG_NB_MAX_PROCESSORS + 2 * partition_id + 1)
+  (3 + POK_CONFIG_NB_PROCESSORS + 2 * partition_id + 1)
 
 #define GDT_BUILD_SELECTOR(seg, local, rpl)                                    \
   ((seg << 3) | ((local & 0x1) << 2) | (rpl & 0x3))

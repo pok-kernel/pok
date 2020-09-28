@@ -36,7 +36,7 @@ loop:
 	hlt
 	jmp loop
 
-.comm	pok_stack, POK_CONFIG_NB_MAX_PROCESSORS*STACK_SIZE
+.comm	pok_stack, POK_CONFIG_NB_PROCESSORS*STACK_SIZE
 
 .comm	pok_multiboot_magic, 4
 .comm	pok_multiboot_info, 4

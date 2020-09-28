@@ -47,6 +47,6 @@ typedef struct {
   uint16_t io_bit_map_offset;
 } __attribute__((packed)) tss_t;
 
-extern tss_t pok_tss[POK_CONFIG_NB_MAX_PROCESSORS];
+extern tss_t pok_tss[POK_CONFIG_NB_PROCESSORS];
 
 #endif /* !__POK_X86_TSS_H__ */

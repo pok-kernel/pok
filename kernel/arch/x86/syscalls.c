@@ -28,7 +28,7 @@
 #include "event.h"
 #include "gdt.h"
 
-#define PARTITION_ID(cs) (((cs >> 3) - 3 - POK_CONFIG_NB_MAX_PROCESSORS) / 2)
+#define PARTITION_ID(cs) (((cs >> 3) - 3 - POK_CONFIG_NB_PROCESSORS) / 2)
 
 INTERRUPT_HANDLER_syscall(syscall_gate) {
   pok_syscall_info_t syscall_info;

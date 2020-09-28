@@ -38,7 +38,7 @@
  * \brief The array that contains ALL partitions in the system.
  */
 pok_partition_t pok_partitions[POK_CONFIG_NB_PARTITIONS];
-uint32_t current_threads[POK_CONFIG_NB_MAX_PROCESSORS] = {KERNEL_THREAD};
+uint32_t current_threads[POK_CONFIG_NB_PROCESSORS] = {KERNEL_THREAD};
 
 uint8_t pok_partitions_index = 0;
 
@@ -194,7 +194,7 @@ pok_ret_t pok_partition_init() {
     pok_partitions[i].period = 0;
     pok_partitions[i].thread_index = 0;
     pok_partitions[i].thread_main = 0;
-    for (int j = 0; j < POK_CONFIG_NB_MAX_PROCESSORS; j++) {
+    for (int j = 0; j < POK_CONFIG_NB_PROCESSORS; j++) {
       pok_partitions[i].current_thread[j] = POK_CONFIG_NB_THREADS - 2 - j;
       pok_partitions[i].prev_thread[j] =
           POK_CONFIG_NB_THREADS - 2 - j; // breaks the rule of prev_thread not

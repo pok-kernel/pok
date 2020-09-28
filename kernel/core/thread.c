@@ -41,6 +41,8 @@
  */
 pok_thread_t pok_threads[POK_CONFIG_NB_THREADS];
 
+uint64_t partition_processor_affinity[] = POK_CONFIG_PROCESSOR_AFFINITY;
+
 extern pok_partition_t pok_partitions[POK_CONFIG_NB_PARTITIONS];
 
 #ifdef POK_NEEDS_SCHED_RMS
@@ -65,7 +67,7 @@ void pok_thread_insert_sort(uint16_t index_low, uint16_t index_high) {
 
 void pok_idle_thread_init() {
 
-  for (int i = 0; i < POK_CONFIG_NB_MAX_PROCESSORS; i++) {
+  for (int i = 0; i < POK_CONFIG_NB_PROCESSORS; i++) {
 
     pok_threads[IDLE_THREAD - i].period = INFINITE_TIME_VALUE;
     pok_threads[IDLE_THREAD - i].deadline = 0;
@@ -99,8 +101,7 @@ void pok_thread_init(void) {
     total_threads = total_threads + pok_partitions[j].nthreads;
   }
 
-  if (total_threads !=
-      (POK_CONFIG_NB_THREADS - 1 - POK_CONFIG_NB_MAX_PROCESSORS)) {
+  if (total_threads != (POK_CONFIG_NB_THREADS - 1 - POK_CONFIG_NB_PROCESSORS)) {
 #ifdef POK_NEEDS_DEBUG
     printf("Error in configuration, bad number of threads\n");
 #endif
@@ -182,6 +183,11 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   assert(multiprocessing_system
              ? attr->processor_affinity < multiprocessing_system
              : attr->processor_affinity == 0);
+  assert(
+      (pok_partitions[partition_id].thread_main_entry == (uint32_t)attr->entry)
+          ? attr->processor_affinity == 0
+          : (1 << attr->processor_affinity) &
+                partition_processor_affinity[partition_id]);
 
   stack_vaddr = pok_thread_stack_addr(
       partition_id, pok_partitions[partition_id].thread_index);

@@ -19,7 +19,7 @@
 
 typedef unsigned char pok_spinlock_t;
 
-extern int spinlocks[POK_CONFIG_NB_MAX_PROCESSORS];
+extern int spinlocks[POK_CONFIG_NB_PROCESSORS];
 
 #define SPIN_UNLOCK(_spin_)                                                    \
   do {                                                                         \

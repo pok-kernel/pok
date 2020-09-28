@@ -25,7 +25,7 @@
 
 gdt_entry_t pok_gdt[GDT_SIZE];
 
-tss_t pok_tss[POK_CONFIG_NB_MAX_PROCESSORS];
+tss_t pok_tss[POK_CONFIG_NB_PROCESSORS];
 
 pok_ret_t pok_gdt_init(uint8_t proc) {
   sysdesc_t sysdesc;

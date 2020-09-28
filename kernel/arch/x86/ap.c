@@ -22,8 +22,8 @@
 
 extern uint8_t incr_var;
 extern uint8_t start_spinlock;
-extern uint8_t proc_index[POK_CONFIG_NB_MAX_PROCESSORS];
-extern int spinlocks[POK_CONFIG_NB_MAX_PROCESSORS];
+extern uint8_t proc_index[POK_CONFIG_NB_PROCESSORS];
+extern int spinlocks[POK_CONFIG_NB_PROCESSORS];
 
 /**
  * \brief Main method for APs

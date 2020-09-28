@@ -22,6 +22,7 @@ int main() {
 
   tattr.priority = 42;
   tattr.entry = pinger_job;
+  tattr.processor_affinity = 0;
 
   pok_thread_create(&tid, &tattr);
 

@@ -177,10 +177,11 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
     pok_threads[id].time_capacity = POK_THREAD_DEFAULT_TIME_CAPACITY;
   }
 
+  pok_threads[id].processor_affinity = attr->processor_affinity;
+
   assert(multiprocessing_system
              ? attr->processor_affinity < multiprocessing_system
              : attr->processor_affinity == 0);
-  pok_threads[id].processor_affinity = attr->processor_affinity;
 
   stack_vaddr = pok_thread_stack_addr(
       partition_id, pok_partitions[partition_id].thread_index);
@@ -188,7 +189,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   pok_threads[id].state = POK_STATE_RUNNABLE;
   pok_threads[id].wakeup_time = 0;
   pok_threads[id].sp = pok_space_context_create(
-      partition_id, (uint32_t)attr->entry, attr->processor_affinity,
+      partition_id, (uint32_t)attr->entry, pok_threads[id].processor_affinity,
       stack_vaddr, 0xdead, 0xbeaf);
   /*
    *  FIXME : current debug session about exceptions-handled

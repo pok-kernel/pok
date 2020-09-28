@@ -12,6 +12,7 @@
  *                                      Copyright (c) 2007-2020 POK team
  */
 
+#include "gdt.h"
 #include "tss.h"
 #include <arch/x86/interrupt.h>
 #include <core/multiprocessing.h>
@@ -20,6 +21,6 @@ void update_tss(interrupt_frame *frame) {
   // Update esp0 in TSS to the given frame if we are not executing in
   // code segment 1 (kernel).
   if ((frame->cs & 0xffff) != (1 << 3)) {
-    pok_tss[pok_get_proc_id()].esp0 = (uint32_t)frame + sizeof(interrupt_frame);
+    tss_set_esp0(pok_get_proc_id(), (uint32_t)frame + sizeof(interrupt_frame));
   }
 }

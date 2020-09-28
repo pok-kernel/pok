@@ -77,6 +77,7 @@ int main() {
 
   tattr.priority = 44;
   tattr.entry = pinger_job1;
+  tattr.processor_affinity = 0;
 
   ret = pok_thread_create(&tid, &tattr);
   printf("[P1] pok_thread_create (1) return=%d\n", ret);

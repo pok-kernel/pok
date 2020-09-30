@@ -22,7 +22,7 @@ class ExecutionTest(Test):
         self.compiler = self.params.get("compiler")
         self.qemu = self.params.get("qemu")
         self.processors = self.params.get("proc")
-        if os.path.exists("/dev/kvm"):
+        if os.access("/dev/kvm", os.R_OK):
             self.qemu += " -accel kvm"
         self.expected = self.params.get("expected",
                                         default=os.path.join(self.dir, "expected.txt"))

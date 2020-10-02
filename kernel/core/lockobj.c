@@ -434,12 +434,17 @@ bool_t pok_lockobj_fifo_is_empty(pok_lockobj_fifo_t *fifo) {
 }
 
 pok_ret_t pok_lockobj_remove_thread(pok_lockobj_fifo_t *fifo, uint32_t thread) {
-  uint32_t tmp = POK_CONFIG_NB_THREADS + 1;
-  for (int i = 0; i < POK_CONFIG_NB_THREADS; i++) {
-    if (fifo->buffer[i] == thread)
+  if (fifo->is_empty)
+    return POK_ERRNO_NOTFOUND;
+  uint32_t tmp = POK_CONFIG_NB_THREADS;
+  uint32_t i = fifo->head;
+  do {
+    if (fifo->buffer[i] == thread) {
       tmp = i;
-    break;
-  }
+      break;
+    }
+    i = (i + 1) % POK_CONFIG_NB_THREADS;
+  } while (i != fifo->last);
   if (tmp == POK_CONFIG_NB_THREADS)
     return POK_ERRNO_NOTFOUND;
   fifo->last = (fifo->last ? (fifo->last - 1) : (POK_CONFIG_NB_THREADS - 1));

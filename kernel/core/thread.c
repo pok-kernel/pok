@@ -41,7 +41,7 @@
  */
 pok_thread_t pok_threads[POK_CONFIG_NB_THREADS];
 
-uint64_t partition_processor_affinity[] = POK_CONFIG_PROCESSOR_AFFINITY;
+extern uint64_t partition_processor_affinity[];
 
 extern pok_partition_t pok_partitions[POK_CONFIG_NB_PARTITIONS];
 
@@ -107,9 +107,6 @@ void pok_thread_init(void) {
 #endif
     pok_kernel_error(POK_ERROR_KIND_KERNEL_CONFIG);
   }
-
-  pok_idle_thread_init();
-
   for (i = 0; i < POK_CONFIG_NB_THREADS; ++i) {
     pok_threads[i].period = INFINITE_TIME_VALUE;
     pok_threads[i].deadline = 0;
@@ -118,8 +115,8 @@ void pok_thread_init(void) {
     pok_threads[i].next_activation = 0;
     pok_threads[i].wakeup_time = 0;
     pok_threads[i].state = POK_STATE_STOPPED;
-    pok_threads[i].processor_affinity = 0;
   }
+  pok_idle_thread_init();
 }
 
 /**
@@ -178,16 +175,19 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
     pok_threads[id].time_capacity = POK_THREAD_DEFAULT_TIME_CAPACITY;
   }
 
-  pok_threads[id].processor_affinity = attr->processor_affinity;
+  pok_threads[id].processor_affinity =
+      get_proc_real_id(partition_id, attr->processor_affinity);
 
   assert(multiprocessing_system
-             ? attr->processor_affinity < multiprocessing_system
-             : attr->processor_affinity == 0);
+             ? pok_threads[id].processor_affinity < multiprocessing_system
+             : pok_threads[id].processor_affinity == 0);
+  assert((1 << pok_threads[id].processor_affinity) &
+         partition_processor_affinity[partition_id]);
   assert(
       (pok_partitions[partition_id].thread_main_entry == (uint32_t)attr->entry)
-          ? attr->processor_affinity == 0
-          : (1 << attr->processor_affinity) &
-                partition_processor_affinity[partition_id]);
+          ? pok_threads[id].processor_affinity ==
+                pok_partitions[partition_id].thread_main_proc
+          : 1);
 
   stack_vaddr = pok_thread_stack_addr(
       partition_id, pok_partitions[partition_id].thread_index);
@@ -336,7 +336,8 @@ pok_ret_t pok_thread_get_status(const uint32_t id, pok_thread_attr_t *attr) {
   attr->period = pok_threads[id].period;
   attr->time_capacity = pok_threads[id].time_capacity;
   attr->stack_size = POK_USER_STACK_SIZE;
-  attr->processor_affinity = pok_threads[id].processor_affinity;
+  attr->processor_affinity = get_proc_partition_id(
+      POK_SCHED_CURRENT_PARTITION, pok_threads[id].processor_affinity);
   return POK_ERRNO_OK;
 }
 

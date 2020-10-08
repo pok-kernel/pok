@@ -228,7 +228,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
   switch (new_partition->mode) {
   case POK_PARTITION_MODE_INIT_COLD:
   case POK_PARTITION_MODE_INIT_WARM:
-    if (pok_get_proc_id() == 0) {
+    if (pok_get_proc_id() == new_partition->thread_main_proc) {
       if ((new_partition->thread_error != 0) &&
           (pok_threads[new_partition->thread_error].state !=
            POK_STATE_STOPPED)) {
@@ -602,7 +602,8 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
   if ((pok_threads[current_thread].remaining_time_capacity > 0 ||
        pok_threads[current_thread].time_capacity == INFINITE_TIME_VALUE) &&
       (pok_threads[current_thread].state == POK_STATE_RUNNABLE) &&
-      (pok_threads[current_thread].processor_affinity == current_proc)) {
+      (pok_threads[current_thread].processor_affinity == current_proc) &&
+      current_thread != IDLE_THREAD) {
     return current_thread;
   }
 

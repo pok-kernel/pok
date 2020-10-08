@@ -38,11 +38,12 @@
  * \brief The array that contains ALL partitions in the system.
  */
 pok_partition_t pok_partitions[POK_CONFIG_NB_PARTITIONS];
-uint32_t current_threads[POK_CONFIG_NB_PROCESSORS] = {KERNEL_THREAD};
+uint32_t current_threads[POK_CONFIG_NB_PROCESSORS];
 
 uint8_t pok_partitions_index = 0;
 
 extern uint64_t pok_sched_slots[];
+extern uint64_t partition_processor_affinity[];
 
 /**
  **\brief Setup the scheduler used in partition pid
@@ -194,6 +195,7 @@ pok_ret_t pok_partition_init() {
     pok_partitions[i].period = 0;
     pok_partitions[i].thread_index = 0;
     pok_partitions[i].thread_main = 0;
+    pok_partitions[i].thread_main_proc = get_default_proc_real_id(i);
     for (int j = 0; j < POK_CONFIG_NB_PROCESSORS; j++) {
       pok_partitions[i].current_thread[j] = POK_CONFIG_NB_THREADS - 2 - j;
       pok_partitions[i].prev_thread[j] =
@@ -205,6 +207,10 @@ pok_ret_t pok_partition_init() {
     /* Initialize the threading stuff */
 
     pok_partitions[i].mode = POK_PARTITION_MODE_INIT_WARM;
+
+    for (uint8_t i = 0; i < POK_CONFIG_NB_PROCESSORS; i++) {
+      current_threads[i] = KERNEL_THREAD;
+    }
 
 #ifdef POK_NEEDS_LOCKOBJECTS
     pok_partitions[i].lockobj_index_low = lockobj_index;
@@ -236,7 +242,6 @@ pok_ret_t pok_partition_init() {
 #endif
 
     pok_partition_setup_main_thread(i);
-    CURRENT_THREAD(pok_partitions[i]) = pok_partitions[i].thread_main;
   }
 
   return POK_ERRNO_OK;

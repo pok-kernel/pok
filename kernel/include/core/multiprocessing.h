@@ -29,6 +29,9 @@ void pok_send_global_schedule_thread(void);
 void pok_send_schedule_thread(uint8_t dest);
 void pok_send_schedule_thread_other_processors(void);
 
+uint8_t get_default_proc_real_id(const uint8_t pid);
+uint8_t get_proc_real_id(const uint8_t pid, const uint8_t partition_proc_id);
+uint8_t get_proc_partition_id(const uint8_t pid, const uint8_t proc_real_id);
 #ifdef POK_ARCH_PPC
 #endif
 

@@ -251,6 +251,7 @@ void pok_multiprocessing_init() {
     lapic_address = mp_float->conf_table->lapic_addr;
 
     multiprocessing_system = proc_enable_number;
+    assert(multiprocessing_system == POK_CONFIG_NB_PROCESSORS);
 
     if (!check_apic())
       enable_apic();

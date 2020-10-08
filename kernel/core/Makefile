@@ -18,7 +18,8 @@ LO_OBJS=	partition.o \
 			loader.o \
 			boot.o \
 			cons.o \
-			assert.o
+			assert.o \
+			multiprocessing.o
 
 LO_DEPS=
 

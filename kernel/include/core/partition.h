@@ -108,7 +108,8 @@ typedef struct {
                            (initialization thread) */
   uint32_t thread_main_entry; /**< The entry-point of the main thread (useful
                                  for re-init) */
-  pok_partition_mode_t mode;  /**< Current mode of the partition */
+  uint8_t thread_main_proc;
+  pok_partition_mode_t mode; /**< Current mode of the partition */
 
 #ifdef POK_NEEDS_IO
   uint16_t io_min; /**< If the partition is allowed to perform I/O, the lower

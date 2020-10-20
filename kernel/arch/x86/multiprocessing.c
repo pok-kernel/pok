@@ -82,12 +82,12 @@ void pok_start_ap() {
   // Send INIT IPI
   *(uint32_t *)(lapic_address + 0x300) = 0b11001100010111111111;
   *(uint32_t *)(lapic_address + 0x300) = 0b11001000010111111111;
-  // Wait 1 millisecond (OSDEV delay)
-  pok_x86_wait_mp(0x4AE);
-  // Send first STARTUP IPI
-  *(uint32_t *)(lapic_address + 0x300) = 0x000C4600 + (0x01);
   // Wait 10 milliseconds (OSDEV delay)
   pok_x86_wait_mp(0x2e9b);
+  // Send first STARTUP IPI
+  *(uint32_t *)(lapic_address + 0x300) = 0x000C4600 + (0x01);
+  // Wait 1 millisecond (OSDEV delay)
+  pok_x86_wait_mp(0x4AE);
   // Send second STARTUP IPI
   *(uint32_t *)(lapic_address + 0x300) = 0x000C4600 + (0x01);
   // Wait 1 second (OSDEV delay)

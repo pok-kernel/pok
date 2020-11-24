@@ -58,6 +58,20 @@ uint32_t pok_space_base_vaddr(uint32_t addr) {
   return (0);
 }
 
+/*
+ * A context switch in POK for x86 can only happen in kernel mode:
+ *   - because a timer interrupt caused a reschedule
+ *   - because a syscall (implemented by an interrupt) caused a reschedule
+ *
+ * If we want to keep the context switch code simple, it is best if
+ * new threads are created as if they were previously switched out by the
+ * kernel. When they will be "resumed" by a context switch they will in
+ * fact start running the thread initialization user code.
+ *
+ * pok_space_context_create() creates a fake context that, when resumed,
+ * will execute pok_dispatch_space() with the right informations on the
+ * stack to "return" to user mode and start executing the user code.
+ */
 uint32_t pok_space_context_create(uint8_t partition_id, uint32_t entry_rel,
                                   uint8_t processor_affinity,
                                   uint32_t stack_rel, uint32_t arg1,

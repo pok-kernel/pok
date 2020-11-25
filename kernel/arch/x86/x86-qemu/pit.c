@@ -28,16 +28,19 @@
 
 #define NS_ONE_SECOND 1000000000LL
 
-static const uint32_t OSCILLATOR_DIVISOR =
-    OSCILLATOR_RATE / POK_TIMER_FREQUENCY;
-static const uint32_t NS_INCREMENT =
-    OSCILLATOR_DIVISOR * NS_ONE_SECOND / OSCILLATOR_RATE;
-static const uint32_t NS_QUANTUM = NS_ONE_SECOND / POK_TIMER_QUANTUM;
+// following variables are constants, not declared as such for
+// retro-compatibility with some versions of GCC; not defined as
+// maccro in order to avoid recomputing their values in interrupt
+// handler.
+static uint32_t OSCILLATOR_DIVISOR;
+static uint32_t NS_INCREMENT;
+static uint32_t NS_QUANTUM;
 
 #define PIT_BASE 0x40
 #define PIT_IRQ 0
 
 INTERRUPT_HANDLER(pit_interrupt) {
+  
   static uint32_t quantum_counter;
   (void)frame;
   pok_pic_eoi(PIT_IRQ);
@@ -51,6 +54,16 @@ INTERRUPT_HANDLER(pit_interrupt) {
 }
 
 pok_ret_t pok_x86_qemu_timer_init() {
+  // OSCILLATOR_DIVISOR, NS_INCREMENT and NS_QUANTUM are constants;
+  // but for reasons of compatibility with legacy gcc version, we do
+  // the initialization here with static global variables that are not
+  // const.
+  OSCILLATOR_DIVISOR =
+    OSCILLATOR_RATE / POK_TIMER_FREQUENCY;
+  NS_INCREMENT =
+    OSCILLATOR_DIVISOR * NS_ONE_SECOND / OSCILLATOR_RATE;
+  NS_QUANTUM = NS_ONE_SECOND / POK_TIMER_QUANTUM;
+
   // Sanity checks
   assert(OSCILLATOR_DIVISOR <= 65536);
   assert(NS_QUANTUM >= NS_INCREMENT);

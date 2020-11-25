@@ -477,14 +477,14 @@ uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
       printf("--- Scheduling processor: %hhd\n    scheduling idle thread\n\t\t",
              current_proc);
     } else {
-      printf("--- Scheduling processor: %hhd\n    scheduling thread: %d {%d} "
+      printf("--- Scheduling processor: %hhd\n    scheduling thread: %d {%lld} "
              "--- ",
              current_proc, res, pok_threads[res].period);
       from = index_low;
       while (from <= index_high) {
         if (pok_threads[from].state == POK_STATE_RUNNABLE &&
             pok_threads[from].processor_affinity == current_proc) {
-          printf(" %d {%d} ,", from, pok_threads[from].period);
+          printf(" %d {%lld} ,", from, pok_threads[from].period);
         }
         from++;
       }

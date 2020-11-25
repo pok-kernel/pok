@@ -101,7 +101,7 @@ void CREATE_PROCESS(PROCESS_ATTRIBUTE_TYPE *attributes,
   core_attr.time_capacity = attributes->TIME_CAPACITY;
   core_attr.stack_size = attributes->STACK_SIZE;
   core_attr.processor_affinity = 0;
-  
+
   core_ret = pok_thread_create(&core_process_id, &core_attr);
   *return_code = core_ret;
   if (core_ret == POK_ERRNO_OK) {

@@ -139,17 +139,17 @@ int32_t search_mp_bios() {
 void bus_entry_handler(uint32_t current_addr) {
 #if POK_NEEDS_DEBUG
   bus_entry *current_bus = (bus_entry *)current_addr;
-  if(current_bus != NULL) {
+  if (current_bus != NULL) {
 
     printf("Bus entry:\nBus ID: %hhx\nBus Type: %c%c%c%c%c%c\n\n",
-	   current_bus->id, current_bus->type_string[0],
-	   current_bus->type_string[1], current_bus->type_string[2],
-	   current_bus->type_string[3], current_bus->type_string[4],
-	   current_bus->type_string[5]);
+           current_bus->id, current_bus->type_string[0],
+           current_bus->type_string[1], current_bus->type_string[2],
+           current_bus->type_string[3], current_bus->type_string[4],
+           current_bus->type_string[5]);
   }
 #else
-  (void) current_addr; // workaround unused parameter; TODO: remove
-		       // when used for other purposes than debug
+  (void)current_addr; // workaround unused parameter; TODO: remove
+                      // when used for other purposes than debug
 #endif
 }
 
@@ -175,18 +175,19 @@ void io_apic_interrupt_entry_handler(uint32_t current_addr) {
 #if POK_NEEDS_DEBUG
   apic_interrupt_entry *current_apic_interrupt =
       (apic_interrupt_entry *)current_addr;
-  if(current_api_interrupt != NULL) {
+  if (current_api_interrupt != NULL) {
 
     printf("IO APIC interrupt:\nType: %hhx\nFlags: %hx\nBus ID: %hhx\nBus "
-	   "IRQ: "
-	   "%hhx\nAPIC: %hhx\nIDINTin: %hhx\n\n",
-	   current_apic_interrupt->interrupt_type, current_apic_interrupt->flags,
-	   current_apic_interrupt->bus_id, current_apic_interrupt->bus_irq,
-	   current_apic_interrupt->apic_id, current_apic_interrupt->apic_intin);
+           "IRQ: "
+           "%hhx\nAPIC: %hhx\nIDINTin: %hhx\n\n",
+           current_apic_interrupt->interrupt_type,
+           current_apic_interrupt->flags, current_apic_interrupt->bus_id,
+           current_apic_interrupt->bus_irq, current_apic_interrupt->apic_id,
+           current_apic_interrupt->apic_intin);
   }
 #else
-  (void) current_addr; // workaround unused parameter; TODO: remove
-		       // when used for other purposes than debug
+  (void)current_addr; // workaround unused parameter; TODO: remove
+                      // when used for other purposes than debug
 #endif
 }
 
@@ -200,8 +201,8 @@ void lapic_interrupt_entry_handler(uint32_t current_addr) {
          current_apic_interrupt->bus_id, current_apic_interrupt->bus_irq,
          current_apic_interrupt->apic_id, current_apic_interrupt->apic_intin);
 #else
-  (void) current_addr; // workaround unused parameter; TODO: remove
-		       // when used for other purposes than debug
+  (void)current_addr; // workaround unused parameter; TODO: remove
+                      // when used for other purposes than debug
 #endif
 }
 

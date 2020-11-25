@@ -30,9 +30,7 @@ extern uint32_t lapic_address;
 
 void pok_end_ipi() { *(uint32_t *)(lapic_address + 0xB0) = 1; }
 
-INTERRUPT_HANDLER_IPI(IPI_test_gate) {
-  (void)frame;
-}
+INTERRUPT_HANDLER_IPI(IPI_test_gate) { (void)frame; }
 
 INTERRUPT_HANDLER(global_sched_thread_gate) {
   (void)frame;

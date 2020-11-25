@@ -40,7 +40,7 @@ static uint32_t NS_QUANTUM;
 #define PIT_IRQ 0
 
 INTERRUPT_HANDLER(pit_interrupt) {
-  
+
   static uint32_t quantum_counter;
   (void)frame;
   pok_pic_eoi(PIT_IRQ);
@@ -58,10 +58,8 @@ pok_ret_t pok_x86_qemu_timer_init() {
   // but for reasons of compatibility with legacy gcc version, we do
   // the initialization here with static global variables that are not
   // const.
-  OSCILLATOR_DIVISOR =
-    OSCILLATOR_RATE / POK_TIMER_FREQUENCY;
-  NS_INCREMENT =
-    OSCILLATOR_DIVISOR * NS_ONE_SECOND / OSCILLATOR_RATE;
+  OSCILLATOR_DIVISOR = OSCILLATOR_RATE / POK_TIMER_FREQUENCY;
+  NS_INCREMENT = OSCILLATOR_DIVISOR * NS_ONE_SECOND / OSCILLATOR_RATE;
   NS_QUANTUM = NS_ONE_SECOND / POK_TIMER_QUANTUM;
 
   // Sanity checks

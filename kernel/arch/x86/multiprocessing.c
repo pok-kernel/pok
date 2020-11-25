@@ -175,7 +175,7 @@ void io_apic_interrupt_entry_handler(uint32_t current_addr) {
 #if POK_NEEDS_DEBUG
   apic_interrupt_entry *current_apic_interrupt =
       (apic_interrupt_entry *)current_addr;
-  if (current_api_interrupt != NULL) {
+  if (current_apic_interrupt != NULL) {
 
     printf("IO APIC interrupt:\nType: %hhx\nFlags: %hx\nBus ID: %hhx\nBus "
            "IRQ: "

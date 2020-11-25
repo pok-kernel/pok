@@ -115,6 +115,7 @@ void pok_thread_init(void) {
     pok_threads[i].next_activation = 0;
     pok_threads[i].wakeup_time = 0;
     pok_threads[i].state = POK_STATE_STOPPED;
+    pok_threads[i].processor_affinity = 0;
   }
   pok_idle_thread_init();
 }

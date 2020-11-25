@@ -32,7 +32,6 @@ void pok_end_ipi() { *(uint32_t *)(lapic_address + 0xB0) = 1; }
 
 INTERRUPT_HANDLER_IPI(IPI_test_gate) {
   (void)frame;
-  printf("Coucou!!\n");
 }
 
 INTERRUPT_HANDLER(global_sched_thread_gate) {

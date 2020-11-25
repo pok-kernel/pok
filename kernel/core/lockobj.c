@@ -459,7 +459,9 @@ pok_ret_t pok_lockobj_enqueue(pok_lockobj_fifo_t *fifo, uint32_t thread,
     return POK_ERRNO_OK;
 
   } else {
+#if POK_NEEDS_DEBUG
     printf("Wrong policy\n");
+#endif
     return POK_ERRNO_PARAM;
   }
 }

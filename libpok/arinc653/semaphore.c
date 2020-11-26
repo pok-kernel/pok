@@ -102,9 +102,11 @@ void WAIT_SEMAPHORE(SEMAPHORE_ID_TYPE SEMAPHORE_ID, SYSTEM_TIME_TYPE TIME_OUT,
     return;
   }
 
-  SYSTEM_TIME_TYPE pok_timeout = TIME_OUT;
-  if (pok_timeout == -1)
+  SYSTEM_TIME_TYPE pok_timeout;
+  if (TIME_OUT == -1)
     pok_timeout = 0;
+  else
+    pok_timeout = (uint64_t)TIME_OUT / 1000;
 
   core_ret = pok_sem_wait(pok_arinc653_semaphores_layers[SEMAPHORE_ID].core_id,
                           pok_timeout);

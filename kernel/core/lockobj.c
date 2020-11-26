@@ -294,43 +294,86 @@ pok_ret_t pok_lockobj_unlock(pok_lockobj_t *obj,
   if (obj->initialized == FALSE) {
     return POK_ERRNO_LOCKOBJ_NOTREADY;
   }
+  // Take the lock object internal lock
   SPIN_LOCK(obj->spin);
 
+  /*
+   * There exist three scenarios:
+   *     - Scenario 1: some resources are available prior to the unlock
+   *     - Scenario 2: no resources are available prior to the unlock and
+   *                   no thread is waiting for the resource
+   *     - Scenario 3: no resources are available prior to the unlock and
+   *                   at least one thread is blocked waiting for a resource
+   */
+
   if (obj->current_value) {
+    /*
+     * Scenario 1: some resources are available priori to the unlock.
+     */
+
+    // No thread should be blocked waiting for a resource since it would
+    // have obtained it already.
     assert(pok_lockobj_fifo_is_empty(&obj->fifo));
+
     if (obj->kind == POK_LOCKOBJ_KIND_SEMAPHORE) {
+      // If the lock object is a semaphore, increase the number of available
+      // resources if it has not yet reached the maximum value.
       if (obj->current_value < obj->max_value) {
         obj->current_value++;
       }
     } else {
+      // Otherwise the lock object is limited to one resource. We do not use
+      // an assertion here because this is likely a user-code problem, not an
+      // internal one.
 #if POK_NEEDS_DEBUG
-      if (obj->current_value)
-        printf("[KERNEL] [DEBUG] Try to unlock a lock which is already "
-               "unlocked\n");
+      printf("[KERNEL] [DEBUG] Try to unlock a lock which is already "
+             "unlocked\n");
 #endif
       obj->current_value = 1;
     }
+    // Release the lock object internal lock and return
     SPIN_UNLOCK(obj->spin);
     return POK_ERRNO_OK;
+    // End of scenario 1
   }
 
   if (pok_lockobj_fifo_is_empty(&obj->fifo)) {
-    SPIN_UNLOCK(obj->spin);
+    /*
+     * Scenario 2: no resources are available prior to the unlock and
+     * no thread is waiting for the resource.
+     */
+
+    // Increment the number of available resources (0 -> 1). This is
+    // always a valid operation.
     obj->current_value = 1;
+
+    // Release the lock object internal lock and return
+    SPIN_UNLOCK(obj->spin);
     return 0;
+    // End of scenario 2
   }
 
-  uint32_t tmp = pok_lockobj_get_head(&obj->fifo);
+  /*
+   * Scenario 3: no resources are available prior to the unlock and
+   * at least one thread is blocked waiting for a resource.
+   */
+
+  // Select a thread to unblock and make it ready again since it
+  // has now acquired a resource. The number of available resources
+  // does not change.
+  uint32_t to_unblock = pok_lockobj_get_head(&obj->fifo);
   pok_lockobj_dequeue(&obj->fifo);
-  pok_sched_unlock_thread(tmp);
+  pok_sched_unlock_thread(to_unblock);
 
+  // Release the lock object internal lock, reschedule in case the unblocked
+  // thread has a greater priority than the one running on the processor it
+  // has an affinity with and return.
   SPIN_UNLOCK(obj->spin);
-
   if (!IS_LOCK(obj->eventspin)) {
-    pok_threads_schedule_one_proc(pok_threads[tmp].processor_affinity);
+    pok_threads_schedule_one_proc(pok_threads[to_unblock].processor_affinity);
   }
-
   return POK_ERRNO_OK;
+  // End of scenario 3
 }
 
 #ifdef POK_NEEDS_LOCKOBJECTS

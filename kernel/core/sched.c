@@ -48,8 +48,7 @@ extern pok_lockobj_t pok_partitions_lockobjs[];
 
 extern pok_thread_t pok_threads[];
 
-#if defined(POK_NEEDS_DEBUG) &&                                                \
-    (defined(POK_NEEDS_SCHED_RMS) || defined(POK_NEEDS_SCHED_STATIC))
+#if defined(POK_NEEDS_DEBUG)
 static const char *state_names[] = {
     "stopped",      "runnable", "waiting", "lock", "waiting next activation",
     "delayed start"};

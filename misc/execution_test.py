@@ -31,6 +31,10 @@ class ExecutionTest(Test):
 
     @fail_on(process.CmdError)
     def test(self):
+        try:
+            os.unlink(self.preserved_output)
+        except OSError:
+            pass
         build.make(self.dir, extra_args="clean")
         build.make(self.dir, env={"MAKEFLAGS": "-j1"},
                    extra_args="CC='{}'".format(self.compiler))
@@ -41,16 +45,12 @@ class ExecutionTest(Test):
         except IndexError:
             raise Exception("unable to find POK kernel startup message")
         try:
-            expected = open(self.expected, "rb").read().rstrip(b"\n")
+            expected = open(self.expected, "rb").read()
         except FileNotFoundError:
             expected = b""
         self.log.debug("expected = {}".format(expected))
         try:
-            os.unlink(self.preserved_output)
-        except OSError:
-            pass
-        try:
-            self.assertEqual(output, expected)
+            self.assertEqual(output.rstrip(b"\n"), expected.rstrip(b"\n"))
         except Exception as e:
-            open(self.preserved_output, "wb").write(output)
+            open(self.preserved_output, "wb").write(output + b'\n')
             raise e

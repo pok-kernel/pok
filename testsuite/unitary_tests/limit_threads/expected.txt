@@ -1,6 +1,12 @@
 [P1] pok_thread_create (0) returned 0
 [P1] pok_thread_create (1) returned 0
 [P1] pok_thread_create (2) returned 5
+--- scheduling partition: 0, low:0, high:3
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 40)
+elected 1 !!! 
+    other ready:  2 (40)
+    non-ready: 0 (1/stopped)
 [P2] pok_thread_create (0) returned 0
 [P2] pok_thread_create (1) returned 0
 [P2] pok_thread_create (2) returned 5

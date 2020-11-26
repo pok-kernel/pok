@@ -29,7 +29,7 @@ pok_port_queueing_create(char *name, const pok_port_size_t size,
                          pok_port_id_t *id) {
   pok_ret_t ret;
   pok_lockobj_attr_t lockattr;
-  if (discipline != POK_PORT_QUEUEING_DISCIPLINE_FIFO) {
+  if (discipline != POK_QUEUEING_DISCIPLINE_FIFO) {
     return POK_ERRNO_DISCIPLINE;
   }
 

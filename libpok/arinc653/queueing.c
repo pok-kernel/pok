@@ -36,11 +36,11 @@ void CREATE_QUEUING_PORT(
 
   switch (QUEUING_DISCIPLINE) {
   case PRIORITY:
-    core_discipline = POK_PORT_QUEUEING_DISCIPLINE_PRIORITY;
+    core_discipline = POK_QUEUEING_DISCIPLINE_PRIORITY;
     break;
 
   case FIFO:
-    core_discipline = POK_PORT_QUEUEING_DISCIPLINE_FIFO;
+    core_discipline = POK_QUEUEING_DISCIPLINE_FIFO;
     break;
 
   default:

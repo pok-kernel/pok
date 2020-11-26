@@ -26,6 +26,8 @@ class ExecutionTest(Test):
             self.qemu += " -accel kvm"
         self.expected = self.params.get("expected",
                                         default=os.path.join(self.dir, "expected.txt"))
+        self.preserved_output = self.params.get("preserved-output",
+                                        default=os.path.join(self.dir, "preserved-output.txt"))
 
     @fail_on(process.CmdError)
     def test(self):
@@ -43,4 +45,12 @@ class ExecutionTest(Test):
         except FileNotFoundError:
             expected = b""
         self.log.debug("expected = {}".format(expected))
-        self.assertEqual(output, expected)
+        try:
+            os.unlink(self.preserved_output)
+        except OSError:
+            pass
+        try:
+            self.assertEqual(output, expected)
+        except Exception as e:
+            open(self.preserved_output, "wb").write(output)
+            raise e

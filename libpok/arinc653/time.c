@@ -35,7 +35,6 @@ void PERIODIC_WAIT(RETURN_CODE_TYPE *return_code) {
 
 void GET_TIME(SYSTEM_TIME_TYPE *system_time, RETURN_CODE_TYPE *return_code) {
   *return_code = pok_time_get((pok_time_t *)system_time);
-  *system_time = *system_time * 1000;
 }
 
 #ifndef POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE

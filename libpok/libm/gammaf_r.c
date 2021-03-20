@@ -9,7 +9,7 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2020 POK team
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 /* w_gammaf_r.c -- float version of w_gamma_r.c.

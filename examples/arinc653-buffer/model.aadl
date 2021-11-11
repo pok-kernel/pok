@@ -21,6 +21,7 @@ public
 
 with Data_Model;
 with POK;
+with ARINC653;
 
 data myint
 properties
@@ -30,7 +31,7 @@ end myint;
 virtual processor partition
 properties
    POK::Scheduler => RR;
-   POK::Additional_Features => (libc_stdio);
+   POK::Additional_Features => (libc_stdio, console);
 end partition;
 
 virtual processor implementation partition.impl
@@ -47,9 +48,10 @@ properties
    POK::Architecture => x86;
    POK::BSP => x86_qemu;
    POK::Scheduler => Static;
-   POK::Major_Frame => 1000 ms;
-   POK::Slots => (500 ms);
-   POK::Slots_Allocation => ( reference (part1));
+   ARINC653::Module_Major_Frame => 1000 ms;
+   ARINC653::Module_Schedule => (
+       	[Partition => reference(part1); Duration => 1000ms; Periodic_Processing_Start => true;]
+      );
 end ppc.impl;
 
 process myprocess1
@@ -60,7 +62,7 @@ subcomponents
    thr1 : thread mythread1.impl;
    thr2 : thread mythread2.impl;
 connections
-   port thr1.output -> thr2.input;
+   cnx: port thr1.output -> thr2.input;
 properties
    POK::Needed_Memory_Size => 200 Kbyte;
 end myprocess1.impl;
@@ -83,7 +85,7 @@ thread implementation mythread1.impl
 calls 
    call1 : { pspg : subprogram hello_part1;};
 connections
-   parameter pspg.output -> output;
+   cnx: parameter pspg.output -> output;
 properties
    dispatch_protocol => periodic;
    period            => 1000 ms;
@@ -93,7 +95,7 @@ thread implementation mythread2.impl
 calls 
    call1 : { pspg : subprogram hello_part2;};
 connections
-   parameter input -> pspg.input;
+   cnx: parameter input -> pspg.input;
 properties
    dispatch_protocol => periodic;
    period            => 1000 ms;
@@ -104,16 +106,16 @@ features
    output : out parameter myint;
 properties
    source_name => "user_send";
-   source_language => C;
-   POK::Source_Location => "../../../send.o";
+   source_language => (C);
+   Source_Text => ("send.c");
 end hello_part1;
 
 subprogram hello_part2
 features
    input : in parameter myint;
 properties
-   POK::Source_Location => "../../../receive.o";
-   source_language => C;
+   Source_Text => ("receive.c");
+   source_language => (C);
    source_name => "user_receive";
 end hello_part2;
 

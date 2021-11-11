@@ -1,0 +1,38 @@
+--
+--                               POK header
+--
+-- The following file is a part of the POK project. Any modification should
+-- be made according to the POK licence. You CANNOT use this file or a part
+-- of a file for your own project.
+--
+-- For more information on the POK licence, please see our LICENCE FILE
+--
+-- Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2021 POK team
+
+package model_ramses
+public
+	with test;
+	with RAMSES_Properties;
+	
+	system node extends test::node
+	end node;
+
+	system implementation node.ramses extends test::node.impl
+	subcomponents
+		mem: memory mainmemory;
+	properties
+		Scheduling_Protocol => (ARINC653) applies to cpu;
+		Scheduling_Protocol => (POSIX_1003_HIGHEST_PRIORITY_FIRST_PROTOCOL) applies to cpu.part1;
+		Period => 1000ms applies to cpu.part1;
+		RAMSES_Properties::Target => "pok" applies to cpu;
+		Actual_Memory_Binding => (reference(mem)) applies to part1;
+	end node.ramses;
+	
+	memory mainmemory
+	properties
+	    Memory_Size => 300000 Bytes;
+	end mainmemory;
+	
+end model_ramses;

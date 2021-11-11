@@ -19,7 +19,6 @@ with Data_Model;
 with POK;
 with ARINC653;
 
-
 data integer
 properties
   Data_Model::Data_Representation => integer;
@@ -42,9 +41,10 @@ properties
 end common_bus;
 
 virtual processor partition
-properties
-   ARINC653::HM_Errors => (Partition_Init);
-   ARINC653::HM_Partition_Recovery_Actions => (Warm_Restart);
+	properties
+	ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 1; Description => "Warm partition restart"; Action => "Warm_Restart";]
+      );
    POK::Additional_Features => (libc_stdio, console);
 end partition;
 
@@ -60,16 +60,16 @@ features
    output : out parameter integer;
 properties
    source_name => "user_send";
-   source_language => C;
-   source_text => ("../../../send.o");
+   source_language => (C);
+   source_text => ("send.c");
 end hello_part1;
 
 subprogram hello_part2
 features
    input : in parameter integer;
 properties
-   source_text => ("../../../receive.o");
-   source_language => C;
+   source_text => ("receive.c");
+   source_language => (C);
    source_name => "user_receive";
 end hello_part2;
 
@@ -92,8 +92,16 @@ subcomponents
    partition_common : virtual processor partition.common;
 properties
    ARINC653::Module_Major_Frame => 1000ms;
-   ARINC653::Partition_Slots => (500ms, 500ms);
-   ARINC653::Slots_Allocation => ( reference (partition_secure), reference (partition_common));
+   Period => 500 ms applies to partition_secure, partition_common;
+   ARINC653::Module_Schedule => (
+       	[Partition => reference(partition_secure); Duration => 500ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(partition_common); Duration => 500ms; Periodic_Processing_Start => true;]
+      );
+   ARINC653::HM_Error_ID_Levels => (
+		[ErrorIdentifier => 1; Description => "Partition init error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Init;],
+		[ErrorIdentifier => 2; Description => "Numeric error"; ErrorLevel => Process_Level; ErrorCode => Numeric_Error;]
+	);
+	scheduling_protocol => (POSIX_1003_HIGHEST_PRIORITY_FIRST_PROTOCOL) applies to partition_secure, partition_common; 
 end ppc.impl;
 
 thread receive_ping
@@ -105,11 +113,12 @@ properties
    Dispatch_Protocol => Periodic;
    Compute_Execution_Time => 0 ms .. 1 ms;
    Period => 1000 Ms;
-   ARINC653::HM_Errors => (Numeric_Error);
-   ARINC653::HM_Process_Recovery_Actions => (Warm_Restart);
-   Source_Data_Size => 400000 bytes;
-   Source_Stack_Size => 400000 bytes;
-   Source_Code_Size => 40 bytes;
+   ARINC653::HM_Error_ID_Actions => (
+   	[ErrorIdentifier => 2; Description => "Warm partition restart"; Action => "Warm_Restart";]
+   );
+   Data_Size => 400000 bytes;
+   Stack_Size => 400000 bytes;
+   Code_Size => 40 bytes;
 end receive_ping;
 
 thread send_ping
@@ -120,34 +129,35 @@ properties
    Priority => 1;
    Dispatch_Protocol => Periodic;
    Period => 1000 Ms;
-   Source_Data_Size => 40 bytes;
-   Source_Stack_Size => 40 bytes;
-   Source_Code_Size => 40 bytes;
+   Data_Size => 40 bytes;
+   Stack_Size => 40 bytes;
+   Code_Size => 40 bytes;
    Compute_Execution_Time => 0 ms .. 1 ms;
-   ARINC653::HM_Errors => (Numeric_Error);
-   ARINC653::HM_Process_Recovery_Actions => (Warm_Restart);
+   ARINC653::HM_Error_ID_Actions => (
+   	[ErrorIdentifier => 2; Description => "Warm partition restart"; Action => "Warm_Restart";]
+   );
 end send_ping;
 
 thread implementation send_ping.impl
 calls 
    call1 : { pspg : subprogram hello_part1;};
 connections
-   parameter pspg.output -> tdataout;
+   cnx: parameter pspg.output -> tdataout;
 end send_ping.impl;
 
 thread implementation receive_ping.impl
 calls 
    call1 : { pspg : subprogram hello_part2;};
 connections
-   parameter tdatain -> pspg.input;
+   cnx: parameter tdatain -> pspg.input;
 end receive_ping.impl;
 
 process receive_ping_process
 features
    pdatain : in event data port integer {Allowed_Connection_Binding_Class => (classifier (pingpong::medium_bus)); Queue_Size => 2;}; 
 properties
-   Source_Code_Size => 10 KByte;
-   Source_Data_Size => 15 KByte;
+   Code_Size => 10 KByte;
+   Data_Size => 15 KByte;
 end receive_ping_process;
 
 process send_ping_process
@@ -165,14 +175,14 @@ process implementation receive_ping_process.impl
 subcomponents
    thr : thread receive_ping.impl;
 connections
-   port pdatain -> thr.tdatain; 
+   cnx: port pdatain -> thr.tdatain; 
 end receive_ping_process.impl;
 
 process implementation send_ping_process.impl
 subcomponents
    thr : thread send_ping.impl;
 connections
-   port thr.tdataout -> pdataout;
+   cnx: port thr.tdataout -> pdataout;
 end send_ping_process.impl;
 
 system node
@@ -180,9 +190,8 @@ end node;
 
 memory partitionmemory
 properties
-   Byte_Count => 80000;
-   ARINC653::Memory_Type => (code_memory);
-   ARINC653::Access_Type => read;
+   Memory_Size => 80000 Bytes;
+   ARINC653::Memory_Kind => (Memory_Code);
 end partitionmemory;
 
 memory mainmemory
@@ -191,11 +200,9 @@ end mainmemory;
 memory implementation mainmemory.impl
 subcomponents
    part1: memory partitionmemory 
-               {ARINC653::Memory_Type => (code_memory);
-                ARINC653::Access_Type => read;};
+               {ARINC653::Memory_Kind => (Memory_Code);};
    part2: memory partitionmemory
-               {ARINC653::Memory_Type => (data_memory);
-               ARINC653::Access_Type => write;};
+               {ARINC653::Memory_Kind => (Memory_Code);};
 end mainmemory.impl;
 
 
@@ -207,9 +214,10 @@ subcomponents
    pr2 : process receive_ping_process.impl;
    mem : memory mainmemory.impl;
 connections
-   port pr1.pdataout -> pr2.pdatain
+   cnx: port pr1.pdataout -> pr2.pdatain
       {Allowed_Connection_Binding_Class => (classifier (pingpong::secure_bus));};
 properties
+   Scheduling_Protocol => (Arinc653) applies to cpu;
    actual_processor_binding => 
       (reference (cpu.partition_secure)) applies to pr2;
    actual_processor_binding => 

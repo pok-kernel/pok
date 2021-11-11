@@ -1,0 +1,14 @@
+package model_ramses
+public
+	with pingpong;
+	with RAMSES_Properties;
+	
+	system node extends pingpong::node
+	end node;
+	
+	system implementation node.ramses extends pingpong::node.impl
+	properties
+		RAMSES_Properties::Target => "pok" applies to cpu;	
+	end node.ramses;
+	
+end model_ramses;

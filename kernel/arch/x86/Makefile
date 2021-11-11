@@ -6,15 +6,20 @@ include $(TOPDIR)/misc/mk/config.mk
 
 LO_TARGET=	x86.lo
 
-LO_OBJS=	arch.o		\
-			gdt.o		\
-			event.o		\
-			thread.o	\
-			space.o		\
-			syscalls.o	\
-			interrupt.o	\
-			pci.o		\
-			exceptions.o
+LO_OBJS=	arch.o                 \
+		start_ap.o	       \
+		ap.o		       \
+		gdt.o                  \
+		event.o                \
+		ipi.o		       \
+		thread.o               \
+		space.o                \
+		syscalls.o             \
+		interrupt.o            \
+		pci.o                  \
+		exceptions.o           \
+		divisionbyzeroerror.o  \
+		multiprocessing.o
 
 LO_DEPS=	$(BSP)/$(BSP).lo
 

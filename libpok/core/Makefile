@@ -6,6 +6,7 @@ include $(TOPDIR)/misc/mk/config.mk
 LO_TARGET=core.lo
 
 LO_OBJS=	allocator.o \
+			assert.o \
 			timecomputedeadline.o \
 			timeget.o \
 			eventlock.o \
@@ -20,7 +21,6 @@ LO_OBJS=	allocator.o \
 			errorraise.o \
 			errorhandlercreate.o \
 			errorhandlerworker.o \
-			errorhandlersetready.o \
 			errorignore.o \
 			errorconfirm.o \
 			main.o \
@@ -32,6 +32,7 @@ LO_OBJS=	allocator.o \
 			semsignal.o \
 			semstatus.o \
 			semwait.o \
+			shutdown.o \
 			threadcreate.o \
 			threadattrinit.o \
 			threadperiod.o \

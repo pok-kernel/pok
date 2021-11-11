@@ -1,0 +1,15 @@
+#! /bin/sh
+#
+# Usage: fix-style [--check]
+#
+# Recursively fix or check files according to the style mandated in
+# .clang-format. To use the --check feature, clang-format 10 or later
+# must be used.
+
+set -e
+
+if [ "x$1" = "x--check" ]; then
+  check="-n -Werror"
+fi
+
+git ls-files | grep '\.[ch]$' | xargs -n 100 clang-format -i $check

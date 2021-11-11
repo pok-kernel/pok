@@ -1,19 +1,15 @@
 #!/usr/bin/perl -w
 #                               POK header
-# 
+#
 # The following file is a part of the POK project. Any modification should
-# be made according to the POK licence. You CANNOT use this file or a part 
+# be made according to the POK licence. You CANNOT use this file or a part
 # of a file for your own project.
 #
 # For more information on the POK licence, please see our LICENCE FILE
 #
 # Please follow the coding guidelines described in doc/CODING_GUIDELINES
 #
-#                                      Copyright (c) 2007-2009 POK team 
-#
-# Created by julien on Fri Oct 16 13:56:22 2009 
-#
-
+#                                      Copyright (c) 2007-2021 POK team
 
 # This program takes as parameter an ARINC653 compliant XML file
 # that describes the overall architecture of the system and generates
@@ -93,7 +89,6 @@ sub header_general_purpose
    #General purpose variables
    print $header_file "\n\n";
    print $header_file "#define POK_NEEDS_GETTICK 1\n";
-   print $header_file "#define POK_NEEDS_SCHED   1\n";
    print $header_file "\n\n";
 
    #Generate POK_CONFIG_NB_THREADS
@@ -127,7 +122,6 @@ sub header_partitions_general
 
    if ($#result > 0)
    {
-      print $header_file "#define POK_NEEDS_PARTITIONS   1\n";
       print $header_file "#define POK_CONFIG_NB_PARTITIONS   " . ($#result + 1) . "\n";
    }
 }

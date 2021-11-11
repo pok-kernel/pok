@@ -1,18 +1,15 @@
 #! /usr/bin/perl -w
 #                               POK header
-# 
+#
 # The following file is a part of the POK project. Any modification should
-# be made according to the POK licence. You CANNOT use this file or a part 
+# be made according to the POK licence. You CANNOT use this file or a part
 # of a file for your own project.
 #
 # For more information on the POK licence, please see our LICENCE FILE
 #
 # Please follow the coding guidelines described in doc/CODING_GUIDELINES
 #
-#                                      Copyright (c) 2007-2009 POK team 
-#
-# Created by julien on Sun Aug 10 12:45:15 2008 
-#
+#                                      Copyright (c) 2007-2021 POK team
 
 use strict;
 use Getopt::Long;

@@ -1,3 +1,4 @@
+export POK_PATH=$(CURDIR)
 -include misc/mk/config.mk
 
 .SILENT:
@@ -49,7 +50,6 @@ doc:
 	$(MAKE) -C doc
 
 release: headers doc
-	svn up
 	$(PERL) ./misc/make-release.pl
 
 testrelease: release

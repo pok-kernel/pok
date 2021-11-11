@@ -1,21 +1,19 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Thu Jul 30 15:49:30 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
-#include <types.h>
 #include <core/dependencies.h>
+#include <types.h>
 
 #ifdef POK_NEEDS_ALLOCATOR
 
@@ -29,14 +27,14 @@
  *    the allocator can allocate
  */
 
-void* pok_allocator_allocate (size_t needed_size);
+void *pok_allocator_allocate(size_t needed_size);
 /*
  * This function allocates memory. The argument is the amount
  * of memory the user needs. This function is called by libc
  * functions malloc() and calloc()
  */
 
-void pok_allocator_free (void* ptr);
+void pok_allocator_free(void *ptr);
 /*
  * This function frees memory. The argument is a previously
  * allocated memory chunk. Be careful, the time required
@@ -45,4 +43,3 @@ void pok_allocator_free (void* ptr);
  */
 
 #endif
-

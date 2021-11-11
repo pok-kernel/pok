@@ -1,0 +1,13 @@
+64 bits number:0x87654321deadbeef
+Test printf: %llx: 87654321deadbeef - %lx: deadbeef - %x: deadbeef - %hx: beef - %hhx: ef
+Test printf: %llo: 1035452062073653337357 - %lo: 33653337357 - %o: 33653337357 - %ho: 137357 - %hho: 357
+Test printf: %llu: 9756277980516957935 - %lu: 3735928559 - %u: 3735928559 - %hu: 48879 - %hhu: 239
+Test printf: %lld: -8690466093192593681 - %ld: -559038737 - %d: -559038737 - %hd: -16657 - %hhd: -17
+Test printf: %lli: -8690466093192593681 - %li: -559038737 - %i: -559038737 - %hi: -16657 - %hhi: -17
+64 bits number:0xdeadbeef87654321
+Test printf: %llx: deadbeef87654321 - %lx: 87654321 - %x: 87654321 - %hx: 4321 - %hhx: 21
+Test printf: %llo: 1572555756760731241441 - %lo: 20731241441 - %o: 20731241441 - %ho: 41441 - %hho: 41
+Test printf: %llu: 16045690983368966945 - %lu: 2271560481 - %u: 2271560481 - %hu: 17185 - %hhu: 33
+Test printf: %lld: -2401053090340584671 - %ld: -2023406815 - %d: -2023406815 - %hd: 17185 - %hhd: 33
+Test printf: %lli: -2401053090340584671 - %li: -2023406815 - %i: -2023406815 - %hi: 17185 - %hhi: 33
+This is PI: 3.141592

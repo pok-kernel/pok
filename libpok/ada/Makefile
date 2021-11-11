@@ -2,7 +2,7 @@
 
 #8-> CUT HERE
 
-NEEDS_FLAGS=-DPOK_NEEDS_PARTITIONS=1 -DPOK_NEEDS_THREADS=1
+NEEDS_FLAGS=
 
 generate:
 	for v in `find $(POK_PATH)/libpok/include/ -type f -name '*.h'`; do \

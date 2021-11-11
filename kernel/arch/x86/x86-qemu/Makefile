@@ -10,7 +10,8 @@ LO_OBJS=	cons.o \
 			bsp.o \
 			pm.o \
 			pic.o \
-			pit.o
+			pit.o \
+			shutdown.o
 
 LO_DEPS=
 

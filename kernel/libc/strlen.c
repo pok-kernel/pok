@@ -1,35 +1,30 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Thu Jan 15 23:34:13 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 #ifdef POK_NEEDS_DEBUG
 
-int strlen (const char* str)
-{
-   int i;
+int strlen(const char *str) {
+  int i;
 
-   i = 0;
+  i = 0;
 
-   while (*str != '\0')
-   {
-      str++;
-      i++;
-   }
+  while (*str != '\0') {
+    str++;
+    i++;
+  }
 
-   return i;
+  return i;
 }
 
 #endif
-

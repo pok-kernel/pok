@@ -1,17 +1,15 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 /* w_hypotf.c -- float version of w_hypot.c.
@@ -35,28 +33,28 @@
  * wrapper hypotf(x,y)
  */
 
-#include <libm.h>
-#include "namespace.h"
 #include "math_private.h"
+#include "namespace.h"
+#include <libm.h>
 
 #ifdef __weak_alias
 __weak_alias(hypotf, _hypotf)
 #endif
 
-float
-hypotf(float x, float y)	/* wrapper hypotf */
+    float hypotf(float x, float y) /* wrapper hypotf */
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_hypotf(x,y);
+  return __ieee754_hypotf(x, y);
 #else
-	float z;
-	z = __ieee754_hypotf(x,y);
-	if(_LIB_VERSION == _IEEE_) return z;
-	if((!finitef(z))&&finitef(x)&&finitef(y))
-	    /* hypot overflow */
-	    return (float)__kernel_standard((double)x,(double)y,104);
-	else
-	    return z;
+  float z;
+  z = __ieee754_hypotf(x, y);
+  if (_LIB_VERSION == _IEEE_)
+    return z;
+  if ((!finitef(z)) && finitef(x) && finitef(y))
+    /* hypot overflow */
+    return (float)__kernel_standard((double)x, (double)y, 104);
+  else
+    return z;
 #endif
 }
 #endif

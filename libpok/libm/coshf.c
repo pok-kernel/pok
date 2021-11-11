@@ -1,17 +1,15 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 /* w_coshf.c -- float version of w_cosh.c.
@@ -35,28 +33,28 @@
  * wrapper coshf(x)
  */
 
-#include <libm.h>
-#include "namespace.h"
 #include "math_private.h"
+#include "namespace.h"
+#include <libm.h>
 
 #ifdef __weak_alias
 __weak_alias(coshf, _coshf)
 #endif
 
-float
-coshf(float x)		/* wrapper coshf */
+    float coshf(float x) /* wrapper coshf */
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_coshf(x);
+  return __ieee754_coshf(x);
 #else
-	float z;
-	z = __ieee754_coshf(x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x)) return z;
-	if(fabsf(x)>(float)8.9415985107e+01) {
-		/* cosh overflow */
-	        return (float)__kernel_standard((double)x,(double)x,105);
-	} else
-	    return z;
+  float z;
+  z = __ieee754_coshf(x);
+  if (_LIB_VERSION == _IEEE_ || isnanf(x))
+    return z;
+  if (fabsf(x) > (float)8.9415985107e+01) {
+    /* cosh overflow */
+    return (float)__kernel_standard((double)x, (double)x, 105);
+  } else
+    return z;
 #endif
 }
 

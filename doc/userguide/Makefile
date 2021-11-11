@@ -1,3 +1,12 @@
+INKSCAPE_VERSION_TEST := $(shell expr `inkscape --version |cut -d' ' -f2 | cut -d. -f1` \>= 1)
+
+ifeq "$(INKSCAPE_VERSION_TEST)" "1" 
+    INKSCAPE_EXPORT_PARAM := --export-filename
+else
+    INKSCAPE_EXPORT_PARAM := --export-pdf
+endif
+
+
 EPSFILES=imgs/pok-layers.pdf \
 			imgs/partitions-architecture.pdf \
 			imgs/partitions-build-steps.pdf \
@@ -24,7 +33,7 @@ LIBPOK_HEADERS=arch.h errno.h libm.h\
 all: $(PDFFILE)
 
 %.pdf: %.svg
-	inkscape --export-pdf=$@ $<
+	inkscape $(INKSCAPE_EXPORT_PARAM)=$@ $<
 
 $(PDFFILE): $(TEXFILES) $(EPSFILES) $(BIBLIO) $(LISTINGS)
 	rm -rf include-libpok

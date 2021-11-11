@@ -1,0 +1,373 @@
+Mutex with Priority Queueing Discipline
+[P1] pok_mutex_create return=0, mid=0
+[P1] pok_thread_create (1) return=0
+[P1] pok_thread_create (2) return=0
+[P1] pok_thread_create (3) return=0
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    other ready:  2 (42), 3 (40)
+    non-ready: 0 (1/stopped)
+Hello from P1T1!
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    other ready:  3 (40)
+    non-ready: 0 (1/stopped), 1 (44/waiting)
+Hello from P1T2!
+P1T2: I take mutex (round 1)
+--- Scheduling processor: 0
+    scheduling thread 3 (priority 40)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting)
+Hello from P1T3!
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/lock), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    other ready:  2 (42)
+    non-ready: 0 (1/stopped), 3 (40/lock)
+P1T1: I take mutex (round 1)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+P1T2: I take mutex (round 2)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/lock), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    other ready:  2 (42)
+    non-ready: 0 (1/stopped), 3 (40/lock)
+P1T1: I take mutex (round 2)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+P1T2: I take mutex (round 3)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/lock), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    other ready:  2 (42)
+    non-ready: 0 (1/stopped), 3 (40/lock)
+P1T1: I take mutex (round 3)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+P1T2: I take mutex (round 4)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/lock), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    other ready:  2 (42)
+    non-ready: 0 (1/stopped), 3 (40/lock)
+P1T1: I take mutex (round 4)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+P1T2: I take mutex (round 5)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/lock), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/lock), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    other ready:  2 (42)
+    non-ready: 0 (1/stopped), 3 (40/lock)
+P1T1: I take mutex (round 5)
+--- Scheduling processor: 0
+    scheduling thread 2 (priority 42)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 3 (40/lock)
+P1T2: sleeping forever
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting), 3 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 1 (priority 44)
+    non-ready: 0 (1/stopped), 2 (42/waiting), 3 (40/lock)
+P1T1: sleeping forever
+--- Scheduling processor: 0
+    scheduling thread 3 (priority 40)
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting)
+P1T3: I take mutex (round 1)
+P1T3: I take mutex (round 2)
+P1T3: I take mutex (round 3)
+P1T3: I take mutex (round 4)
+P1T3: I take mutex (round 5)
+P1T3: sleeping forever
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 0 (1/stopped), 1 (44/waiting), 2 (42/waiting), 3 (40/waiting)
+Mutex with FIFO Queueing Discipline
+[P2] pok_mutex_create return=0, mid=1
+[P2] pok_thread_create (1) return=0
+[P2] pok_thread_create (2) return=0
+[P2] pok_thread_create (3) return=0
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    other ready:  6 (42), 7 (40)
+    non-ready: 4 (1/stopped)
+Hello from P2T1!
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    other ready:  7 (40)
+    non-ready: 4 (1/stopped), 5 (44/waiting)
+Hello from P2T2!
+P2T2: I take mutex (round 1)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting)
+Hello from P2T3!
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/lock)
+P2T3: I take mutex (round 1)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    other ready:  7 (40)
+    non-ready: 4 (1/stopped), 6 (42/lock)
+P2T1: I take mutex (round 1)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 7 (40/lock)
+P2T2: I take mutex (round 2)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/lock)
+P2T3: I take mutex (round 2)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    other ready:  7 (40)
+    non-ready: 4 (1/stopped), 6 (42/lock)
+P2T1: I take mutex (round 2)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 7 (40/lock)
+P2T2: I take mutex (round 3)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/lock)
+P2T3: I take mutex (round 3)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    other ready:  7 (40)
+    non-ready: 4 (1/stopped), 6 (42/lock)
+P2T1: I take mutex (round 3)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 7 (40/lock)
+P2T2: I take mutex (round 4)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/lock)
+P2T3: I take mutex (round 4)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    other ready:  7 (40)
+    non-ready: 4 (1/stopped), 6 (42/lock)
+P2T1: I take mutex (round 4)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/lock), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 7 (40/lock)
+P2T2: I take mutex (round 5)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/waiting), 7 (40/lock)
+--- Scheduling processor: 0
+    scheduling thread 6 (priority 42)
+    non-ready: 4 (1/stopped), 5 (44/lock), 7 (40/lock)
+P2T2: sleeping forever
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/lock), 6 (42/waiting)
+P2T3: I take mutex (round 5)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    other ready:  7 (40)
+    non-ready: 4 (1/stopped), 6 (42/waiting)
+P2T1: I take mutex (round 5)
+--- Scheduling processor: 0
+    scheduling thread 7 (priority 40)
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting)
+P2T3: sleeping forever
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting), 7 (40/waiting)
+--- Scheduling processor: 0
+    scheduling thread 5 (priority 44)
+    non-ready: 4 (1/stopped), 6 (42/waiting), 7 (40/waiting)
+P2T1: sleeping forever
+--- Scheduling processor: 0
+    scheduling idle thread
+    non-ready: 4 (1/stopped), 5 (44/waiting), 6 (42/waiting), 7 (40/waiting)
+[P3] Will shutdown

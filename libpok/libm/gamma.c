@@ -1,17 +1,15 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 /* @(#)w_gamma.c 5.1 93/09/24 */
@@ -34,25 +32,24 @@
  * Method: call gamma_r
  */
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-double
-gamma(double x)
-{
+double gamma(double x) {
 #ifdef _IEEE_LIBM
-	return __ieee754_lgamma_r(x,&signgam);
+  return __ieee754_lgamma_r(x, &signgam);
 #else
-        double y;
-        y = __ieee754_lgamma_r(x,&signgam);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finite(y)&&finite(x)) {
-            if(floor(x)==x&&x<=0.0)
-                return __kernel_standard(x,x,41); /* gamma pole */
-            else
-                return __kernel_standard(x,x,40); /* gamma overflow */
-        } else
-            return y;
+  double y;
+  y = __ieee754_lgamma_r(x, &signgam);
+  if (_LIB_VERSION == _IEEE_)
+    return y;
+  if (!finite(y) && finite(x)) {
+    if (floor(x) == x && x <= 0.0)
+      return __kernel_standard(x, x, 41); /* gamma pole */
+    else
+      return __kernel_standard(x, x, 40); /* gamma overflow */
+  } else
+    return y;
 #endif
 }
 

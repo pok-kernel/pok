@@ -5,12 +5,13 @@ include $(TOPDIR)/misc/mk/config.mk
 
 LO_TARGET=	x86.lo
 
-LO_OBJS=	arch.o \
-		ioports.o \
-		pci.o \
-		syscall.o
+LO_OBJS=	arch.o                \
+		ioports.o             \
+		pci.o                 \
+		syscall.o             \
+		divisionbyzeroerror.o
 
-LO_DEPS=	
+LO_DEPS=
 
 include $(TOPDIR)/misc/mk/objdir.mk
 

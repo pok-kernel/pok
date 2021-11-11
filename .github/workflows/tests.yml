@@ -1,0 +1,31 @@
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - trying
+  pull_request:
+
+name: Execution checks
+
+jobs:
+  test-utils:
+    name: Test utility programs
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get -y update
+      - run: sudo apt-get -y install python3 python3-yaml
+      - run: python3 misc/gen_dependencies --test
+      - run: python3 misc/gen_deployment --test
+
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get -y update
+      - run: sudo apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc python3 python3-venv qemu-system-x86 clang
+      - run: make configure
+      - run: sudo pip install -r misc/requirements.txt
+      - run: make -C testsuite/unitary_tests check

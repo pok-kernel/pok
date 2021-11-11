@@ -1,17 +1,15 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 /* s_frexpf.c -- float version of s_frexp.c.
@@ -31,31 +29,28 @@
 
 #ifdef POK_NEEDS_LIBMATH
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-static const float
-two25 =  3.3554432000e+07; /* 0x4c000000 */
+static const float two25 = 3.3554432000e+07; /* 0x4c000000 */
 
-float
-frexpf(float x, int *eptr)
-{
-	int32_t hx,ix;
-	GET_FLOAT_WORD(hx,x);
-	ix = 0x7fffffff&hx;
-	*eptr = 0;
-	if(ix>=0x7f800000||(ix==0)) return x;	/* 0,inf,nan */
-	if (ix<0x00800000) {		/* subnormal */
-	    x *= two25;
-	    GET_FLOAT_WORD(hx,x);
-	    ix = hx&0x7fffffff;
-	    *eptr = -25;
-	}
-	*eptr += (ix>>23)-126;
-	hx = (hx&0x807fffff)|0x3f000000;
-	SET_FLOAT_WORD(x,hx);
-	return x;
+float frexpf(float x, int *eptr) {
+  int32_t hx, ix;
+  GET_FLOAT_WORD(hx, x);
+  ix = 0x7fffffff & hx;
+  *eptr = 0;
+  if (ix >= 0x7f800000 || (ix == 0))
+    return x;            /* 0,inf,nan */
+  if (ix < 0x00800000) { /* subnormal */
+    x *= two25;
+    GET_FLOAT_WORD(hx, x);
+    ix = hx & 0x7fffffff;
+    *eptr = -25;
+  }
+  *eptr += (ix >> 23) - 126;
+  hx = (hx & 0x807fffff) | 0x3f000000;
+  SET_FLOAT_WORD(x, hx);
+  return x;
 }
 
 #endif
-

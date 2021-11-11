@@ -1,17 +1,15 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Thu Jan 15 23:34:13 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 /**
@@ -20,26 +18,27 @@
  * @brief  Leon3 timer management.
  */
 
-#include <errno.h>
-#include <bsp.h>
-#include <core/time.h>
-#include <core/sched.h>
 #include <arch.h>
+#include <bsp.h>
+#include <core/sched.h>
+#include <core/time.h>
+#include <errno.h>
 
+#include "../traps.h"
 #include "ioports.h"
+#include "irq.h"
 #include "sparc_conf.h"
 #include "timer.h"
-#include "irq.h"
-#include "../traps.h"
 
 /**
  * Timer interrupt subroutine.
  * @see ack_irq(irq_nbr)
  */
-void timer_isr(void)
-{
+void timer_isr(void) {
   ack_irq(TIMER_IRQ);
-  CLOCK_HANDLER
+  pok_tick_counter += 10000;
+  pok_sched(); // 10000 because freq (POK_TIMER_FREQUENCY) is 10e5 and time
+               // (pok_tick_counter) is in nanoseconds: 10e9/POK_TIMER_FREQUENCY
   return;
 }
 
@@ -47,8 +46,7 @@ void timer_isr(void)
  * Initialize the timer, register the ISR and unmask the interrupt.
  * @see unmask_irq(irq_nbr)
  */
-pok_ret_t pok_bsp_time_init ()
-{
+pok_ret_t pok_bsp_time_init() {
   outw(TIMER1 + TIMER_SCALER_OFFSET, 1);
   outw(TIMER1 + TIMER_SCAL_RELOAD_OFFSET, 1);
 

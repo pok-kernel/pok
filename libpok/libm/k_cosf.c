@@ -1,17 +1,15 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Sat Jan 31 20:12:07 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 /* k_cosf.c -- float version of k_cos.c
@@ -31,43 +29,40 @@
 
 #ifdef POK_NEEDS_LIBMATH
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-static const float
-one =  1.0000000000e+00, /* 0x3f800000 */
-C1  =  4.1666667908e-02, /* 0x3d2aaaab */
-C2  = -1.3888889225e-03, /* 0xbab60b61 */
-C3  =  2.4801587642e-05, /* 0x37d00d01 */
-C4  = -2.7557314297e-07, /* 0xb493f27c */
-C5  =  2.0875723372e-09, /* 0x310f74f6 */
-C6  = -1.1359647598e-11; /* 0xad47d74e */
+static const float one = 1.0000000000e+00, /* 0x3f800000 */
+    C1 = 4.1666667908e-02,                 /* 0x3d2aaaab */
+    C2 = -1.3888889225e-03,                /* 0xbab60b61 */
+    C3 = 2.4801587642e-05,                 /* 0x37d00d01 */
+    C4 = -2.7557314297e-07,                /* 0xb493f27c */
+    C5 = 2.0875723372e-09,                 /* 0x310f74f6 */
+    C6 = -1.1359647598e-11;                /* 0xad47d74e */
 
-float
-__kernel_cosf(float x, float y)
-{
-	float a,hz,z,r,qx;
-	int32_t ix;
-	GET_FLOAT_WORD(ix,x);
-	ix &= 0x7fffffff;			/* ix = |x|'s high word*/
-	if(ix<0x32000000) {			/* if x < 2**27 */
-	    if(((int)x)==0) return one;		/* generate inexact */
-	}
-	z  = x*x;
-	r  = z*(C1+z*(C2+z*(C3+z*(C4+z*(C5+z*C6)))));
-	if(ix < 0x3e99999a) 			/* if |x| < 0.3 */
-	    return one - ((float)0.5*z - (z*r - x*y));
-	else {
-	    if(ix > 0x3f480000) {		/* x > 0.78125 */
-		qx = (float)0.28125;
-	    } else {
-	        SET_FLOAT_WORD(qx,ix-0x01000000);	/* x/4 */
-	    }
-	    hz = (float)0.5*z-qx;
-	    a  = one-qx;
-	    return a - (hz - (z*r-x*y));
-	}
+float __kernel_cosf(float x, float y) {
+  float a, hz, z, r, qx;
+  int32_t ix;
+  GET_FLOAT_WORD(ix, x);
+  ix &= 0x7fffffff;      /* ix = |x|'s high word*/
+  if (ix < 0x32000000) { /* if x < 2**27 */
+    if (((int)x) == 0)
+      return one; /* generate inexact */
+  }
+  z = x * x;
+  r = z * (C1 + z * (C2 + z * (C3 + z * (C4 + z * (C5 + z * C6)))));
+  if (ix < 0x3e99999a) /* if |x| < 0.3 */
+    return one - ((float)0.5 * z - (z * r - x * y));
+  else {
+    if (ix > 0x3f480000) { /* x > 0.78125 */
+      qx = (float)0.28125;
+    } else {
+      SET_FLOAT_WORD(qx, ix - 0x01000000); /* x/4 */
+    }
+    hz = (float)0.5 * z - qx;
+    a = one - qx;
+    return a - (hz - (z * r - x * y));
+  }
 }
 
 #endif
-

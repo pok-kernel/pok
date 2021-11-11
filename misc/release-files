@@ -191,7 +191,6 @@ libpok/core/errorget.c
 libpok/core/errorraise.c
 libpok/core/errorconfirm.c
 libpok/core/errorhandlerworker.c
-libpok/core/errorhandlersetready.c
 libpok/core/semcreate.c
 libpok/core/semsignal.c
 libpok/core/semstatus.c

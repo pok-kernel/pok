@@ -1,17 +1,15 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
- * made according to the POK licence. You CANNOT use this file or a part of
- * this file is this part of a file for your own project
+ * be made according to the POK licence. You CANNOT use this file or a part
+ * of a file for your own project.
  *
  * For more information on the POK licence, please see our LICENCE FILE
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2009 POK team 
- *
- * Created by julien on Fri Jan 30 14:41:34 2009 
+ *                                      Copyright (c) 2007-2021 POK team
  */
 
 /* @(#)s_logb.c 5.1 93/09/24 */
@@ -26,7 +24,6 @@
  * ====================================================
  */
 
-
 /*
  * double logb(x)
  * IEEE 754 logb. Included to pass IEEE test suite. Not recommend.
@@ -35,21 +32,21 @@
 
 #ifdef POK_NEEDS_LIBMATH
 
-#include <libm.h>
 #include "math_private.h"
+#include <libm.h>
 
-double
-logb(double x)
-{
-	int32_t lx,ix;
-	EXTRACT_WORDS(ix,lx,x);
-	ix &= 0x7fffffff;			/* high |x| */
-	if((ix|lx)==0) return -1.0/fabs(x);
-	if(ix>=0x7ff00000) return x*x;
-	if((ix>>=20)==0) 			/* IEEE 754 logb */
-		return -1022.0;
-	else
-		return (double) (ix-1023);
+double logb(double x) {
+  int32_t lx, ix;
+  EXTRACT_WORDS(ix, lx, x);
+  ix &= 0x7fffffff; /* high |x| */
+  if ((ix | lx) == 0)
+    return -1.0 / fabs(x);
+  if (ix >= 0x7ff00000)
+    return x * x;
+  if ((ix >>= 20) == 0) /* IEEE 754 logb */
+    return -1022.0;
+  else
+    return (double)(ix - 1023);
 }
 
 #endif

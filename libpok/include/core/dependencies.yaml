@@ -1,0 +1,73 @@
+#                               POK header
+#
+# The following file is a part of the POK project. Any modification should
+# be made according to the POK licence. You CANNOT use this file or a part
+# of a file for your own project.
+#
+# For more information on the POK licence, please see our LICENCE FILE
+#
+# Please follow the coding guidelines described in doc/CODING_GUIDELINES
+#
+#                                      Copyright (c) 2007-2021 POK team
+
+# Used to generate dependencies.h
+
+domain: libpok
+
+always:
+    dependencies:
+        config_funcs: [memcpy, streq, strlen]
+
+deployment:
+    condition:
+        before: "#if defined POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE && defined GENERATED_CODE_PATH"
+        after: "#endif // POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE && GENERATED_CODE_PATH"
+
+conditional:
+    dependencies:
+        libc_stdio:
+            config_funcs: [printf, vprintf, getchar]
+        libc_stdlib:
+            config_funcs: [rand, malloc, calloc, free]
+            needs: [allocator]
+        string:
+            config_funcs: [memset, memcmp, strcmp, strncmp, strcpy, strncpy]
+        protocols_des:
+            config_funcs: [memcmp]
+        arinc653_process:
+            config_funcs: [strcpy, strcmp]
+            needs: [thread_id]
+        arinc653_queuing:
+            needs: [ports_queuing]
+        arinc653_sampling:
+            needs: [ports_sampling]
+        arinc653_event:
+            config_funcs: [strncmp]
+        arinc653_buffer:
+            needs: [middleware, buffers]
+        arinc653_blackboard:
+            needs: [middleware, blackboards]
+        arinc653_semaphore:
+            config_funcs: [strcmp]
+            needs: [semaphores]
+        arinc653_error:
+            funcs: [time_get]
+        assert:
+            needs: [shutdown, debug]
+        mutexes:
+            funcs: [time_get]
+        events:
+            funcs: [time_get]
+        buffers:
+            funcs: [time_get]
+        blackboards:
+            funcs: [time_get]
+        time:
+            funcs: [time_get]
+
+unoptimized:
+    nguard: "POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE"
+    dependencies:
+        needs: [semaphore, ports_queuing, buffers, blackboards, semaphores, allocator]
+        config_funcs: [memset, memcmp, strcmp, strncmp, strcpy, strncpy, itoa, atoi, udivdi3, umoddi3,
+            rand, malloc, calloc, free]

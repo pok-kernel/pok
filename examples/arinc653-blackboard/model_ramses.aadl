@@ -1,0 +1,23 @@
+package model_ramses
+public
+	with test;
+	with RAMSES_Properties;
+	
+	system node extends test::node
+	end node;
+
+	system implementation node.ramses extends test::node.impl
+	subcomponents
+		mem: memory mainmemory;
+	properties
+		Scheduling_Protocol => (ARINC653) applies to cpu;
+		Scheduling_Protocol => (POSIX_1003_HIGHEST_PRIORITY_FIRST_PROTOCOL) applies to cpu.part1;
+		Period => 1000ms applies to cpu.part1;
+		RAMSES_Properties::Target => "pok" applies to cpu;
+		Actual_Memory_Binding => (reference(mem)) applies to part1;
+	end node.ramses;
+	
+	memory mainmemory
+	end mainmemory;
+	
+end model_ramses;

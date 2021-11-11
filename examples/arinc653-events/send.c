@@ -9,9 +9,8 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2021 POK team 
+ *                                      Copyright (c) 2007-2021 POK team
  *
- * Created by julien on Thu Jan 15 23:34:13 2009 
  */
 
 #include <libc/stdio.h>
@@ -19,10 +18,14 @@
 
 #include "aadl_runtime_services.h"
 
-void user_receive (__user_receive_context *  context)
+int round = 0;
+void user_send (__user_send_context *  context)
 {
-  uint16_t received_events = 0;
-  error_code_t err = Get_Count(context->input, &received_events);
-  if(!err)
-    printf ("I received %d events\n", received_events);
+  round++;
+  int i, limit=round%3;
+  for(i=0; i<limit; i++) {
+    Put_Value(context->output, NULL);
+    Send_Output(context->output);
+  }
+  printf ("I send %d events\n", limit);
 }

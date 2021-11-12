@@ -12,5 +12,10 @@
  *                                      Copyright (c) 2007-2021 POK team
  */
 
-void user_kernelhm() { /* DO NOTHING */
-}
+#ifndef __THREADSTART_H__
+#define __THREADSTART_H__
+
+void user_thread_starting();
+
+#endif
+

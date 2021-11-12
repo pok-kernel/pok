@@ -47,8 +47,14 @@ end common_bus;
 
 virtual processor partition
 properties
-   ARINC653::HM_Errors              => (Numeric_Error, Illegal_Request);
-   ARINC653::HM_Partition_Recovery_Actions   => (Ignore, Warm_Restart);
+   ARINC653::HM_Error_ID_Actions => (
+	   	[ErrorIdentifier => 5; Description => "Ignore"; Action => "Ignore";],
+   		[ErrorIdentifier => 6; Description => "Warm restart partition"; Action => "Warm restart partition";],
+    	[ErrorIdentifier => 7; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 8; Description => "Stop partition"; Action => "Partition_Stop";],
+    	[ErrorIdentifier => 9; Description => "Warm restart partition"; Action => "Warm_Restart";],
+    	[ErrorIdentifier => 10; Description => "Warm restart partition"; Action => "Warm_Restart";]
+      );
    POK::Additional_Features         => (console);
 end partition;
 
@@ -56,9 +62,6 @@ virtual processor implementation partition.secure
 properties
    Provided_Virtual_Bus_Class => 
                (classifier (arinchm::secure_bus));
-   ARINC653::HM_Errors => (Partition_Init, Partition_Scheduling, Partition_Handler, Partition_Config);
-   ARINC653::HM_Partition_Recovery_Actions => (Ignore, Partition_Stop, Warm_Restart, Warm_Restart);
-   ARINC653::HM_Callback => classifier (arinchm::partitionhm);
    POK::Criticality => 10;
 end partition.secure;
 
@@ -67,8 +70,6 @@ properties
    POK::Criticality => 1;
    Provided_Virtual_Bus_Class => 
                (classifier (arinchm::common_bus));
-   ARINC653::HM_Errors => (Partition_Init, Partition_Scheduling, Partition_Handler, Partition_Config);
-   ARINC653::HM_Partition_Recovery_Actions => (Ignore, Partition_Stop, Warm_Restart, Warm_Restart);
 end partition.common;
 
 
@@ -77,29 +78,28 @@ features
    output : out parameter integer;
 properties
    source_name => "user_send";
-   source_language => C;
-   Source_Text => ("../../../send.o");
-   Source_Code_Size  => 2 Kbyte;
-   Source_Data_Size  => 2 Kbyte;
+   source_language => (C);
+   Source_Text => ("send.c", "send.h");
+   Code_Size  => 2 Kbyte;
+   Data_Size  => 2 Kbyte;
 end hello_part1;
 
 subprogram hello_part2
 features
    input : in parameter integer;
 properties
-   Source_Text => ("../../../receive.o");
-   source_language => C;
+   Source_Text => ("receive.c", "receive.h");
+   source_language => (C);
    source_name => "user_receive";
-   Source_Code_Size  => 2 Kbyte;
-   Source_Data_Size  => 2 Kbyte;
+   Code_Size  => 2 Kbyte;
+   Data_Size  => 2 Kbyte;
 end hello_part2;
 
 processor ppc
 properties
    POK::Architecture => x86;
    POK::BSP => x86_qemu;
-   ARINC653::HM_Errors => (Hardware_Fault);
-   ARINC653::HM_Module_Recovery_Actions => (Reset);
+   
 end ppc;
 
 processor implementation ppc.impl
@@ -108,14 +108,53 @@ subcomponents
    partition_common : virtual processor partition.common;
 properties
    ARINC653::Module_Major_Frame => 1000ms;
-   ARINC653::Partition_Slots => (500ms, 500ms);
-   ARINC653::Slots_Allocation => ( reference (partition_common), reference (partition_secure));
-   ARINC653::HM_Errors => (Module_Init, Module_Scheduling, Module_Config);
-   ARINC653::HM_Module_Recovery_Actions => (Ignore, Stop, Reset);
-   ARINC653::HM_Callback => classifier (arinchm::kernelhm);
+   ARINC653::Module_Schedule => (
+       	[Partition => reference(partition_common); Duration => 500ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(partition_secure); Duration => 500ms; Periodic_Processing_Start => true;]
+   );
+   
+   ARINC653::HM_Error_ID_Levels => (
+		[ErrorIdentifier => 1; Description => "Module init error"; ErrorLevel => Module_Level; ErrorCode => Module_Init;],
+		[ErrorIdentifier => 2; Description => "Module Scheduling error"; ErrorLevel => Module_Level; ErrorCode => Module_Scheduling;],
+		[ErrorIdentifier => 3; Description => "Module config error"; ErrorLevel => Module_Level; ErrorCode => Module_Config;],
+		[ErrorIdentifier => 4; Description => "Hardware error"; ErrorLevel => Module_Level; ErrorCode => Hardware_Fault;],
+		[ErrorIdentifier => 5; Description => "Partition numeric error"; ErrorLevel => Partition_Level; ErrorCode => Numeric_Error;],
+		[ErrorIdentifier => 6; Description => "Partition illegal request error"; ErrorLevel => Partition_Level; ErrorCode => Illegal_Request;],
+		[ErrorIdentifier => 7; Description => "Partition init error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Init;],
+		[ErrorIdentifier => 8; Description => "Partition scheduling error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Scheduling;],
+		[ErrorIdentifier => 9; Description => "Partition handler error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Handler;],
+		[ErrorIdentifier => 10; Description => "Partition config error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Config;],
+		[ErrorIdentifier => 11; Description => "Process deadline miss"; ErrorLevel => Process_Level; ErrorCode => Deadline_Miss;],
+		[ErrorIdentifier => 12; Description => "Process application error"; ErrorLevel => Process_Level; ErrorCode => Application_Error;],
+		[ErrorIdentifier => 13; Description => "Process numeric error"; ErrorLevel => Process_Level; ErrorCode => Numeric_Error;],
+		[ErrorIdentifier => 14; Description => "Process illegal request"; ErrorLevel => Process_Level; ErrorCode => Illegal_Request;],
+		[ErrorIdentifier => 15; Description => "Process power fail"; ErrorLevel => Process_Level; ErrorCode => Power_Fail;],
+		[ErrorIdentifier => 16; Description => "Process memory violation"; ErrorLevel => Process_Level; ErrorCode => Memory_Violation;],
+		[ErrorIdentifier => 17; Description => "Process stack overflow"; ErrorLevel => Process_Level; ErrorCode => Stack_Overflow;]		
+	);
+   ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 1; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 2; Description => "Stop module"; Action => "Stop";],
+    	[ErrorIdentifier => 3; Description => "Reset module"; Action => "Reset";],
+    	[ErrorIdentifier => 4; Description => "Reset module"; Action => "Reset";]
+      );
 end ppc.impl;
 
-thread receive_ping
+thread threads_hm_definition
+properties
+   ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 11; Description => "Restart process"; Action => "Process_Restart";],
+    	[ErrorIdentifier => 12; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 13; Description => "Warm restart partition"; Action => "Warm_Restart";],
+    	[ErrorIdentifier => 14; Description => "Stop partition"; Action => "Partition_Stop";],
+    	[ErrorIdentifier => 15; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 16; Description => "Restart process"; Action => "Process_Restart";],
+    	[ErrorIdentifier => 4; Description => "Restart process"; Action => "Process_Restart";],
+    	[ErrorIdentifier => 18; Description => "Restart process"; Action => "Process_Restart";]
+      );
+end threads_hm_definition;
+
+thread receive_ping extends threads_hm_definition
 features
    datain : in event data port integer;
 properties
@@ -124,22 +163,22 @@ properties
    Dispatch_Protocol => Periodic;
    Recover_Execution_Time => 10 ms .. 20 ms;
    Period => 500 Ms;
-   Source_Code_Size  => 3 Kbyte;
-   Source_Data_Size  => 3 Kbyte;
-   Source_Stack_Size => 3 KByte;
+   Code_Size  => 3 Kbyte;
+   Data_Size  => 3 Kbyte;
+   Stack_Size => 3 KByte;
 end receive_ping;
 
 subprogram thread_starting
 properties
    source_name => "user_thread_starting";
-   source_language => C;
-   Source_Text => ("../../../threadstart.o");
-   Source_Code_Size  => 3 Kbyte;
-   Source_Data_Size  => 3 Kbyte;
-   Source_Stack_Size => 3 KByte;
+   source_language => (C);
+   Source_Text => ("threadstart.c", "threadstart.h");
+   Code_Size  => 3 Kbyte;
+   Data_Size  => 3 Kbyte;
+   Stack_Size => 3 KByte;
 end thread_starting;
 
-thread send_ping
+thread send_ping extends threads_hm_definition
 features
    dataout : out event data port integer {Compute_Deadline => 40 ms;};
 properties
@@ -147,45 +186,24 @@ properties
    Dispatch_Protocol => Periodic;
    Period => 1000 Ms;
    Recover_Execution_Time => 10 ms .. 20 ms;
-   Source_Code_Size  => 3 Kbyte;
-   Source_Data_Size  => 3 Kbyte;
-   Source_Stack_Size => 3 KByte;
+   Code_Size  => 3 Kbyte;
+   Data_Size  => 3 Kbyte;
+   Stack_Size => 3 KByte;
 end send_ping;
 
 thread implementation send_ping.impl
 calls 
    call1 : { pspg : subprogram hello_part1;};
 connections
-   parameter pspg.output -> dataout;
-properties
-   ARINC653::HM_Errors => (Deadline_Miss, Application_Error, Numeric_Error, Illegal_Request, Power_Fail, Memory_Violation, Hardware_Fault, Stack_Overflow);
-   ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Ignore, Warm_Restart, Partition_Stop, Ignore, Process_Restart, Process_Restart, Process_Restart);
+   cnx: parameter pspg.output -> dataout;
 end send_ping.impl;
 
 thread implementation receive_ping.impl
 calls 
    call1 : { pspg : subprogram hello_part2;};
 connections
-   parameter datain -> pspg.input;
-properties
-
-   ARINC653::HM_Errors => (Deadline_Miss, Application_Error, Numeric_Error, Illegal_Request, Power_Fail, Memory_Violation, Hardware_Fault, Stack_Overflow);
-   ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Ignore, Warm_Restart, Partition_Stop, Ignore, Process_Restart, Process_Restart, Process_Restart);
+   cnx: parameter datain -> pspg.input;
 end receive_ping.impl;
-
-subprogram partitionhm
-properties
-   source_name => "user_partitionhm";
-   source_language => C;
-   Source_Text => ("../../../partitionhm.o");
-end partitionhm;
-
-subprogram kernelhm
-properties
-   source_name => "user_kernelhm";
-   source_language => C;
-   Source_Text => ("../../../kernelhm.o");
-end kernelhm;
 
 process receive_ping_process
 features
@@ -208,14 +226,14 @@ process implementation receive_ping_process.impl
 subcomponents
    thr : thread receive_ping.impl;
 connections
-   port pdatain -> thr.datain; 
+   cnx: port pdatain -> thr.datain; 
 end receive_ping_process.impl;
 
 process implementation send_ping_process.impl
 subcomponents
    thr : thread send_ping.impl;
 connections
-   port thr.dataout -> pdataout;
+   cnx: port thr.dataout -> pdataout;
 end send_ping_process.impl;
 
 system node
@@ -223,9 +241,7 @@ end node;
 
 memory partitionmemory
 properties
-   Byte_Count => 80000;
-   ARINC653::Memory_Type => (code_memory);
-   ARINC653::Access_Type => read;
+   Memory_Size => 800000 Bytes;
 end partitionmemory;
 
 memory mainmemory
@@ -233,12 +249,8 @@ end mainmemory;
 
 memory implementation mainmemory.impl
 subcomponents
-   part1: memory partitionmemory 
-               {ARINC653::Memory_Type => (code_memory);
-                ARINC653::Access_Type => read;};
-   part2: memory partitionmemory
-               {ARINC653::Memory_Type => (data_memory);
-               ARINC653::Access_Type => write;};
+   part1: memory partitionmemory ;
+   part2: memory partitionmemory ;
 end mainmemory.impl;
 
 bus separation_bus
@@ -260,7 +272,7 @@ subcomponents
    mem : memory mainmemory.impl;
    eth : bus separation_bus.i;
 connections
-   port pr1.pdataout -> pr2.pdatain
+   cnx: port pr1.pdataout -> pr2.pdatain
       {Allowed_Connection_Binding_Class => (classifier (arinchm::secure_bus));};
 properties
    actual_processor_binding => 

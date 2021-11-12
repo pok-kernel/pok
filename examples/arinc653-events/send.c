@@ -12,5 +12,18 @@
  *                                      Copyright (c) 2007-2021 POK team
  */
 
-void user_kernelhm() { /* DO NOTHING */
+#include <libc/stdio.h>
+#include <types.h>
+
+#include "aadl_runtime_services.h"
+
+int round = 0;
+void user_send(__user_send_context *context) {
+  round++;
+  int i, limit = round % 3;
+  for (i = 0; i < limit; i++) {
+    Put_Value(context->output, NULL);
+    Send_Output(context->output);
+  }
+  printf("I send %d events\n", limit);
 }

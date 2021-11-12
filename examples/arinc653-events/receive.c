@@ -15,9 +15,11 @@
 #include <libc/stdio.h>
 #include <types.h>
 
-int ntimes = 0;
+#include "aadl_runtime_services.h"
 
-void user_receive() {
-  printf("I received a signal %d times\n", ntimes);
-  ntimes++;
+void user_receive(__user_receive_context *context) {
+  uint16_t received_events = 0;
+  error_code_t err = Get_Count(context->input, &received_events);
+  if (!err)
+    printf("I received %d events\n", received_events);
 }

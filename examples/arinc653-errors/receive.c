@@ -47,7 +47,7 @@ void user_receive(int t) {
     break;
 
   case 8:
-    tmp = (int *)0x2234234;
+    tmp = (int *)0x9234234;
     a = *tmp;
     break;
 

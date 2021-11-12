@@ -12,5 +12,9 @@
  *                                      Copyright (c) 2007-2021 POK team
  */
 
-void user_partitionhm() { /* DO NOTHING */
-}
+#ifndef __SEND_H__
+#define __SEND_H__
+
+void user_send(int *t);
+
+#endif

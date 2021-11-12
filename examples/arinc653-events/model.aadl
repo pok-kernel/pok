@@ -26,7 +26,6 @@ end myint;
 
 virtual processor partition
 properties
-   POK::Scheduler => RR;
    POK::Additional_Features => (console, libc_stdio);
 end partition;
 
@@ -43,8 +42,9 @@ properties
    POK::Architecture => x86;
    POK::BSP => x86_qemu;
    ARINC653::Module_Major_Frame => 500 ms;
-   ARINC653::Partition_Slots => (500 ms);
-   ARINC653::Slots_Allocation => ( reference (part1));
+   ARINC653::Module_Schedule => (
+       	[Partition => reference(part1); Duration => 500ms; Periodic_Processing_Start => true;]
+   );
 end ppc.impl;
 
 process myprocess1
@@ -55,28 +55,29 @@ subcomponents
    thr1 : thread mythread1.impl;
    thr2 : thread mythread2.impl;
 connections
-   port thr1.output -> thr2.input;
+   cnx: port thr1.output -> thr2.input;
 end myprocess1.impl;
 
 thread mythread1
 features
    output : out event port;
 properties
-   Priority => 1;
+   Priority => 2;
 end mythread1;
 
 thread mythread2
 features
-   input : in event port
-      {Compute_Entrypoint => classifier (arinc653_testevents::spg_receive_event);};
+   input : in event port {Input_Time=>([Time => Start; Offset => 0 ns .. 0 ns;]);};
 properties
    Priority => 1;
+   Compute_Entrypoint => classifier (arinc653_testevents::spg_receive_event);
 end mythread2;
 
 thread implementation mythread1.impl
 properties
    dispatch_protocol => periodic;
    period            => 1000 ms;
+   Compute_Entrypoint => classifier (arinc653_testevents::spg_send_event);
 end mythread1.impl;
 
 thread implementation mythread2.impl
@@ -87,17 +88,21 @@ end mythread2.impl;
 
 subprogram spg_receive_event
 properties
-   POK::Source_Location => "../../../receive.o";
-   source_language => C;
+   Source_Text => ("receive.c");
+   source_language => (C);
    source_name => "user_receive";
 end spg_receive_event;
 
+subprogram spg_send_event
+properties
+   Source_Text => ("send.c");
+   source_language => (C);
+   source_name => "user_send";
+end spg_send_event;
 
 memory partitionmemory
 properties
-   Byte_Count => 80000;
-   ARINC653::Memory_Type => (code_memory);
-   ARINC653::Access_Type => read;
+   Memory_Size => 300000 Bytes;
 end partitionmemory;
 
 memory mainmemory
@@ -105,9 +110,7 @@ end mainmemory;
 
 memory implementation mainmemory.impl
 subcomponents
-   part1: memory partitionmemory 
-               {ARINC653::Memory_Type => (code_memory);
-                ARINC653::Access_Type => read;};
+   part1: memory partitionmemory ;
 end mainmemory.impl;
 
 

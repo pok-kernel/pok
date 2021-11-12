@@ -43,9 +43,10 @@ modes
    PartitionInit     -[ InitDone ]-> ProcessExecution;
    ProcessExecution  -[ ErrorRaised ]-> PartitionError;
    PartitionError    -[ ErrorRecovered ]-> ProcessExecution;
-properties
-   ARINC653::HM_Errors => (Partition_Config) in modes (PartitionInit);
-   ARINC653::HM_Partition_Recovery_Actions => (Ignore) in modes (PartitionInit);
+properties   
+   ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 10; Description => "Ignore"; Action => "Ignore";]
+   );
    POK::Criticality => 1;
 end partition.secure;
 
@@ -55,8 +56,9 @@ modes
    PartitionError : mode;
    ProcessExecution : mode;
 properties
-   ARINC653::HM_Errors => (Partition_Config) in modes (PartitionInit);
-   ARINC653::HM_Partition_Recovery_Actions => (Ignore) in modes (PartitionInit);
+   ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 10; Description => "Ignore"; Action => "Ignore";]
+   );
    POK::Criticality => 10;
 end partition.common;
 
@@ -65,16 +67,16 @@ features
    output : out parameter integer;
 properties
    source_name => "user_send";
-   source_language => C;
-   Source_Text => ("../../../send.o");
+   source_language => (C);
+   Source_Text => ("send.c");
 end hello_part1;
 
 subprogram hello_part2
 features
    input : in parameter integer;
 properties
-   Source_Text => ("../../../receive.o");
-   source_language => C;
+   Source_Text => ("receive.c");
+   source_language => (C);
    source_name => "user_receive";
 end hello_part2;
 
@@ -102,10 +104,18 @@ modes
    PartitionSwitching -[ SwitchDone ]-> SystemFunctionExecution;
 properties
    ARINC653::Module_Major_Frame => 1000 ms;
-   ARINC653::Partition_Slots => (500 ms, 500 ms);
-   ARINC653::Slots_Allocation => ( reference (partition_secure), reference (partition_common));
-   ARINC653::HM_Errors => (Module_Init) in modes (ModuleInit, SystemFunctionExecution);
-   ARINC653::HM_Module_Recovery_Actions => (Reset) in modes (ModuleInit, SystemFunctionExecution);
+   ARINC653::Module_Schedule => (
+       	[Partition => reference(partition_secure); Duration => 500ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(partition_common); Duration => 500ms; Periodic_Processing_Start => true;]
+   );
+   ARINC653::HM_Error_ID_Levels => (
+		[ErrorIdentifier => 1; Description => "Module init error"; ErrorLevel => Module_Level; ErrorCode => Module_Init;],
+		[ErrorIdentifier => 10; Description => "Partition config error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Config;],
+		[ErrorIdentifier => 17; Description => "Process stack overflow"; ErrorLevel => Process_Level; ErrorCode => Stack_Overflow;]		
+   );
+   ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 1; Description => "Reset module"; Action => "Reset";]
+   );
 end ppc.impl;
 
 thread receive_ping
@@ -117,8 +127,9 @@ properties
    Recover_Execution_Time => 10 ms .. 20 ms;
    Compute_Execution_Time => 1 ms .. 2 ms;
    Period => 200 Ms;
-   ARINC653::HM_Errors => (Stack_Overflow);
-   ARINC653::HM_Process_Recovery_Actions => (Ignore);
+   ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 17; Description => "Ignore"; Action => "Ignore";]
+   );
 end receive_ping;
 
 thread send_ping
@@ -129,22 +140,23 @@ properties
    Dispatch_Protocol => Periodic;
    Period => 1000 Ms;
    Recover_Execution_Time => 10 ms .. 20 ms;
-   ARINC653::HM_Errors => (Stack_Overflow);
-   ARINC653::HM_Process_Recovery_Actions => (Ignore);
+   ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 17; Description => "Ignore"; Action => "Ignore";]
+   );
 end send_ping;
 
 thread implementation send_ping.impl
 calls 
    call1 : { pspg : subprogram hello_part1;};
 connections
-   parameter pspg.output -> dataout;
+   cnx: parameter pspg.output -> dataout;
 end send_ping.impl;
 
 thread implementation receive_ping.impl
 calls 
    call1 : { pspg : subprogram hello_part2;};
 connections
-   parameter datain -> pspg.input;
+   cnx: parameter datain -> pspg.input;
 end receive_ping.impl;
 
 process receive_ping_process
@@ -162,21 +174,19 @@ process implementation receive_ping_process.impl
 subcomponents
    thr : thread receive_ping.impl;
 connections
-   port pdatain -> thr.datain; 
+   cnx: port pdatain -> thr.datain; 
 end receive_ping_process.impl;
 
 process implementation send_ping_process.impl
 subcomponents
    thr : thread send_ping.impl;
 connections
-   port thr.dataout -> pdataout;
+   cnx: port thr.dataout -> pdataout;
 end send_ping_process.impl;
 
 memory partitionmemory
 properties
-   Byte_Count => 80000;
-   ARINC653::Memory_Type => (code_memory);
-   ARINC653::Access_Type => read;
+   Memory_Size => 80000 Bytes;
 end partitionmemory;
 
 memory mainmemory
@@ -184,12 +194,8 @@ end mainmemory;
 
 memory implementation mainmemory.impl
 subcomponents
-   part1: memory partitionmemory 
-               {ARINC653::Memory_Type => (code_memory);
-                ARINC653::Access_Type => read;};
-   part2: memory partitionmemory
-               {ARINC653::Memory_Type => (data_memory);
-               ARINC653::Access_Type => write;};
+   part1: memory partitionmemory ;
+   part2: memory partitionmemory ;
 end mainmemory.impl;
 
 system node
@@ -202,7 +208,7 @@ subcomponents
    pr2 : process receive_ping_process.impl;
    mem : memory mainmemory.impl;
 connections
-   port pr1.pdataout -> pr2.pdatain;
+   cnx: port pr1.pdataout -> pr2.pdatain;
 properties
    actual_processor_binding => 
       (reference (cpu.partition_secure)) applies to pr2;

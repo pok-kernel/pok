@@ -1,6 +1,6 @@
 /*
  *                               POK header
- * 
+ *
  * The following file is a part of the POK project. Any modification should
  * made according to the POK licence. You CANNOT use this file or a part of
  * this file is this part of a file for your own project
@@ -19,13 +19,12 @@
 #include "aadl_runtime_services.h"
 
 int round = 0;
-void user_send (__user_send_context *  context)
-{
+void user_send(__user_send_context *context) {
   round++;
-  int i, limit=round%3;
-  for(i=0; i<limit; i++) {
+  int i, limit = round % 3;
+  for (i = 0; i < limit; i++) {
     Put_Value(context->output, NULL);
     Send_Output(context->output);
   }
-  printf ("I send %d events\n", limit);
+  printf("I send %d events\n", limit);
 }

@@ -18,4 +18,3 @@
 void user_thread_starting();
 
 #endif
-

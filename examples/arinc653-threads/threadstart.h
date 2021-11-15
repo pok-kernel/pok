@@ -12,6 +12,9 @@
  *                                      Copyright (c) 2007-2021 POK team
  */
 
-#include <libc/stdio.h>
+#ifndef __THREADSTART_H__
+#define __THREADSTART_H__
 
-void user_thread_starting() { printf("thread starts\n"); }
+void user_thread_starting();
+
+#endif

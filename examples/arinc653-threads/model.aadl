@@ -14,8 +14,6 @@
 package test
 public
 
-
-with Data_Model;
 with POK;
 with ARINC653;
 
@@ -34,8 +32,14 @@ end security_layer.topsecret;
 
 virtual processor partition
 properties
-   ARINC653::HM_Errors => (Partition_Config, Partition_Init, Partition_Handler, Partition_Scheduling);
-   ARINC653::HM_Partition_Recovery_Actions => (Warm_Restart, Warm_Restart, Warm_Restart, Warm_Restart);
+   ARINC653::HM_Error_ID_Actions => (
+	   	[ErrorIdentifier => 5; Description => "Ignore"; Action => "Ignore";],
+   		[ErrorIdentifier => 6; Description => "Warm restart partition"; Action => "Warm restart partition";],
+    	[ErrorIdentifier => 7; Description => "Warm restart partition"; Action => "Warm_Restart";],
+    	[ErrorIdentifier => 8; Description => "Warm restart partition"; Action => "Warm_Restart";],
+    	[ErrorIdentifier => 9; Description => "Warm restart partition"; Action => "Warm_Restart";],    	
+    	[ErrorIdentifier => 10; Description => "Warm restart partition"; Action => "Warm_Restart";]
+      );
    POK::Additional_Features => (libc_stdio, console);
 end partition;
 
@@ -57,10 +61,34 @@ properties
    POK::Architecture => x86;
    POK::BSP => x86_qemu;
    ARINC653::Module_Major_Frame => 1000ms;
-   ARINC653::Partition_Slots => (500ms, 500ms);
-   ARINC653::Slots_Allocation => (reference (part1), reference (part2));
-   ARINC653::HM_Errors => (Module_Config, Module_Init, Module_Scheduling);
-   ARINC653::HM_Module_Recovery_Actions => (Reset, Reset, Reset);
+   ARINC653::Module_Schedule => (
+       	[Partition => reference(part1); Duration => 500ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(part2); Duration => 500ms; Periodic_Processing_Start => true;]
+   );
+   ARINC653::HM_Error_ID_Levels => (
+		[ErrorIdentifier => 1; Description => "Module init error"; ErrorLevel => Module_Level; ErrorCode => Module_Init;],
+		[ErrorIdentifier => 2; Description => "Module Scheduling error"; ErrorLevel => Module_Level; ErrorCode => Module_Scheduling;],
+		[ErrorIdentifier => 3; Description => "Module config error"; ErrorLevel => Module_Level; ErrorCode => Module_Config;],
+		[ErrorIdentifier => 4; Description => "Hardware error"; ErrorLevel => Module_Level; ErrorCode => Hardware_Fault;],
+		[ErrorIdentifier => 5; Description => "Partition numeric error"; ErrorLevel => Partition_Level; ErrorCode => Numeric_Error;],
+		[ErrorIdentifier => 6; Description => "Partition illegal request error"; ErrorLevel => Partition_Level; ErrorCode => Illegal_Request;],
+		[ErrorIdentifier => 7; Description => "Partition init error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Init;],
+		[ErrorIdentifier => 8; Description => "Partition scheduling error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Scheduling;],
+		[ErrorIdentifier => 9; Description => "Partition handler error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Handler;],
+		[ErrorIdentifier => 10; Description => "Partition config error"; ErrorLevel => Partition_Level; ErrorCode => Partition_Config;],
+		[ErrorIdentifier => 11; Description => "Process deadline miss"; ErrorLevel => Process_Level; ErrorCode => Deadline_Miss;],
+		[ErrorIdentifier => 12; Description => "Process application error"; ErrorLevel => Process_Level; ErrorCode => Application_Error;],
+		[ErrorIdentifier => 13; Description => "Process numeric error"; ErrorLevel => Process_Level; ErrorCode => Numeric_Error;],
+		[ErrorIdentifier => 14; Description => "Process illegal request"; ErrorLevel => Process_Level; ErrorCode => Illegal_Request;],
+		[ErrorIdentifier => 15; Description => "Process power fail"; ErrorLevel => Process_Level; ErrorCode => Power_Fail;],
+		[ErrorIdentifier => 16; Description => "Process memory violation"; ErrorLevel => Process_Level; ErrorCode => Memory_Violation;],
+		[ErrorIdentifier => 17; Description => "Process stack overflow"; ErrorLevel => Process_Level; ErrorCode => Stack_Overflow;]		
+	);
+	ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 1; Description => "Reset module"; Action => "Reset";],
+    	[ErrorIdentifier => 2; Description => "Reset module"; Action => "Reset";],
+    	[ErrorIdentifier => 3; Description => "Reset module"; Action => "Reset";]
+      );
 end ppc.impl;
 
 process myprocess
@@ -76,9 +104,23 @@ subcomponents
    thr2 : thread mythread.impl2;
 end myprocess.impl2;
 
-thread mythread
+thread threads_hm_definition
 properties
-   Source_Stack_Size => 30 Kbyte;
+   ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 11; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 12; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 13; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 14; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 15; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 16; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 4; Description => "Ignore"; Action => "Ignore";],
+    	[ErrorIdentifier => 18; Description => "Ignore"; Action => "Ignore";]
+      );
+end threads_hm_definition;
+
+thread mythread extends threads_hm_definition
+properties
+   Stack_Size => 30 Kbyte;
 end mythread;
 
 thread implementation mythread.impl1
@@ -91,11 +133,9 @@ properties
    period            => 1000ms;
    deadline          => 500ms;
    compute_execution_time => 0ms .. 1ms;
-   Source_Code_Size  => 4 Kbyte;
-   Source_Stack_Size => 4 Kbyte;
-   Source_Data_Size  => 4 Kbyte;
-   ARINC653::HM_Errors => (Deadline_Miss,Application_Error,Numeric_Error,Illegal_Request,Stack_Overflow,Memory_Violation,Hardware_Fault,Power_Fail);
-   ARINC653::HM_Process_Recovery_Actions => (Ignore, Ignore, Ignore, Ignore, Ignore, Ignore, Ignore, Ignore);
+   Code_Size  => 4 Kbyte;
+   Stack_Size => 4 Kbyte;
+   Data_Size  => 4 Kbyte;
 end mythread.impl1;
 
 thread implementation mythread.impl2
@@ -107,46 +147,42 @@ properties
    dispatch_Protocol => periodic;
    period            => 1000ms;
    deadline          => 600ms;
-   Source_Code_Size  => 4 Kbyte;
-   Source_Stack_Size => 4 Kbyte;
-   Source_Data_Size  => 4 Kbyte;
-   ARINC653::HM_Errors => (Deadline_Miss,Application_Error,Numeric_Error,Illegal_Request,Stack_Overflow,Memory_Violation,Hardware_Fault,Power_Fail);
-   ARINC653::HM_Process_Recovery_Actions => (Ignore, Ignore, Ignore, Ignore, Ignore, Ignore, Ignore, Ignore);
+   Code_Size  => 4 Kbyte;
+   Stack_Size => 4 Kbyte;
+   Data_Size  => 4 Kbyte;
 end mythread.impl2;
 
 subprogram thread_starting
 properties
    source_name => "user_thread_starting";
-   source_language => C;
-   Source_Text => ("../../../threadstart.o");
-   Source_Code_Size  => 2 Kbyte;
-   Source_Data_Size  => 2 Kbyte;
+   source_language => (C);
+   Source_Text => ("threadstart.c",  "threadstart.h");
+   Code_Size  => 2 Kbyte;
+   Data_Size  => 2 Kbyte;
 end thread_starting;
 
 subprogram hello_part1
 properties
    source_name => "user_hello_part1";
-   source_language => C;
-   Source_Text => ("../../../hello1.o");
-   Source_Code_Size  => 2 Kbyte;
-   Source_Data_Size  => 2 Kbyte;
+   source_language => (C);
+   Source_Text => ("hello1.c");
+   Code_Size  => 2 Kbyte;
+   Data_Size  => 2 Kbyte;
 end hello_part1;
 
 subprogram hello_part2
 properties
-   Source_Text => ("../../../hello2.o");
-   source_language => C;
+   Source_Text => ("hello2.c");
+   source_language => (C);
    source_name => "user_hello_part2";
-   Source_Code_Size  => 2 Kbyte;
-   Source_Data_Size  => 2 Kbyte;
+   Code_Size  => 2 Kbyte;
+   Data_Size  => 2 Kbyte;
 end hello_part2;
 
 
 memory partitionmemory
 properties
-   Byte_Count => 80000;
-   ARINC653::Memory_Type => (code_memory);
-   ARINC653::Access_Type => read;
+   Memory_Size => 800000 Bytes;
 end partitionmemory;
 
 memory mainmemory
@@ -154,12 +190,8 @@ end mainmemory;
 
 memory implementation mainmemory.impl
 subcomponents
-   part1: memory partitionmemory 
-               {ARINC653::Memory_Type => (code_memory);
-                ARINC653::Access_Type => read;};
-   part2: memory partitionmemory
-               {ARINC653::Memory_Type => (data_memory);
-               ARINC653::Access_Type => write;};
+   part1: memory partitionmemory ;
+   part2: memory partitionmemory ;
 end mainmemory.impl;
 
 

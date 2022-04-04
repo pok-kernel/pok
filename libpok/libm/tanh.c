@@ -9,7 +9,7 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2021 POK team
+ *                                      Copyright (c) 2007-2022 POK team
  */
 
 /* @(#)s_tanh.c 5.1 93/09/24 */

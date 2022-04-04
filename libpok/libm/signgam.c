@@ -9,7 +9,7 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2021 POK team
+ *                                      Copyright (c) 2007-2022 POK team
  */
 
 /*	$NetBSD: s_signgam.c,v 1.4 1998/01/09 03:15:46 perry Exp $	*/

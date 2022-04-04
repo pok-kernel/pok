@@ -312,7 +312,6 @@ void rtl8029_write(pok_port_id_t port_id, const void *data, uint32_t len) {
   pok_packet_t packet;
   const char *d;
   size_t cpylen = 0;
-  size_t sndlen = 0;
   unsigned char state; // ISR state
 
   ret = pok_port_virtual_nb_destinations(port_id, &nbdest);

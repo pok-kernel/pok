@@ -9,7 +9,7 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2021 POK team
+ *                                      Copyright (c) 2007-2022 POK team
  */
 
 /* e_j0f.c -- float version of e_j0.c.

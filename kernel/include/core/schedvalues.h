@@ -22,7 +22,11 @@ typedef enum {
   POK_SCHED_RMS = 3,
   POK_SCHED_EDF = 4,
   POK_SCHED_LLF = 5,
-  POK_SCHED_STATIC = 6
+  POK_SCHED_STATIC = 6,
+  POK_MY_SCHED_PRIO = 7,
+  POK_MY_SCHED_EDF = 8,
+  POK_MY_SCHED_RR = 9,
+  POK_MY_SCHED_WRR = 10
 } pok_sched_t;
 
 #endif

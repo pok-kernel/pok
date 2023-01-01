@@ -26,6 +26,10 @@ extern uint8_t pok_current_partition;
 extern uint32_t current_threads[POK_CONFIG_NB_PROCESSORS];
 #define POK_SCHED_CURRENT_THREAD current_threads[pok_get_proc_id()]
 
+#ifndef POK_LAB_SCHED_ROUND
+#define POK_LAB_SCHED_ROUND 3
+#endif /* POK_LAB_SCHED_ROUND */
+
 typedef enum {
   POK_STATE_STOPPED = 0,
   POK_STATE_RUNNABLE = 1,
@@ -60,16 +64,16 @@ uint32_t pok_sched_part_rms(const uint32_t, const uint32_t,
 uint32_t pok_sched_part_static(const uint32_t, const uint32_t,
                                const uint32_t prev_thread,
                                const uint32_t current_thread);
-uint32_t pok_my_sched_prio(const uint32_t, const uint32_t,
+uint32_t pok_my_sched_part_prio(const uint32_t, const uint32_t,
                                const uint32_t prev_thread,
                                const uint32_t current_thread);
-uint32_t pok_my_sched_edf(const uint32_t, const uint32_t,
+uint32_t pok_my_sched_part_edf(const uint32_t, const uint32_t,
                                const uint32_t prev_thread,
                                const uint32_t current_thread);
-uint32_t pok_my_sched_rr(const uint32_t, const uint32_t,
+uint32_t pok_my_sched_part_rr(const uint32_t, const uint32_t,
                                const uint32_t prev_thread,
                                const uint32_t current_thread);
-uint32_t pok_my_sched_wrr(const uint32_t, const uint32_t,
+uint32_t pok_my_sched_part_wrr(const uint32_t, const uint32_t,
                                const uint32_t prev_thread,
                                const uint32_t current_thread);
 /* Context switch functions */

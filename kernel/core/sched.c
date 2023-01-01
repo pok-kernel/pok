@@ -672,7 +672,7 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
   return elected;
 }
 
-uint32_t pok_my_sched_prio(const uint32_t index_low, const uint32_t index_high,
+uint32_t pok_my_sched_part_prio(const uint32_t index_low, const uint32_t index_high,
                            const uint32_t prev_thread,
                            const uint32_t current_thread) {
   uint32_t elected;
@@ -707,7 +707,7 @@ uint32_t pok_my_sched_prio(const uint32_t index_low, const uint32_t index_high,
   return max_prio;
 }
 
-uint32_t pok_my_sched_edf(const uint32_t index_low, const uint32_t index_high,
+uint32_t pok_my_sched_part_edf(const uint32_t index_low, const uint32_t index_high,
                            const uint32_t prev_thread,
                            const uint32_t current_thread) {
   uint32_t elected;
@@ -742,9 +742,11 @@ uint32_t pok_my_sched_edf(const uint32_t index_low, const uint32_t index_high,
   return edf;
 }
 
-uint32_t pok_my_sched_wrr(const uint32_t index_low, const uint32_t index_high,
+uint32_t my_rr(const uint32_t index_low, const uint32_t index_high,
                            const uint32_t prev_thread,
-                           const uint32_t current_thread) {
+                           const uint32_t current_thread, const bool_t is_wrr) {
+  
+  
   uint32_t elected;
   uint32_t from;
   uint8_t current_proc = pok_get_proc_id();
@@ -755,15 +757,15 @@ uint32_t pok_my_sched_wrr(const uint32_t index_low, const uint32_t index_high,
     elected = current_thread;
   }
 
-  from = elected;
-
-  if ((pok_threads[current_thread].remaining_time_capacity > 0 ||
-       pok_threads[current_thread].time_capacity == INFINITE_TIME_VALUE) &&
+  if (pok_threads[current_thread].remaining_time_capacity > 0 &&
       (pok_threads[current_thread].state == POK_STATE_RUNNABLE) &&
-      (pok_threads[current_thread].processor_affinity == current_proc) &&
+      (pok_threads[current_thread].remaining_round > 0) &&
       current_thread != IDLE_THREAD) {
+    pok_threads[current_thread].remaining_round -- ;    
     return current_thread;
   }
+
+  from = elected;
 
   do {
     elected++;
@@ -779,58 +781,27 @@ uint32_t pok_my_sched_wrr(const uint32_t index_low, const uint32_t index_high,
        (pok_threads[elected].processor_affinity != current_proc))) {
     elected = IDLE_THREAD;
   }
-
-#ifdef POK_NEEDS_DEBUG
-  if (elected != current_thread &&
-      (elected != IDLE_THREAD || current_thread != IDLE_THREAD)) {
-    printf("--- scheduling partition: %d, low:%d, high:%d\n",
-           pok_current_partition, index_low, index_high);
-    uint32_t non_ready = 0;
-    if (elected == IDLE_THREAD) {
-      printf("--- Scheduling processor: %hhd\n    scheduling idle thread\n",
-             current_proc);
-      non_ready = index_high - index_low;
-    } else {
-      uint32_t first = 1;
-      printf("--- Scheduling processor: %hhd\n    scheduling thread %d "
-             "(priority "
-             "%d)\n",
-             current_proc, elected, pok_threads[elected].priority);
-      for (uint32_t i = index_low; i < index_high; i++) {
-        if (pok_threads[i].state == POK_STATE_RUNNABLE &&
-            pok_threads[i].processor_affinity == current_proc) {
-          if (i != elected) {
-            printf("%s %d (%d)", first ? "    other ready: " : ",", i,
-                   pok_threads[i].priority);
-            first = 0;
-          } else
-            printf("elected %d !!! \n", elected);
-        } else {
-          non_ready++;
-        }
-      }
-      if (!first) {
-        printf("\n");
-      }
+  if (elected != IDLE_THREAD){
+    if(is_wrr == 1){
+      pok_threads[current_thread].remaining_round = POK_LAB_SCHED_ROUND*pok_threads[current_thread].weight;
     }
-    if (non_ready) {
-      printf("    non-ready:");
-      uint32_t first = 1;
-      for (uint32_t i = index_low; i < index_high; i++) {
-        if (pok_threads[i].state != POK_STATE_RUNNABLE &&
-            pok_threads[i].processor_affinity == current_proc) {
-          printf("%s %d (%d/%s)", first ? "" : ",", i, pok_threads[i].priority,
-                 state_names[pok_threads[i].state]);
-          first = 0;
-        }
-      }
-      printf("\n");
+    else{
+      pok_threads[current_thread].remaining_round = POK_LAB_SCHED_ROUND;
     }
   }
-#endif
   return elected;
 }
 
+uint32_t pok_my_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
+                           const uint32_t prev_thread,
+                           const uint32_t current_thread) {
+  return my_rr(index_low,index_high,prev_thread,current_thread,0);
+                           }
+uint32_t pok_my_sched_part_wrr(const uint32_t index_low, const uint32_t index_high,
+                           const uint32_t prev_thread,
+                           const uint32_t current_thread) {
+  return my_rr(index_low,index_high,prev_thread,current_thread,1); 
+                           }
 #if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_PORTS_QUEUEING) ||     \
     defined(POK_NEEDS_PORTS_SAMPLING)
 void pok_sched_unlock_thread(const uint32_t thread_id) {

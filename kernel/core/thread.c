@@ -116,6 +116,8 @@ void pok_thread_init(void) {
     pok_threads[i].wakeup_time = 0;
     pok_threads[i].state = POK_STATE_STOPPED;
     pok_threads[i].processor_affinity = 0;
+    pok_threads[i].weight = 0;
+    pok_threads[i].remaining_round = 0;
   }
   pok_idle_thread_init();
 }
@@ -162,6 +164,10 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   if (attr->period > 0) {
     pok_threads[id].period = attr->period;
     pok_threads[id].next_activation = attr->period;
+  }
+
+  if (attr->weight > 0){
+    pok_threads[id].weight = attr->weight;
   }
 
   if (attr->deadline > 0) {

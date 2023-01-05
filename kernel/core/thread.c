@@ -71,9 +71,10 @@ void pok_idle_thread_init() {
 
     pok_threads[IDLE_THREAD - i].period = INFINITE_TIME_VALUE;
     pok_threads[IDLE_THREAD - i].deadline = 0;
+    pok_threads[IDLE_THREAD - i].ab_deadline = 0;
     pok_threads[IDLE_THREAD - i].time_capacity = INFINITE_TIME_VALUE;
     pok_threads[IDLE_THREAD - i].next_activation = 0;
-    pok_threads[IDLE_THREAD - i].remaining_time_capacity = INFINITE_TIME_VALUE;
+    pok_threads[IDLE_THREAD - i].remaining_time_capacity = 100000;
     pok_threads[IDLE_THREAD - i].wakeup_time = 0;
     pok_threads[IDLE_THREAD - i].entry = pok_arch_idle;
     pok_threads[IDLE_THREAD - i].processor_affinity = i;
@@ -110,8 +111,9 @@ void pok_thread_init(void) {
   for (i = 0; i < POK_CONFIG_NB_THREADS; ++i) {
     pok_threads[i].period = INFINITE_TIME_VALUE;
     pok_threads[i].deadline = 0;
+    pok_threads[i].ab_deadline = 0;
     pok_threads[i].time_capacity = INFINITE_TIME_VALUE;
-    pok_threads[i].remaining_time_capacity = INFINITE_TIME_VALUE;
+    pok_threads[i].remaining_time_capacity = -1;
     pok_threads[i].next_activation = 0;
     pok_threads[i].wakeup_time = 0;
     pok_threads[i].state = POK_STATE_STOPPED;
@@ -171,6 +173,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   }
 
   if (attr->deadline > 0) {
+    pok_threads[id].current_deadline = attr->deadline;
     pok_threads[id].deadline = attr->deadline;
   }
 
@@ -201,6 +204,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
 
   pok_threads[id].state = POK_STATE_RUNNABLE;
   pok_threads[id].wakeup_time = 0;
+  pok_threads[id].ab_deadline = pok_threads[id].wakeup_time + pok_threads[id].deadline;
   pok_threads[id].sp = pok_space_context_create(
       partition_id, (uint32_t)attr->entry, pok_threads[id].processor_affinity,
       stack_vaddr, 0xdead, 0xbeaf);

@@ -33,24 +33,34 @@
 // maccro in order to avoid recomputing their values in interrupt
 // handler.
 static uint32_t OSCILLATOR_DIVISOR;
-static uint32_t NS_INCREMENT;
-static uint32_t NS_QUANTUM;
+// static uint32_t NS_INCREMENT;
+// static uint32_t NS_QUANTUM;
 
 #define PIT_BASE 0x40
 #define PIT_IRQ 0
 
+static uint64_t pok_prev_tick_value;
+
 INTERRUPT_HANDLER(pit_interrupt) {
 
-  static uint32_t quantum_counter;
-  (void)frame;
-  pok_pic_eoi(PIT_IRQ);
+  // static uint32_t quantum_counter;
+  // (void)frame;
+  // pok_pic_eoi(PIT_IRQ);
 
-  pok_tick_counter += NS_INCREMENT;
-  quantum_counter += NS_INCREMENT;
-  if (quantum_counter >= NS_QUANTUM) {
-    quantum_counter -= NS_QUANTUM;
-    pok_global_sched();
-  }
+  // pok_tick_counter += NS_INCREMENT;
+  // quantum_counter += NS_INCREMENT;
+  // if (quantum_counter >= NS_QUANTUM) {
+  //   quantum_counter -= NS_QUANTUM;
+  //   pok_global_sched();
+  // }
+      (void)frame;
+    pok_pic_eoi(PIT_IRQ);
+
+    pok_tick_counter += 1;
+    if (pok_tick_counter - pok_prev_tick_value >= 20) {
+        pok_prev_tick_value = pok_tick_counter;
+        pok_global_sched();
+    }
 }
 
 pok_ret_t pok_x86_qemu_timer_init() {
@@ -58,13 +68,13 @@ pok_ret_t pok_x86_qemu_timer_init() {
   // but for reasons of compatibility with legacy gcc version, we do
   // the initialization here with static global variables that are not
   // const.
-  OSCILLATOR_DIVISOR = OSCILLATOR_RATE / POK_TIMER_FREQUENCY;
-  NS_INCREMENT = OSCILLATOR_DIVISOR * NS_ONE_SECOND / OSCILLATOR_RATE;
-  NS_QUANTUM = NS_ONE_SECOND / POK_TIMER_QUANTUM;
+  // OSCILLATOR_DIVISOR = OSCILLATOR_RATE / POK_TIMER_FREQUENCY;
+  // NS_INCREMENT = OSCILLATOR_DIVISOR * NS_ONE_SECOND / OSCILLATOR_RATE;
+  // NS_QUANTUM = NS_ONE_SECOND / POK_TIMER_QUANTUM;
 
-  // Sanity checks
-  assert(OSCILLATOR_DIVISOR <= 65536);
-  assert(NS_QUANTUM >= NS_INCREMENT);
+  // // Sanity checks
+  // assert(OSCILLATOR_DIVISOR <= 65536);
+  // assert(NS_QUANTUM >= NS_INCREMENT);
 
   outb(PIT_BASE + 3, 0x34); /* Channel0, rate generator, Set LSB then MSB */
   outb(PIT_BASE, OSCILLATOR_DIVISOR & 0xff);

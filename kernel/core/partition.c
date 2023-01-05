@@ -77,9 +77,9 @@ void pok_partition_setup_scheduler(const uint8_t pid) {
     break;
   case POK_MY_SCHED_RR:
     pok_partitions[pid].sched_func = &pok_my_sched_part_rr;
+    break;
   default:
     pok_partitions[pid].sched_func = &pok_sched_part_rr;
-    break;
   }
 #else
   pok_partitions[pid].sched_func = &pok_sched_part_rr;

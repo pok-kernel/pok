@@ -26,29 +26,41 @@ uint32_t pok_my_sched_part_prio(const uint32_t index_low, const uint32_t index_h
         }
     } while (elected != from);
   #ifdef POK_NEEDS_DEBUG
+    // printf("--- Processor %hhd, Time: %u \n",current_proc,(unsigned)(POK_GETTICK()));
     if(res == IDLE_THREAD){
-      printf("P%hhd: It's idle now.\n",current_proc);
+      printf("Idle at %u.\n",(unsigned)(POK_GETTICK()));
     }
     else if(pok_threads[res].remaining_time_capacity == pok_threads[res].time_capacity){
-      // printf("Time %u: Start scheduling thread %d\n",
-      // (unsigned)POK_GETTICK(),
-      // res);
-      printf("P%hhdT%d: Start scheduling\n",
-      current_proc,
-      res);
-    }
-    else{
-      // printf("Time %u: Scheduling thread %d,remaining time:%u(processor:%hhd)\n",
-      // (unsigned)POK_GETTICK(),
-      // res,
-      // (unsigned)(pok_threads[res].remaining_time_capacity),
-      // current_proc);
-      printf("P%hhdT%d: Remaining time:%u\n",
+      printf("P%hhdT%d: Start scheduling (priority: %d) at %u\n",
       current_proc,
       res,
-      (unsigned)(pok_threads[res].remaining_time_capacity));
+      pok_threads[res].priority,
+      (unsigned)(POK_GETTICK()));
     }
-
+    else{
+      printf("P%hhdT%d: Remaining time:%u (priority: %d) at %u\n",
+      current_proc,
+      res,
+      (unsigned)(pok_threads[res].remaining_time_capacity),
+      pok_threads[res].priority,
+      (unsigned)(POK_GETTICK()));
+    }
+    // if(res != IDLE_THREAD){
+    //   uint32_t first =1;
+    //   for (uint32_t i = index_low + 1; i < index_high; i++) {
+    //     if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+    //         pok_threads[i].processor_affinity == current_proc) {
+    //       if (i != elected) {
+    //         printf("%s %d (%d)", first ? "    --- other ready: " : ",", i,
+    //                pok_threads[i].priority);
+    //         first = 0;
+    //       }
+    //     }
+    //   }
+    //   if (!first) {
+    //     printf("\n");
+    //   }
+    // }
   #endif
   return res;
 }
@@ -71,39 +83,42 @@ uint32_t pok_my_sched_part_edf(const uint32_t index_low, const uint32_t index_hi
           elected = index_low;
         }
     } while (elected != from);
-  #ifdef POK_NEEDS_DEBUG
+    #ifdef POK_NEEDS_DEBUG
+    // printf("--- Processor %hhd, Time: %u \n",current_proc,(unsigned)(POK_GETTICK()));
     if(res == IDLE_THREAD){
-      printf("P%hhd: It's idle now.\n",current_proc);
+      printf("Idle at %u.\n",(unsigned)(POK_GETTICK()));
     }
     else if(pok_threads[res].remaining_time_capacity == pok_threads[res].time_capacity){
-      // printf("Time %u: Start scheduling thread %d\n",
-      // (unsigned)POK_GETTICK(),
-      // res);
-      printf("P%hhdT%d: Start scheduling at %u, ddl: %u\n",
+      printf("P%hhdT%d: Start scheduling (deadline: %u) at %u\n",
       current_proc,
       res,
-      (unsigned)(POK_GETTICK()),
-      (unsigned)(pok_threads[res].ab_deadline));
-    }
-    else if(pok_threads[res].remaining_time_capacity == 0){
-      printf("P%hhdT%d: Finish at %u, ddl: %u\n",
-      current_proc,
-      res,
-      (unsigned)(POK_GETTICK()),
-      (unsigned)(pok_threads[res].ab_deadline));
+      (unsigned)(pok_threads[res].ab_deadline),
+      (unsigned)(POK_GETTICK()));
     }
     else{
-      // printf("Time %u: Scheduling thread %d,remaining time:%u(processor:%hhd)\n",
-      // (unsigned)POK_GETTICK(),
-      // res,
-      // (unsigned)(pok_threads[res].remaining_time_capacity),
-      // current_proc);
-      printf("P%hhdT%d: Remaining time:%u\n",
+      printf("P%hhdT%d: Remaining time:%u (deadline: %u) at %u\n",
       current_proc,
       res,
-      (unsigned)(pok_threads[res].remaining_time_capacity));
+      (unsigned)(pok_threads[res].remaining_time_capacity),
+      (unsigned)(pok_threads[res].ab_deadline),
+      (unsigned)(POK_GETTICK()));
     }
-
+    // if(res != IDLE_THREAD){
+    //   uint32_t first =1;
+    //   for (uint32_t i = index_low + 1; i < index_high; i++) {
+    //     if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+    //         pok_threads[i].processor_affinity == current_proc) {
+    //       if (i != elected) {
+    //         printf("%s %d (%u)", first ? "    --- other ready: " : ",", i,
+    //                (unsigned)(pok_threads[i].ab_deadline));
+    //         first = 0;
+    //       }
+    //     }
+    //   }
+    //   if (!first) {
+    //     printf("\n");
+    //   }
+    // }
   #endif
   return res;
 }
@@ -146,29 +161,42 @@ uint32_t my_rr(const uint32_t index_low, const uint32_t index_high,
       pok_threads[res].remaining_round --;
     }
   }
-  #ifdef POK_NEEDS_DEBUG
+    #ifdef POK_NEEDS_DEBUG
+    // printf("--- Processor %hhd, Time: %u \n",current_proc,(unsigned)(POK_GETTICK()));
     if(res == IDLE_THREAD){
-      printf("P%hhd: It's idle now.\n",current_proc);
+      printf("Idle at %u.\n",(unsigned)(POK_GETTICK()));
     }
     else if(pok_threads[res].remaining_time_capacity == pok_threads[res].time_capacity){
       // printf("Time %u: Start scheduling thread %d\n",
       // (unsigned)POK_GETTICK(),
       // res);
-      printf("P%hhdT%d: Start scheduling.\n",
-      current_proc,
-      res);
-    }
-    else{
-      // printf("Time %u: Scheduling thread %d,remaining time:%u(processor:%hhd)\n",
-      // (unsigned)POK_GETTICK(),
-      // res,
-      // (unsigned)(pok_threads[res].remaining_time_capacity),
-      // current_proc);
-      printf("P%hhdT%d: Remaining time:%u\n",
+      printf("P%hhdT%d: Start scheduling at %u\n",
       current_proc,
       res,
-      (unsigned)(pok_threads[res].remaining_time_capacity));
+      (unsigned)(POK_GETTICK()));
     }
+    else{
+      printf("P%hhdT%d: Remaining time:%u at %u\n",
+      current_proc,
+      res,
+      (unsigned)(pok_threads[res].remaining_time_capacity),
+      (unsigned)(POK_GETTICK()));
+    }
+    // if(res != IDLE_THREAD){
+    //   uint32_t first =1;
+    //   for (uint32_t i = index_low + 1; i < index_high; i++) {
+    //     if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+    //         pok_threads[i].processor_affinity == current_proc) {
+    //       if (i != elected) {
+    //         printf("%s %d", first ? "    --- other ready: " : ",", i);
+    //         first = 0;
+    //       }
+    //     }
+    //   }
+    //   if (!first) {
+    //     printf("\n");
+    //   }
+    // }
   #endif
   return res;
 }

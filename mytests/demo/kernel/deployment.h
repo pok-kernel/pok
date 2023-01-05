@@ -15,7 +15,7 @@
 #define POK_CONFIG_PARTITIONS_NTHREADS                                         \
   { 4 }
 #define POK_CONFIG_PARTITIONS_SCHEDULER                                        \
-  { POK_MY_SCHED_WRR}
+  { POK_SCHED_STATIC}
 #define POK_CONFIG_PARTITIONS_SIZE                                             \
   { 133120 }
 #define POK_CONFIG_PROCESSOR_AFFINITY                                          \
@@ -36,7 +36,6 @@
 #define POK_NEEDS_THREAD_SLEEP 1
 #define POK_NEEDS_THREAD_SUSPEND 1
 #define POK_NEEDS_TIME 1
-#define POK_LAB_SCHED_ROUND 2
 
 typedef enum {
   pok_part_identifier_pr1 = 0

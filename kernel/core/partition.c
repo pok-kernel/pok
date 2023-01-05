@@ -27,6 +27,7 @@
 #include <core/multiprocessing.h>
 #include <core/partition.h>
 #include <core/sched.h>
+#include <core/my_sched.h>
 #include <core/thread.h>
 #include <core/time.h>
 #include <dependencies.h>

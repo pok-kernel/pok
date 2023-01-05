@@ -70,8 +70,8 @@ void pok_idle_thread_init() {
   for (int i = 0; i < POK_CONFIG_NB_PROCESSORS; i++) {
 
     pok_threads[IDLE_THREAD - i].period = INFINITE_TIME_VALUE;
-    pok_threads[IDLE_THREAD - i].deadline = 0;
-    pok_threads[IDLE_THREAD - i].ab_deadline = 0;
+    pok_threads[IDLE_THREAD - i].deadline = 100000;
+    pok_threads[IDLE_THREAD - i].ab_deadline = 100000;
     pok_threads[IDLE_THREAD - i].time_capacity = INFINITE_TIME_VALUE;
     pok_threads[IDLE_THREAD - i].next_activation = 0;
     pok_threads[IDLE_THREAD - i].remaining_time_capacity = 100000;
@@ -118,8 +118,8 @@ void pok_thread_init(void) {
     pok_threads[i].wakeup_time = 0;
     pok_threads[i].state = POK_STATE_STOPPED;
     pok_threads[i].processor_affinity = 0;
-    pok_threads[i].weight = 0;
-    pok_threads[i].remaining_round = 0;
+    pok_threads[i].weight = 1;
+    pok_threads[i].remaining_round = POK_LAB_SCHED_ROUND;
   }
   pok_idle_thread_init();
 }
@@ -166,6 +166,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   if (attr->period > 0) {
     pok_threads[id].period = attr->period;
     pok_threads[id].next_activation = attr->period;
+    pok_threads[id].deadline = attr->period;
   }
 
   if (attr->weight > 0){
@@ -173,7 +174,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
   }
 
   if (attr->deadline > 0) {
-    pok_threads[id].current_deadline = attr->deadline;
+    pok_threads[id].ab_deadline = attr->deadline;
     pok_threads[id].deadline = attr->deadline;
   }
 
@@ -187,6 +188,8 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
 
   pok_threads[id].processor_affinity =
       get_proc_real_id(partition_id, attr->processor_affinity);
+
+  pok_threads[id].remaining_round =POK_LAB_SCHED_ROUND;
 
   assert(multiprocessing_system
              ? pok_threads[id].processor_affinity < multiprocessing_system

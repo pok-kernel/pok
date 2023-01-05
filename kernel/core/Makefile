@@ -12,6 +12,7 @@ LO_OBJS=	partition.o \
 			thread.o \
 			instrumentation.o \
 			sched.o \
+			my_sched.o\
 			time.o \
 			syscall.o \
 			error.o \

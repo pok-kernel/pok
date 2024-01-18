@@ -12,6 +12,7 @@
  *                                      Copyright (c) 2007-2024 POK team
  */
 
+#include <core/mutex.h>
 #include <core/thread.h>
 #include <libc/stdio.h>
 void *pinger_job() {

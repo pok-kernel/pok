@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get -y update
-      - run: sudo apt-get -y install clang-format git python
+      - run: sudo apt-get -y install clang-format git python3
       - run: misc/fix-style --check
       - run: misc/update-headers --check
 

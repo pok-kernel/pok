@@ -14,7 +14,7 @@
 
 #if (defined POK_NEEDS_DEBUG) || (defined POK_NEEDS_USER_DEBUG)
 
-//#ifdef POK_NEEDS_DEBUG
+// #ifdef POK_NEEDS_DEBUG
 
 #include "../event.h"
 #include <libc.h>

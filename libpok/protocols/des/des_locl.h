@@ -126,7 +126,7 @@
 #include <libc/stdlib.h>
 #include <libc/string.h>
 #endif
-//#include <libm.h>
+// #include <libm.h>
 #endif
 #endif
 #include "des.h"

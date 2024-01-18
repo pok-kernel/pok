@@ -75,7 +75,7 @@
 #ifndef HEADER_BLOWFISH_H
 #define HEADER_BLOWFISH_H
 
-//#include <openssl/e_os2.h>
+// #include <openssl/e_os2.h>
 #include <types.h>
 
 #define BF_ENCRYPT 1

@@ -1,4 +1,4 @@
-avocado-framework==82.0
+avocado-framework==103.0
 avocado-framework-plugin-loader-yaml==82.0
 avocado-framework-plugin-result-html==82.0
 avocado-framework-plugin-varianter-yaml-to-mux==82.0

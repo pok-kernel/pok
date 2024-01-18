@@ -9,7 +9,7 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2022 POK team
+ *                                      Copyright (c) 2007-2024 POK team
  */
 
 /*	$NetBSD: s_infinity.c,v 1.5 2003/07/26 19:25:05 salo Exp $	*/

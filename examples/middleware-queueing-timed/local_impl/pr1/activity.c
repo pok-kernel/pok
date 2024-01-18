@@ -22,7 +22,7 @@ void *pinger_job() {
   simple_type data_source_request_var;
 
   ret = pok_port_queueing_create("dataout", 8, POK_PORT_DIRECTION_OUT,
-                                 POK_PORT_QUEUEING_DISCIPLINE_FIFO,
+                                 POK_QUEUEING_DISCIPLINE_FIFO,
                                  &port_pinger_data_source_id);
   printf("P1T1: create queue, return=%d\n", ret);
 

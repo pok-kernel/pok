@@ -28,7 +28,7 @@ void *pingme_job() {
   toto = 0;
 
   ret = pok_port_queueing_create("datain", 8, POK_PORT_DIRECTION_IN,
-                                 POK_PORT_QUEUEING_DISCIPLINE_FIFO,
+                                 POK_QUEUEING_DISCIPLINE_FIFO,
                                  &port_pingme_data_sink);
   printf("Create port, return = %d\n", ret);
 

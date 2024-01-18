@@ -7,7 +7,7 @@ name: Execution checks
 jobs:
   test-utils:
     name: Test utility programs
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get -y update
@@ -17,7 +17,7 @@ jobs:
 
   unit-tests:
     name: Unit tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get -y update

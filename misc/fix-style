@@ -10,6 +10,7 @@ set -e
 
 if [ "x$1" = "x--check" ]; then
   check="-n -Werror"
+  echo "Using $(clang-format --version)"
 fi
 
 git ls-files | grep '\.[ch]$' | xargs -n 100 clang-format -i $check

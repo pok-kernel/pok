@@ -854,8 +854,7 @@ int PID_altitude(int PID_set_Point, int PID_current_Point) {
   /* Computes the error */
 
   altitude_I += (float)PID_error * dt;
-  altitude_I =
-      constrain(altitude_I, 20, -20); /* Limit the PID integrator...  */
+  altitude_I = constrain(altitude_I, 20, -20); /* Limit the PID integrator... */
   /* Integratior part */
 
   altitude_D =

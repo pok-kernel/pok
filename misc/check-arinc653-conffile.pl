@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #                               POK header
 #
 # The following file is a part of the POK project. Any modification should
@@ -10,8 +10,6 @@
 # Please follow the coding guidelines described in doc/CODING_GUIDELINES
 #
 #                                      Copyright (c) 2007-2024 POK team
-
-#!/usr/bin/perl
 
 use strict;
 

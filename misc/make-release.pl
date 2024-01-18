@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #                               POK header
 #
 # The following file is a part of the POK project. Any modification should
@@ -12,6 +12,7 @@
 #                                      Copyright (c) 2007-2024 POK team
 
 use strict;
+use warnings;
 use File::Temp qw/ tempfile tempdir /;
 use File::Copy;
 use File::Path;

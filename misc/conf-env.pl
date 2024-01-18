@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w
+#! /usr/bin/env perl
 #                               POK header
 #
 # The following file is a part of the POK project. Any modification should
@@ -12,6 +12,7 @@
 #                                      Copyright (c) 2007-2024 POK team
 
 use strict;
+use warnings;
 use Getopt::Long;
 
 my $OCARINA_VERSION = "2.0w";
@@ -346,7 +347,7 @@ my %colors =
 
 	sub check_libxml
 	{
-		my $ret = system ("/usr/bin/perl -e 'use XML::LibXML;' >/dev/null 2>&1");  
+		my $ret = system ("perl -e 'use XML::LibXML;' >/dev/null 2>&1");  
 		if ($ret != 0)
 		{
 			printf "XML::LibXML (Perl XML/LibXML library) not installed, please install it\n";

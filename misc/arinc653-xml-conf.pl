@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #                               POK header
 #
 # The following file is a part of the POK project. Any modification should
@@ -15,9 +15,8 @@
 # that describes the overall architecture of the system and generates
 # configuration files to deploy POK systems.
 
-#!/usr/bin/perl -w
-
 use strict;
+use warnings;
 use Data::Dumper;
 use XML::LibXML;
 use XML::LibXML::XPathContext;

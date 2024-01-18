@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #                               POK header
 #
 # The following file is a part of the POK project. Any modification should
@@ -11,9 +11,8 @@
 #
 #                                      Copyright (c) 2007-2024 POK team
 
-#!/usr/bin/perl -w
-
 use strict;
+use warnings;
 use XML::LibXML;
 
 ###################################

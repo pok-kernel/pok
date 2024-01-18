@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 #
 # Generate deployment.h and Makefile according to the given configuration file.
 # Run with --test to run unit tests.

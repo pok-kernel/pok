@@ -9,7 +9,7 @@ jobs:
     name: Check style and headers
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: sudo apt-get -y update
       - run: sudo apt-get -y install clang-format git python
       - run: misc/fix-style --check
@@ -19,7 +19,7 @@ jobs:
     name: Clean compilation
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: sudo apt-get -y update
       - run: sudo apt-get -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc
       - run: make configure

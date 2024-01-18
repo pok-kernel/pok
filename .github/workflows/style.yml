@@ -7,7 +7,7 @@ name: Non executable checks
 jobs:
   check-style:
     name: Check style and headers
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get -y update
@@ -17,7 +17,7 @@ jobs:
 
   clean-compilation:
     name: Clean compilation
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get -y update

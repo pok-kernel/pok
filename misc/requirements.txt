@@ -1,6 +1,6 @@
 avocado-framework==82.0
 avocado-framework-plugin-loader-yaml==82.0
-avocado-framework-plugin-result-html==82.0
+avocado-framework-plugin-result-html==103.0
 avocado-framework-plugin-varianter-yaml-to-mux==82.0
 Jinja2==2.11.3
 MarkupSafe==1.1.1

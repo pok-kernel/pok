@@ -2,7 +2,7 @@
     "extends": ["config:recommended", ":automergeMinor", ":automergePr"],
     "packageRules": [
       {
-        "matchPackagePrefixes": ["avocado-framework-"],
+        "matchPackagePrefixes": ["avocado-framework"],
         "groupName": "avocado"
       }
     ]

@@ -3,7 +3,7 @@
     "packageRules": [
       {
         "matchPackagePrefixes": ["avocado-framework-"],
-        "groupname": "avocado"
+        "groupName": "avocado"
       }
     ]
 }

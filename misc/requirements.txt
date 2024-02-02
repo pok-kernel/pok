@@ -2,5 +2,5 @@ avocado-framework==103.0
 avocado-framework-plugin-result-html==103.0
 avocado-framework-plugin-varianter-yaml-to-mux==103.0
 Jinja2==3.1.3
-MarkupSafe==2.1.3
+MarkupSafe==2.1.5
 PyYAML==6.0.1

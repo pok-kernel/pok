@@ -37,8 +37,7 @@
 /*  the kernel.It comprises the tasks for the partition and the main task of */
 /*  each partition that initialize all ressources.*/
 
-#define POK_CONFIG_PARTITIONS_NTHREADS                                         \
-  { 3, 3 }
+#define POK_CONFIG_PARTITIONS_NTHREADS {3, 3}
 
 /*  The maccro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of */
 /*  threads in each partition we also add an additional process that */
@@ -46,21 +45,17 @@
 
 #define POK_NEEDS_SCHED_RR 1
 
-#define POK_CONFIG_PARTITIONS_SIZE                                             \
-  { 80000, 80000 }
+#define POK_CONFIG_PARTITIONS_SIZE {80000, 80000}
 
-#define POK_CONFIG_PARTITIONS_SCHEDULER                                        \
-  { POK_SCHED_RR, POK_SCHED_RR }
+#define POK_CONFIG_PARTITIONS_SCHEDULER {POK_SCHED_RR, POK_SCHED_RR}
 
 /*  The maccro POK_CONFIG_PARTTITIONS_SIZE indicates the required amount of */
 /*  memory for each partition.This value was deduced from the property */
 /*  POK::Needed_Memory_Size of each process*/
 
-#define POK_CONFIG_SCHEDULING_SLOTS                                            \
-  { 500000000, 500000000 }
+#define POK_CONFIG_SCHEDULING_SLOTS {500000000, 500000000}
 
-#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION                                 \
-  { 0, 1 }
+#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0, 1}
 
 #define POK_CONFIG_SCHEDULING_NBSLOTS 2
 

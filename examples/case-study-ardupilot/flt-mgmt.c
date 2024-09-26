@@ -43,7 +43,7 @@
 #define LAUNCH_ALTITUDE 0 /* Set to 0 by default */
 
 #define RAD_TO_DEG 57.295779513082320876798154814105
-#define degrees(rad) ((rad)*RAD_TO_DEG)
+#define degrees(rad) ((rad) * RAD_TO_DEG)
 #define constrain(amt, low, high)                                              \
   ((amt) < (low) ? (low) : ((amt) > (high) ? (high) : (amt)))
 

@@ -57,7 +57,7 @@ pok_ret_t pok_idt_init() {
 
 void pok_idt_set_gate(uint16_t index, uint16_t segsel, uint32_t offset,
                       e_idte_type t, int dpl) {
-  pok_idt[index].offset_low = (offset)&0xFFFF;
+  pok_idt[index].offset_low = (offset) & 0xFFFF;
   pok_idt[index].offset_high = (offset >> 16) & 0xFFFF;
   pok_idt[index].segsel = segsel;
   pok_idt[index].dpl = dpl;

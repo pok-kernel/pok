@@ -220,7 +220,7 @@
   (LL ^= KEY[Pi], t = KEY[BF_ROUNDS + 2 + 0 + ((R >> 24) & 0xFF)],             \
    t += KEY[BF_ROUNDS + 2 + 256 + ((R >> 16) & 0xFF)],                         \
    t ^= KEY[BF_ROUNDS + 2 + 512 + ((R >> 8) & 0xFF)],                          \
-   t += KEY[BF_ROUNDS + 2 + 768 + ((R)&0xFF)], LL ^= t)
+   t += KEY[BF_ROUNDS + 2 + 768 + ((R) & 0xFF)], LL ^= t)
 
 #elif defined(BF_PTR)
 
@@ -263,7 +263,7 @@
    LL ^=                                                                       \
    (((S[((int)(R >> 24) & 0xff)] + S[0x0100 + ((int)(R >> 16) & 0xff)]) ^      \
      S[0x0200 + ((int)(R >> 8) & 0xff)]) +                                     \
-    S[0x0300 + ((int)(R)&0xff)]) &                                             \
+    S[0x0300 + ((int)(R) & 0xff)]) &                                           \
    0xffffffffL)
 #endif
 

@@ -21,11 +21,11 @@
 #ifndef __POK_SPARC_PSR_H__
 #define __POK_SPARC_PSR_H__
 
-#define PSR_ET 0x20                     /**< enable traps */
-#define PSR_PS 0x40                     /**< previous supervisor */
-#define PSR_S 0x80                      /**< supervisor */
-#define PSR_CWP_MASK 0x1F               /**< Current Window Pointer Mask */
-#define PSR_PIL(pil) (((pil)&0xF) << 8) /**< Proc Interrupt Level */
+#define PSR_ET 0x20                       /**< enable traps */
+#define PSR_PS 0x40                       /**< previous supervisor */
+#define PSR_S 0x80                        /**< supervisor */
+#define PSR_CWP_MASK 0x1F                 /**< Current Window Pointer Mask */
+#define PSR_PIL(pil) (((pil) & 0xF) << 8) /**< Proc Interrupt Level */
 
 static inline unsigned int psr_get(void) {
   unsigned int psr;

@@ -378,12 +378,12 @@ void DES_set_key_unchecked(const_DES_cblock *key, DES_key_schedule *schedule) {
     d &= 0x0fffffffL;
     /* could be a few less shifts but I am to lazy at this
      * point in time to investigate */
-    s = des_skb[0][(c)&0x3f] |
+    s = des_skb[0][(c) & 0x3f] |
         des_skb[1][((c >> 6L) & 0x03) | ((c >> 7L) & 0x3c)] |
         des_skb[2][((c >> 13L) & 0x0f) | ((c >> 14L) & 0x30)] |
         des_skb[3][((c >> 20L) & 0x01) | ((c >> 21L) & 0x06) |
                    ((c >> 22L) & 0x38)];
-    t = des_skb[4][(d)&0x3f] |
+    t = des_skb[4][(d) & 0x3f] |
         des_skb[5][((d >> 7L) & 0x03) | ((d >> 8L) & 0x3c)] |
         des_skb[6][(d >> 15L) & 0x3f] |
         des_skb[7][((d >> 21L) & 0x0f) | ((d >> 22L) & 0x30)];

@@ -367,7 +367,7 @@ void throttle_control(void) {
 
     // Now reading the yaw initial position
     while (digitalRead(2) == HIGH) {
-    }                              // Waits until the input pin goes low.
+    } // Waits until the input pin goes low.
     read_servo = pulseIn(2, HIGH); // Read the pulse length of the receiver
     middle_thr =
         ((read_servo - MIN16_THROTTLE) * 180L) /

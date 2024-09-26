@@ -353,11 +353,11 @@
   {                                                                            \
     LOAD_DATA_tmp(R, S, u, t, E0, E1);                                         \
     t = ROTATE(t, 4);                                                          \
-    LL ^= *(const DES_LONG *)(des_SP + ((u)&0xfc)) ^                           \
+    LL ^= *(const DES_LONG *)(des_SP + ((u) & 0xfc)) ^                         \
           *(const DES_LONG *)(des_SP + 0x200 + ((u >> 8L) & 0xfc)) ^           \
           *(const DES_LONG *)(des_SP + 0x400 + ((u >> 16L) & 0xfc)) ^          \
           *(const DES_LONG *)(des_SP + 0x600 + ((u >> 24L) & 0xfc)) ^          \
-          *(const DES_LONG *)(des_SP + 0x100 + ((t)&0xfc)) ^                   \
+          *(const DES_LONG *)(des_SP + 0x100 + ((t) & 0xfc)) ^                 \
           *(const DES_LONG *)(des_SP + 0x300 + ((t >> 8L) & 0xfc)) ^           \
           *(const DES_LONG *)(des_SP + 0x500 + ((t >> 16L) & 0xfc)) ^          \
           *(const DES_LONG *)(des_SP + 0x700 + ((t >> 24L) & 0xfc));           \

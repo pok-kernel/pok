@@ -68,8 +68,7 @@ void pok_error_declare(const uint8_t error) {
   }
 }
 
-void pok_error_ignore() { /* Do nothing at this time */
-}
+void pok_error_ignore() { /* Do nothing at this time */ }
 
 #ifndef POK_USE_GENERATED_KERNEL_ERROR_HANDLER
 void pok_kernel_error(uint32_t error) {

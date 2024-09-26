@@ -444,8 +444,8 @@ void pok_threads_schedule_every_proc() {
 #ifdef POK_NEEDS_SCHED_RMS
 uint32_t pok_sched_part_rms(const uint32_t index_low, const uint32_t index_high,
                             const uint32_t __attribute__((unused)) prev_thread,
-                            const uint32_t __attribute__((unused))
-                            current_thread) {
+                            const uint32_t
+                            __attribute__((unused)) current_thread) {
   uint32_t res;
   uint8_t current_proc = pok_get_proc_id();
 #ifdef POK_NEEDS_DEBUG

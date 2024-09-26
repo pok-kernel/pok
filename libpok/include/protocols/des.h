@@ -52,7 +52,8 @@ void pok_protocols_des_marshall(void *uncrypted_data, pok_size_t uncrypted_size,
  * defined by the macro POK_PROTOCOLS_DES_KEY
  */
 #ifndef POK_PROTOCOLS_DES_KEY
-#define POK_PROTOCOLS_DES_KEY {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}
+#define POK_PROTOCOLS_DES_KEY                                                  \
+  { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef }
 #endif
 
 /**
@@ -60,7 +61,8 @@ void pok_protocols_des_marshall(void *uncrypted_data, pok_size_t uncrypted_size,
  * defined by the macro POK_PROTOCOLS_DES_INIT
  */
 #ifndef POK_PROTOCOLS_DES_INIT
-#define POK_PROTOCOLS_DES_INIT {0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10}
+#define POK_PROTOCOLS_DES_INIT                                                 \
+  { 0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10 }
 #endif
 
 #endif

@@ -7,15 +7,22 @@
 #define POK_CONFIG_NB_PARTITIONS 1
 #define POK_CONFIG_NB_PROCESSORS 1
 #define POK_CONFIG_NB_THREADS 3
-#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS {0}
-#define POK_CONFIG_PARTITIONS_NTHREADS {1}
-#define POK_CONFIG_PARTITIONS_SIZE {122880}
-#define POK_CONFIG_PROCESSOR_AFFINITY {1}
-#define POK_CONFIG_PROGRAM_NAME {"pr1/pr1.elf"}
+#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS                                     \
+  { 0 }
+#define POK_CONFIG_PARTITIONS_NTHREADS                                         \
+  { 1 }
+#define POK_CONFIG_PARTITIONS_SIZE                                             \
+  { 122880 }
+#define POK_CONFIG_PROCESSOR_AFFINITY                                          \
+  { 1 }
+#define POK_CONFIG_PROGRAM_NAME                                                \
+  { "pr1/pr1.elf" }
 #define POK_CONFIG_SCHEDULING_MAJOR_FRAME 2000000000
 #define POK_CONFIG_SCHEDULING_NBSLOTS 1
-#define POK_CONFIG_SCHEDULING_SLOTS {2000000000}
-#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0}
+#define POK_CONFIG_SCHEDULING_SLOTS                                            \
+  { 2000000000 }
+#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION                                 \
+  { 0 }
 
 #define POK_NEEDS_ASSERT 1
 #define POK_NEEDS_CONSOLE 1

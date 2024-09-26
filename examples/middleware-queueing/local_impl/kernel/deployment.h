@@ -23,13 +23,18 @@
 #define POK_CONFIG_NB_THREADS 4
 #define POK_CONFIG_NB_PARTITIONS 2
 
-#define POK_CONFIG_PARTITIONS_SIZE {12 * 1024, 12 * 1024}
-#define POK_CONFIG_PARTITIONS_NTHREADS {2, 2}
-#define POK_CONFIG_PARTITIONS_TIMESLICE {2000000000, 2000000000}
+#define POK_CONFIG_PARTITIONS_SIZE                                             \
+  { 12 * 1024, 12 * 1024 }
+#define POK_CONFIG_PARTITIONS_NTHREADS                                         \
+  { 2, 2 }
+#define POK_CONFIG_PARTITIONS_TIMESLICE                                        \
+  { 2000000000, 2000000000 }
 
-#define POK_CONFIG_SCHEDULING_SLOTS {2000000000, 2000000000}
+#define POK_CONFIG_SCHEDULING_SLOTS                                            \
+  { 2000000000, 2000000000 }
 #define POK_CONFIG_SCHEDULING_MAJOR_FRAME 4000000000
-#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {0, 1}
+#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION                                 \
+  { 0, 1 }
 #define POK_CONFIG_SCHEDULING_NBSLOTS 2
 
 #define POK_CONFIG_NB_PORTS 2

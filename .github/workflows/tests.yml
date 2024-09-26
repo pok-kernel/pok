@@ -23,5 +23,6 @@ jobs:
       - run: sudo apt-get -y update
       - run: sudo apt -y install build-essential mtools perl libxml-libxml-perl libxml-simple-perl libfile-copy-recursive-perl bc python3 python3-venv qemu-system-x86 clang
       - run: make configure
-      - run: sudo pip install -r misc/requirements.txt
-      - run: make -C testsuite/unitary_tests check
+      - run: python -mvenv venv
+      - run: venv/bin/pip install -r misc/requirements.txt
+      - run: PATH=$PWD/venv/bin:$PATH make -C testsuite/unitary_tests check

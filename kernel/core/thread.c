@@ -233,9 +233,9 @@ void pok_thread_start(void (*entry)(), unsigned int id) {
 }
 
 #ifdef POK_NEEDS_THREAD_SLEEP
-pok_ret_t pok_thread_sleep(uint32_t us) {
+pok_ret_t pok_thread_sleep(uint32_t tick) {
   uint64_t mytime;
-  mytime = ((uint64_t)us) * 1000 + POK_GETTICK();
+  mytime = tick + POK_GETTICK();
   pok_sched_lock_current_thread_timed(mytime);
   pok_sched_thread(TRUE);
   return POK_ERRNO_OK;
@@ -243,8 +243,8 @@ pok_ret_t pok_thread_sleep(uint32_t us) {
 #endif
 
 #ifdef POK_NEEDS_THREAD_SLEEP_UNTIL
-pok_ret_t pok_thread_sleep_until(uint32_t us) {
-  pok_sched_lock_current_thread_timed(((uint64_t)us) * 1000);
+pok_ret_t pok_thread_sleep_until(uint32_t tick) {
+  pok_sched_lock_current_thread_timed(tick);
   pok_sched_thread(TRUE);
   return POK_ERRNO_OK;
 }

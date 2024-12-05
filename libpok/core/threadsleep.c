@@ -15,6 +15,6 @@
 #include <core/syscall.h>
 #include <types.h>
 
-pok_ret_t pok_thread_sleep(const pok_time_t us) {
-  return pok_syscall2(POK_SYSCALL_THREAD_SLEEP, (uint32_t)us, 0);
+pok_ret_t pok_thread_sleep(const pok_time_t tick) {
+  return pok_syscall2(POK_SYSCALL_THREAD_SLEEP, (uint32_t)tick, 0);
 }

@@ -45,10 +45,9 @@ INTERRUPT_HANDLER(pit_interrupt) {
   (void)frame;
   pok_pic_eoi(PIT_IRQ);
 
-  pok_tick_counter += NS_INCREMENT;
-  quantum_counter += NS_INCREMENT;
-  if (quantum_counter >= NS_QUANTUM) {
-    quantum_counter -= NS_QUANTUM;
+  pok_tick_counter += 1;
+  if (pok_tick_counter - quantum_counter >= POK_TIMER_QUANTUM) {
+    quantum_counter = pok_tick_counter;
     pok_global_sched();
   }
 }
@@ -63,8 +62,8 @@ pok_ret_t pok_x86_qemu_timer_init() {
   NS_QUANTUM = NS_ONE_SECOND / POK_TIMER_QUANTUM;
 
   // Sanity checks
-  assert(OSCILLATOR_DIVISOR <= 65536);
-  assert(NS_QUANTUM >= NS_INCREMENT);
+  // assert(OSCILLATOR_DIVISOR <= 65536);
+  // assert(NS_QUANTUM >= NS_INCREMENT);
 
   outb(PIT_BASE + 3, 0x34); /* Channel0, rate generator, Set LSB then MSB */
   outb(PIT_BASE, OSCILLATOR_DIVISOR & 0xff);

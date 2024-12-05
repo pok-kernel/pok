@@ -21,13 +21,13 @@
 /**
  * The rate of the clock change in POK in Hz.
  */
-#define POK_TIMER_FREQUENCY 100000
+#define POK_TIMER_FREQUENCY 1000
 
 /**
  * POK timer quantum in Hz. Delays and scheduling will be restricted to this
  * precision.
  */
-#define POK_TIMER_QUANTUM 1000
+#define POK_TIMER_QUANTUM 20
 
 extern volatile uint64_t pok_tick_counter;
 

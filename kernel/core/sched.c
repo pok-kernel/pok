@@ -341,14 +341,16 @@ void pok_global_sched_thread(bool_t is_source_processor) {
     CURRENT_THREAD(pok_partitions[POK_SCHED_CURRENT_PARTITION]) =
         elected_thread;
 #ifdef POK_NEEDS_SCHED_VERBOSE
-        if (elected_thread == IDLE_THREAD) {
-            printf("Idle at %u...\n", (unsigned)POK_GETTICK());
-        } else {
-            printf("Thread %u.%u, scheduled at %u\n",
-                   (unsigned)pok_current_partition + 1,
-                   (unsigned)(elected_thread - POK_CURRENT_PARTITION.thread_index_low),
-                   (unsigned)POK_GETTICK());
-        }
+    if(pok_partitions[POK_SCHED_CURRENT_PARTITION].mode == POK_PARTITION_MODE_NORMAL) {
+      if (elected_thread == IDLE_THREAD) {
+          printf("Idle at %u...\n", (unsigned)POK_GETTICK());
+      } else {
+          printf("Thread %u.%u, scheduled at %u\n",
+                  (unsigned)pok_current_partition + 1,
+                  (unsigned)(elected_thread - POK_CURRENT_PARTITION.thread_index_low),
+                  (unsigned)POK_GETTICK());
+      }
+    }
 #endif /* POK_NEEDS_SCHED_VERBOSE */
   }
   pok_global_sched_context_switch(elected_thread, is_source_processor);
@@ -733,8 +735,6 @@ static uint32_t select_thread_rr(rr_budget_getter_fn budget_getter, const uint32
     uint8_t current_proc = pok_get_proc_id();
     uint32_t from;
 
-    // printf("elected thread at %llu\n", POK_GETTICK());
-
     if (current_thread == IDLE_THREAD) {
         res = (prev_thread != IDLE_THREAD) ? prev_thread : index_low;
     } else {
@@ -744,7 +744,6 @@ static uint32_t select_thread_rr(rr_budget_getter_fn budget_getter, const uint32
         res = current_thread;
     }
 
-    // && pok_threads[current_thread].remaining_time_capacity > 0
     if (pok_threads[current_thread].state == POK_STATE_RUNNABLE && pok_threads[current_thread].processor_affinity == current_proc
          && pok_threads[current_thread].rr_budget > 0) {
         /* Still run current thread */
@@ -752,13 +751,11 @@ static uint32_t select_thread_rr(rr_budget_getter_fn budget_getter, const uint32
     }
 
     from = res;
-    // res = index_low;
     do {
         res++;
         if (res >= index_high) {
           res = index_low;
         }
-        // res = index_low + (res - index_low + 1) % (index_high - index_low);
     } while ((res != from) && ((pok_threads[res].state != POK_STATE_RUNNABLE) ||
                                (pok_threads[res].processor_affinity != current_proc)));
 

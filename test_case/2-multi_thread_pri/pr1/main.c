@@ -29,10 +29,21 @@ int main() {
   uint32_t tid;
   pok_thread_attr_t tattr;
 
-  tattr.priority = 42;
-  tattr.time_capacity = 200;
-  tattr.period = 500;
-  tattr.deadline = 500;
+  tattr.period = 1200;
+  tattr.time_capacity = 240;
+  tattr.priority = 50;
+  tattr.entry = task;
+  pok_thread_create(&tid, &tattr);
+  
+  tattr.period = 300;
+  tattr.time_capacity = 60;
+  tattr.priority = 30;
+  tattr.entry = task;
+  pok_thread_create(&tid, &tattr);
+  
+  tattr.period = 400;
+  tattr.time_capacity = 80;
+  tattr.priority = 20;
   tattr.entry = task;
   pok_thread_create(&tid, &tattr);
 

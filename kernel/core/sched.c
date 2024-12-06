@@ -260,7 +260,8 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
 #endif /* POK_NEEDS_SCHED_VERBOSE */
         POK_CURRENT_THREAD.remaining_time_capacity =
             POK_CURRENT_THREAD.remaining_time_capacity - POK_TIMER_QUANTUM;
-      } else if (POK_CURRENT_THREAD.time_capacity >
+      }
+      if (POK_CURRENT_THREAD.remaining_time_capacity <= 0 && POK_CURRENT_THREAD.time_capacity >
                   0) // Wait next activation only for thread
                      // with non-infinite capacity (could be
                      // infinite with value -1 <--> INFINITE_TIME_CAPACITY)
@@ -780,6 +781,17 @@ uint32_t pok_lab_sched_part_pri(const uint32_t index_low, const uint32_t index_h
   } while (i != from);  // 遍历: 有优先级更高的thread就调度, 否则调度IDLE_THREAD
 
   uint32_t elected = max_prio >= 0 ? max_thread : IDLE_THREAD;
+#ifdef POK_NEEDS_SCHED_VERBOSE
+  if (elected != current_thread &&
+      (elected != IDLE_THREAD || current_thread != IDLE_THREAD)) {
+    if (elected != IDLE_THREAD) {
+      printf("[LOG] Schedule partition %d thread %d at %lld\n",
+        pok_current_partition,
+        elected-index_low,
+        POK_GETTICK());
+    }
+  }
+#endif /* POK_NEEDS_SCHED_VERBOSE */
   return elected;
 }
 

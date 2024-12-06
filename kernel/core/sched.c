@@ -215,6 +215,7 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
         assert(thread->time_capacity);
         thread->state = POK_STATE_RUNNABLE;
         thread->remaining_time_capacity = thread->time_capacity;
+        thread->update_deadline = thread->next_activation + thread->deadline;
         thread->next_activation = thread->next_activation + thread->period;
       }
     }
@@ -798,16 +799,19 @@ uint32_t pok_lab_sched_part_pri(const uint32_t index_low, const uint32_t index_h
 uint32_t pok_lab_sched_part_edf(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread,
                                 const uint32_t current_thread) {
   uint32_t from = current_thread != IDLE_THREAD ? current_thread : prev_thread; // start of loop
-  uint32_t max_thread = from;
+  uint32_t max_thread = IDLE_THREAD;
   uint8_t current_proc = pok_get_proc_id();
 
   uint32_t i = from;
 
   do {
     if (pok_threads[i].state == POK_STATE_RUNNABLE &&
-        pok_threads[i].processor_affinity == current_proc &&
-        pok_threads[i].deadline < pok_threads[max_thread].deadline) {
-      max_thread = i;
+        pok_threads[i].processor_affinity == current_proc && 
+        pok_threads[i].deadline > 0) {
+      if (pok_threads[max_thread].deadline == 0 ||
+          (pok_threads[i].update_deadline < pok_threads[max_thread].update_deadline)) {
+        max_thread = i;
+      }
     }
     i++;
     if (i >= index_high) {
@@ -824,7 +828,7 @@ uint32_t pok_lab_sched_part_edf(const uint32_t index_low, const uint32_t index_h
         pok_current_partition,
         elected-index_low,
         POK_GETTICK(),
-        pok_threads[max_thread].deadline);
+        pok_threads[elected].update_deadline);
     }
   }
 #endif /* POK_NEEDS_SCHED_VERBOSE */

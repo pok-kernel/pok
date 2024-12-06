@@ -50,6 +50,7 @@ typedef struct {
   uint8_t weight;
   int64_t period;
   uint64_t deadline;
+  uint64_t update_deadline;
   int64_t time_capacity;
   int64_t remaining_time_capacity;
   uint64_t next_activation;

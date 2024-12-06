@@ -757,6 +757,58 @@ uint32_t pok_lab_sched_part_wrr(const uint32_t index_low, const uint32_t index_h
     return select_thread_rr(wrr_budget_getter, index_low, index_high, prev_thread, current_thread);
 }
 
+uint32_t pok_lab_sched_part_pri(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread,
+                                const uint32_t current_thread) {
+  uint32_t from = current_thread != IDLE_THREAD ? current_thread : prev_thread; // start of loop
+  int32_t max_prio = -1;
+  uint32_t max_thread = from;
+  uint8_t current_proc = pok_get_proc_id();
+
+  uint32_t i = from;
+
+  do {
+    if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+        pok_threads[i].processor_affinity == current_proc &&
+        pok_threads[i].priority > max_prio) {
+      max_prio = pok_threads[i].priority;
+      max_thread = i;
+    }
+    i++;
+    if (i >= index_high) {
+      i = index_low;
+    }
+  } while (i != from);  // 遍历: 有优先级更高的thread就调度, 否则调度IDLE_THREAD
+
+  uint32_t elected = max_prio >= 0 ? max_thread : IDLE_THREAD;
+  return elected;
+}
+
+uint32_t pok_lab_sched_part_edf(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread,
+                                const uint32_t current_thread) {
+  uint32_t from = current_thread != IDLE_THREAD ? current_thread : prev_thread; // start of loop
+  int32_t max_prio = -1;
+  uint32_t max_thread = from;
+  uint8_t current_proc = pok_get_proc_id();
+
+  uint32_t i = from;
+
+  do {
+    if (pok_threads[i].state == POK_STATE_RUNNABLE &&
+        pok_threads[i].processor_affinity == current_proc &&
+        pok_threads[i].priority > max_prio) {
+      max_prio = pok_threads[i].priority;
+      max_thread = i;
+    }
+    i++;
+    if (i >= index_high) {
+      i = index_low;
+    }
+  } while (i != from);  // 遍历: 有优先级更高的thread就调度, 否则调度IDLE_THREAD
+
+  uint32_t elected = max_prio >= 0 ? max_thread : IDLE_THREAD;
+  return elected;
+}
+
 #if defined(POK_NEEDS_LOCKOBJECTS) || defined(POK_NEEDS_PORTS_QUEUEING) ||     \
     defined(POK_NEEDS_PORTS_SAMPLING)
 void pok_sched_unlock_thread(const uint32_t thread_id) {

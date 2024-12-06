@@ -26,6 +26,8 @@ typedef enum {
 
   POK_LAB_SCHED_RR = 12,
   POK_LAB_SCHED_WRR = 13,
+  POK_LAB_SCHED_PRI = 14,
+  POK_LAB_SCHED_EDF = 15
 } pok_sched_t;
 
 #endif

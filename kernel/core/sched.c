@@ -253,8 +253,8 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
         (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_error)) {
       if (POK_CURRENT_THREAD.remaining_time_capacity > 0) {
         POK_CURRENT_THREAD.remaining_time_capacity =
-            POK_CURRENT_THREAD.remaining_time_capacity - 1;
-        printf("Partition %u thread %u is running at %lld\n",
+            POK_CURRENT_THREAD.remaining_time_capacity - POK_TIMER_QUANTUM;
+        printf("[LOG] Partition %u thread %u is running at %lld\n",
           (unsigned)pok_current_partition,
           (unsigned)POK_SCHED_CURRENT_THREAD,
           POK_GETTICK());
@@ -263,6 +263,11 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
                     // with non-infinite capacity (could be
                     // infinite with value -1 <--> INFINITE_TIME_CAPACITY)
       {
+        printf("[LOG] Partition %u thread %u finish at %lld, next activation: %u\n",
+          (unsigned)pok_current_partition,
+          (unsigned)POK_SCHED_CURRENT_THREAD,
+          POK_GETTICK(),
+          (unsigned)POK_CURRENT_THREAD.next_activation);
         POK_CURRENT_THREAD.state = POK_STATE_WAIT_NEXT_ACTIVATION;
       }
     }
@@ -641,7 +646,7 @@ uint32_t pok_sched_part_rr(const uint32_t index_low, const uint32_t index_high,
       //        "(priority "
       //        "%d)\n",
       //        current_proc, elected, pok_threads[elected].priority);
-      printf("Schedule partition %d thread %d at %lld\n",
+      printf("[LOG] Schedule partition %d thread %d at %lld\n",
         pok_current_partition,
         elected-index_low,
         POK_GETTICK());

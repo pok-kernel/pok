@@ -110,6 +110,8 @@ void pok_thread_init(void) {
   for (i = 0; i < POK_CONFIG_NB_THREADS; ++i) {
     pok_threads[i].period = INFINITE_TIME_VALUE;
     pok_threads[i].deadline = 0;
+    pok_threads[i].weight = 0;
+    pok_threads[i].rr_budget = 0;
     pok_threads[i].time_capacity = INFINITE_TIME_VALUE;
     pok_threads[i].remaining_time_capacity = INFINITE_TIME_VALUE;
     pok_threads[i].next_activation = 0;
@@ -157,6 +159,10 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
        pok_sched_get_priority_min(pok_partitions[partition_id].sched))) {
     pok_threads[id].priority = attr->priority;
     pok_threads[id].base_priority = attr->priority;
+  }
+
+  if (attr->weight > 0) {
+      pok_threads[id].weight = attr->weight;
   }
 
   if (attr->period > 0) {

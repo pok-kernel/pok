@@ -29,3 +29,6 @@ GTAGS
 grub-boot-only.img
 qemu.pid
 .vscode/
+
+mytests
+examples

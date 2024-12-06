@@ -20,6 +20,10 @@
 #include <errno.h>
 #include <types.h>
 
+#ifndef POK_LAB_SCHED_RR_BUDGET
+#define POK_LAB_SCHED_RR_BUDGET 3
+#endif /* POK_LAB_SCHED_RR_BUDGET */
+
 extern uint8_t pok_current_partition;
 #define POK_SCHED_CURRENT_PARTITION pok_current_partition
 
@@ -58,6 +62,13 @@ uint32_t pok_sched_part_rms(const uint32_t, const uint32_t,
                             const uint32_t prev_thread,
                             const uint32_t current_thread);
 uint32_t pok_sched_part_static(const uint32_t, const uint32_t,
+                               const uint32_t prev_thread,
+                               const uint32_t current_thread);
+
+uint32_t pok_lab_sched_part_rr(const uint32_t, const uint32_t,
+                               const uint32_t prev_thread,
+                               const uint32_t current_thread);
+uint32_t pok_lab_sched_part_wrr(const uint32_t, const uint32_t,
                                const uint32_t prev_thread,
                                const uint32_t current_thread);
 

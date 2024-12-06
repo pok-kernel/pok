@@ -798,7 +798,6 @@ uint32_t pok_lab_sched_part_pri(const uint32_t index_low, const uint32_t index_h
 uint32_t pok_lab_sched_part_edf(const uint32_t index_low, const uint32_t index_high, const uint32_t prev_thread,
                                 const uint32_t current_thread) {
   uint32_t from = current_thread != IDLE_THREAD ? current_thread : prev_thread; // start of loop
-  int32_t max_prio = -1;
   uint32_t max_thread = from;
   uint8_t current_proc = pok_get_proc_id();
 
@@ -807,17 +806,28 @@ uint32_t pok_lab_sched_part_edf(const uint32_t index_low, const uint32_t index_h
   do {
     if (pok_threads[i].state == POK_STATE_RUNNABLE &&
         pok_threads[i].processor_affinity == current_proc &&
-        pok_threads[i].priority > max_prio) {
-      max_prio = pok_threads[i].priority;
+        pok_threads[i].deadline < pok_threads[max_thread].deadline) {
       max_thread = i;
     }
     i++;
     if (i >= index_high) {
       i = index_low;
     }
-  } while (i != from);  // 遍历: 有优先级更高的thread就调度, 否则调度IDLE_THREAD
+  } while (i != from);  // 遍历: deadline更早的thread就调度, 否则调度IDLE_THREAD
 
-  uint32_t elected = max_prio >= 0 ? max_thread : IDLE_THREAD;
+  uint32_t elected = max_thread;
+#ifdef POK_NEEDS_SCHED_VERBOSE
+  if (elected != current_thread &&
+      (elected != IDLE_THREAD || current_thread != IDLE_THREAD)) {
+    if (elected != IDLE_THREAD) {
+      printf("[LOG] Schedule partition %d thread %d at %lld, deadline at %lld\n",
+        pok_current_partition,
+        elected-index_low,
+        POK_GETTICK(),
+        pok_threads[max_thread].deadline);
+    }
+  }
+#endif /* POK_NEEDS_SCHED_VERBOSE */
   return elected;
 }
 

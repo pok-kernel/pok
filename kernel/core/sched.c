@@ -82,6 +82,25 @@ extern void pok_port_flush_partition(uint8_t);
   uint64_t pok_sched_slots[POK_CONFIG_NB_PARTITIONS] =
     (uint64_t[])POK_CONFIG_SCHEDULING_SLOTS;
   uint8_t pok_sched_slots_allocation[POK_CONFIG_NB_PARTITIONS];
+#elif defined POK_PARTITION_SCHEDULING_EDF
+  #define POK_CONFIG_SCHEDULING_NBSLOTS POK_CONFIG_NB_PARTITIONS
+  uint64_t pok_sched_ddl[POK_CONFIG_NB_PARTITIONS] = 
+    (uint64_t[])POK_CONFIG_SCHEDULING_DEADLINE_ALLOCATION;
+  uint64_t pok_sched_slots[POK_CONFIG_NB_PARTITIONS] =
+    (uint64_t[])POK_CONFIG_SCHEDULING_SLOTS;
+  uint8_t pok_sched_slots_allocation[POK_CONFIG_NB_PARTITIONS];
+#elif defined POK_PARTITION_SCHEDULING_RR
+  #define POK_CONFIG_SCHEDULING_NBSLOTS POK_CONFIG_NB_PARTITIONS
+  uint64_t pok_sched_slots[POK_CONFIG_SCHEDULING_NBSLOTS] =
+    (uint64_t[])POK_CONFIG_SCHEDULING_SLOTS;
+  uint8_t pok_sched_slots_allocation[POK_CONFIG_SCHEDULING_NBSLOTS] =
+    (uint8_t[])POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION;
+#elif defined POK_PARTITION_SCHEDULING_WRR
+  #define POK_CONFIG_SCHEDULING_NBSLOTS POK_CONFIG_NB_PARTITIONS
+  uint64_t pok_sched_weight[POK_CONFIG_NB_PARTITIONS] = 
+    (uint64_t[])POK_CONFIG_SCHEDULING_WEIGHT_ALLOCATION;
+  uint64_t pok_sched_slots[POK_CONFIG_NB_PARTITIONS];
+  uint8_t pok_sched_slots_allocation[POK_CONFIG_NB_PARTITIONS];
 #endif
 
 uint64_t pok_sched_next_deadline;
@@ -101,7 +120,7 @@ void pok_sched_thread_switch(void);
 /**
  *\\brief Init scheduling service
  */
-void insertionSortIndices(const uint8_t* pok_sched_priority, int n, uint8_t* indices) {
+void prioritySort(const uint8_t* pok_sched_priority, int n, uint8_t* indices) {
     for (uint8_t i = 0; i < n; i++) {
         indices[i] = i;
     }
@@ -118,10 +137,27 @@ void insertionSortIndices(const uint8_t* pok_sched_priority, int n, uint8_t* ind
     }
 }
 
+void ddlSort(const uint64_t* pok_sched_ddl, int n, uint8_t* indices) {
+    for (uint8_t i = 0; i < n; i++) {
+        indices[i] = i;
+    }
+
+    for (uint8_t i = 1; i < n; i++) {
+        int keyIndex = indices[i];
+        int j = i - 1;
+
+        while (j >= 0 && pok_sched_ddl[indices[j]] > pok_sched_ddl[keyIndex]) {
+            indices[j + 1] = indices[j];
+            j = j - 1;
+        }
+        indices[j + 1] = keyIndex;
+    }
+}
+
 void pok_sched_init(void) {
 #ifdef POK_PARTITION_SCHEDULING_PRI
   uint8_t indices[POK_CONFIG_NB_PARTITIONS];
-  insertionSortIndices(pok_sched_priority, POK_CONFIG_NB_PARTITIONS, indices);
+  prioritySort(pok_sched_priority, POK_CONFIG_NB_PARTITIONS, indices);
 
   uint64_t new_slots[POK_CONFIG_NB_PARTITIONS];
   for (uint8_t i = 0; i < POK_CONFIG_NB_PARTITIONS; i++) {
@@ -132,14 +168,39 @@ void pok_sched_init(void) {
   for (uint8_t i = 0; i < POK_CONFIG_NB_PARTITIONS; i++) {
     pok_sched_slots[i] = new_slots[i];
   }
-#endif
+#elif defined POK_PARTITION_SCHEDULING_EDF
+  uint8_t indices[POK_CONFIG_NB_PARTITIONS];
+  ddlSort(pok_sched_ddl, POK_CONFIG_NB_PARTITIONS, indices);
 
-#ifdef POK_NEEDS_DEBUG
-  printf("Partition Scheduling Strategy: ");
-  for (int i = 0; i < POK_CONFIG_SCHEDULING_NBSLOTS; i++) {
-    printf("%d ", pok_sched_slots_allocation[i]);
+  uint64_t new_slots[POK_CONFIG_NB_PARTITIONS];
+  for (uint8_t i = 0; i < POK_CONFIG_NB_PARTITIONS; i++) {
+      pok_sched_slots_allocation[i] = indices[i];
+      new_slots[i] = pok_sched_slots[indices[i]];
   }
-  printf("!\n");
+
+  for (uint8_t i = 0; i < POK_CONFIG_NB_PARTITIONS; i++) {
+    pok_sched_slots[i] = new_slots[i];
+  }
+#elif defined POK_PARTITION_SCHEDULING_WRR
+  uint64_t total_weight = 0;
+  for (uint8_t i = 0; i < POK_CONFIG_NB_PARTITIONS; i++) {
+      total_weight += pok_sched_weight[i];
+      pok_sched_slots_allocation[i] = i;
+  }
+
+  uint64_t frame_remain = POK_CONFIG_SCHEDULING_MAJOR_FRAME;
+  for (uint8_t i = 0; i < POK_CONFIG_NB_PARTITIONS - 1; i++) {
+      pok_sched_slots[i] = pok_sched_weight[i] * POK_CONFIG_SCHEDULING_MAJOR_FRAME / total_weight;
+      frame_remain -= pok_sched_slots[i];
+  }
+  pok_sched_slots[POK_CONFIG_NB_PARTITIONS - 1] = frame_remain;
+#ifdef POK_NEEDS_DEBUG
+    printf("Weighted Round Robin Slot: ");
+    for (int i = 0; i < POK_CONFIG_NB_PARTITIONS; i++) {
+      printf("%lld ", pok_sched_slots[i]);
+    }
+    printf("\n");
+#endif
 #endif
 
   /*

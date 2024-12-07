@@ -70,10 +70,19 @@ extern void pok_port_flushall(void);
 extern void pok_port_flush_partition(uint8_t);
 #endif
 
-uint64_t pok_sched_slots[POK_CONFIG_SCHEDULING_NBSLOTS] =
+#if defined POK_CONFIG_SCHEDULING_NBSLOTS
+  uint64_t pok_sched_slots[POK_CONFIG_SCHEDULING_NBSLOTS] =
     (uint64_t[])POK_CONFIG_SCHEDULING_SLOTS;
-uint8_t pok_sched_slots_allocation[POK_CONFIG_SCHEDULING_NBSLOTS] =
+  uint8_t pok_sched_slots_allocation[POK_CONFIG_SCHEDULING_NBSLOTS] =
     (uint8_t[])POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION;
+#elif defined POK_PARTITION_SCHEDULING_PRI
+  #define POK_CONFIG_SCHEDULING_NBSLOTS POK_CONFIG_NB_PARTITIONS
+  uint8_t pok_sched_priority[POK_CONFIG_NB_PARTITIONS] = 
+    (uint8_t[])POK_CONFIG_SCHEDULING_PRIORITY_ALLOCATION;
+  uint64_t pok_sched_slots[POK_CONFIG_NB_PARTITIONS] =
+    (uint64_t[])POK_CONFIG_SCHEDULING_SLOTS;
+  uint8_t pok_sched_slots_allocation[POK_CONFIG_NB_PARTITIONS];
+#endif
 
 uint64_t pok_sched_next_deadline;
 uint64_t pok_sched_next_major_frame;
@@ -92,8 +101,47 @@ void pok_sched_thread_switch(void);
 /**
  *\\brief Init scheduling service
  */
+void insertionSortIndices(const uint8_t* pok_sched_priority, int n, uint8_t* indices) {
+    for (uint8_t i = 0; i < n; i++) {
+        indices[i] = i;
+    }
+
+    for (uint8_t i = 1; i < n; i++) {
+        int keyIndex = indices[i];
+        int j = i - 1;
+
+        while (j >= 0 && pok_sched_priority[indices[j]] > pok_sched_priority[keyIndex]) {
+            indices[j + 1] = indices[j];
+            j = j - 1;
+        }
+        indices[j + 1] = keyIndex;
+    }
+}
 
 void pok_sched_init(void) {
+#ifdef POK_PARTITION_SCHEDULING_PRI
+  uint8_t indices[POK_CONFIG_NB_PARTITIONS];
+  insertionSortIndices(pok_sched_priority, POK_CONFIG_NB_PARTITIONS, indices);
+
+  uint64_t new_slots[POK_CONFIG_NB_PARTITIONS];
+  for (uint8_t i = 0; i < POK_CONFIG_NB_PARTITIONS; i++) {
+      pok_sched_slots_allocation[i] = indices[i];
+      new_slots[i] = pok_sched_slots[indices[i]];
+  }
+
+  for (uint8_t i = 0; i < POK_CONFIG_NB_PARTITIONS; i++) {
+    pok_sched_slots[i] = new_slots[i];
+  }
+#endif
+
+#ifdef POK_NEEDS_DEBUG
+  printf("Partition Scheduling Strategy: ");
+  for (int i = 0; i < POK_CONFIG_SCHEDULING_NBSLOTS; i++) {
+    printf("%d ", pok_sched_slots_allocation[i]);
+  }
+  printf("!\n");
+#endif
+
   /*
    * We check that the total time of time frame
    * corresponds to the sum of each slot

@@ -138,7 +138,8 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
    * We can create a thread only if the partition is in INIT mode
    */
   if ((pok_partitions[partition_id].mode != POK_PARTITION_MODE_INIT_COLD) &&
-      (pok_partitions[partition_id].mode != POK_PARTITION_MODE_INIT_WARM)) {
+      (pok_partitions[partition_id].mode != POK_PARTITION_MODE_INIT_WARM) &&
+      (attr->user_add == FALSE)) {
     return POK_ERRNO_MODE;
   }
 
@@ -169,13 +170,16 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
 
   if (attr->period > 0) {
     pok_threads[id].period = attr->period;
-    pok_threads[id].next_activation = attr->period;
+    pok_threads[id].next_activation = POK_GETTICK()+attr->period;
   }
 
   if (attr->deadline > 0) {
     pok_threads[id].deadline = attr->deadline;
-    pok_threads[id].update_deadline = attr->deadline;
+    pok_threads[id].update_deadline = POK_GETTICK()+attr->deadline;
   }
+
+  pok_threads[id].finish_num = 0;
+  pok_threads[id].miss_num = 0;
 
   if (attr->time_capacity > 0) {
     pok_threads[id].time_capacity = attr->time_capacity;
@@ -203,7 +207,7 @@ pok_ret_t pok_partition_thread_create(uint32_t *thread_id,
       partition_id, pok_partitions[partition_id].thread_index);
 
   pok_threads[id].state = POK_STATE_RUNNABLE;
-  pok_threads[id].wakeup_time = 0;
+  pok_threads[id].wakeup_time = POK_GETTICK()+0;
   pok_threads[id].sp = pok_space_context_create(
       partition_id, (uint32_t)attr->entry, pok_threads[id].processor_affinity,
       stack_vaddr, 0xdead, 0xbeaf);
@@ -348,6 +352,9 @@ pok_ret_t pok_thread_get_status(const uint32_t id, pok_thread_attr_t *attr) {
   attr->stack_size = POK_USER_STACK_SIZE;
   attr->processor_affinity = get_proc_partition_id(
       POK_SCHED_CURRENT_PARTITION, pok_threads[id].processor_affinity);
+  attr->finish_num = pok_threads[id].finish_num;
+  attr->miss_num = pok_threads[id].miss_num;
+  attr->total_num = (POK_GETTICK()-pok_threads[id].wakeup_time)/pok_threads[id].period;
   return POK_ERRNO_OK;
 }
 

@@ -363,10 +363,10 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
         (POK_SCHED_CURRENT_THREAD != POK_CURRENT_PARTITION.thread_error)) {
       if (POK_CURRENT_THREAD.remaining_time_capacity > 0) {
 #ifdef POK_NEEDS_SCHED_VERBOSE
-        printf("[LOG] Partition %u thread %u is running at %lld\n",
-          (unsigned)pok_current_partition,
-          (unsigned)POK_SCHED_CURRENT_THREAD,
-          POK_GETTICK());
+        // printf("[LOG] Partition %u thread %u is running at %lld\n",
+        //   (unsigned)pok_current_partition,
+        //   (unsigned)POK_SCHED_CURRENT_THREAD,
+        //   POK_GETTICK());
 #endif /* POK_NEEDS_SCHED_VERBOSE */
         POK_CURRENT_THREAD.remaining_time_capacity =
             POK_CURRENT_THREAD.remaining_time_capacity - POK_TIMER_QUANTUM;
@@ -377,6 +377,10 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
                      // infinite with value -1 <--> INFINITE_TIME_CAPACITY)
       {
 #ifdef POK_NEEDS_SCHED_VERBOSE
+        if (POK_GETTICK() > POK_CURRENT_THREAD.deadline) {
+          POK_CURRENT_THREAD.miss_num += 1;
+        }
+        POK_CURRENT_THREAD.finish_num += 1;
         printf("[LOG] Partition %u thread %u finish at %lld, next activation: %u\n",
           (unsigned)pok_current_partition,
           (unsigned)POK_SCHED_CURRENT_THREAD,

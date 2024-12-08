@@ -376,11 +376,11 @@ uint32_t pok_elect_thread(uint8_t new_partition_id) {
                      // with non-infinite capacity (could be
                      // infinite with value -1 <--> INFINITE_TIME_CAPACITY)
       {
+        if (POK_GETTICK() > POK_CURRENT_THREAD.update_deadline) {
+            POK_CURRENT_THREAD.miss_num += 1;
+          }
+          POK_CURRENT_THREAD.finish_num += 1;
 #ifdef POK_NEEDS_SCHED_VERBOSE
-        if (POK_GETTICK() > POK_CURRENT_THREAD.deadline) {
-          POK_CURRENT_THREAD.miss_num += 1;
-        }
-        POK_CURRENT_THREAD.finish_num += 1;
         printf("[LOG] Partition %u thread %u finish at %lld, next activation: %u\n",
           (unsigned)pok_current_partition,
           (unsigned)POK_SCHED_CURRENT_THREAD,

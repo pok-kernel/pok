@@ -354,7 +354,7 @@ pok_ret_t pok_thread_get_status(const uint32_t id, pok_thread_attr_t *attr) {
       POK_SCHED_CURRENT_PARTITION, pok_threads[id].processor_affinity);
   attr->finish_num = pok_threads[id].finish_num;
   attr->miss_num = pok_threads[id].miss_num;
-  attr->total_num = (POK_GETTICK()-pok_threads[id].wakeup_time)/pok_threads[id].period;
+  attr->total_num = (POK_GETTICK()-pok_threads[id].wakeup_time+pok_threads[id].period)/pok_threads[id].period;
   return POK_ERRNO_OK;
 }
 

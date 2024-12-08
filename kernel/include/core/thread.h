@@ -83,7 +83,7 @@ typedef struct {
   bool_t user_add;
   uint8_t finish_num;
   uint8_t miss_num;
-  uint8_t total_num;
+  uint32_t total_num;
 } pok_thread_attr_t;
 /*
  * Attributes given to create a thread

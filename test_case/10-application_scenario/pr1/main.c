@@ -31,12 +31,13 @@ void task() {
   }
 }
 
-int add_task(uint64_t period, uint64_t time_capacity, uint8_t pri) {
+int add_task(uint64_t period, uint64_t time_capacity, uint8_t pri, uint64_t deadline) {
   uint32_t tid;
   pok_thread_attr_t tattr;
 
   tattr.period = period;
   tattr.priority = pri;
+  tattr.deadline = deadline;
   tattr.time_capacity = time_capacity;
   tattr.user_add = TRUE;
   tattr.entry = task;
@@ -68,53 +69,60 @@ void user_thread() {
     int number = getInput();
 
     printf("%d\n", number-'0');
-    printf("You choose: %d => ", number-'0');
+    printf("You choose: %d\n", number-'0');
+    printf("---------------------------\n");
 
     uint32_t new_tid;
 
     if (number == '0') {
       printf("Create Image Recognition Task\n");
-      new_tid = add_task(400, 50, 39);
+      new_tid = add_task(200, 80, 40, 100);
       if (new_tid!=(uint32_t)-1) {
         tids[current_new_thread] = new_tid;
         current_new_thread++;
       }
     } else if (number == '1') {
       printf("Create Chatbot Task\n");
-      new_tid = add_task(800, 100, 38);
+      new_tid = add_task(300, 100, 30, 160);
       if (new_tid!=(uint32_t)-1) {
         tids[current_new_thread] = new_tid;
         current_new_thread++;
       }
     } else if (number == '2') {
-      printf("CreatevMeeting Minutes Task\n");
-      new_tid = add_task(100, 1000, 37);
+      printf("Create Meeting Minutes Task\n");
+      new_tid = add_task(400, 180, 25, 200);
       if (new_tid!=(uint32_t)-1) {
         tids[current_new_thread] = new_tid;
         current_new_thread++;
       }
     } 
     else if (number == '3') {
-      printf("-----Show Task Information-----\n");
+      printf("Show Task Information\n");
       pok_thread_attr_t showattr;
-      for (int i = 0; i < current_new_thread; i++) {
-        pok_thread_status(tids[i], &showattr);
-        printf("Task Num = %d, Total Num = %d, Finish Number = %d, \
-                Miss Num = %d, Throughput = %d, Goodput = %d\n", tids[i], 
-                showattr.total_num, showattr.finish_num, showattr.miss_num, 
-                showattr.finish_num/showattr.total_num,
-                (showattr.finish_num-showattr.miss_num)/showattr.total_num);
+      if (current_new_thread == 0) {
+        printf("Empty\n");
+      } else {
+        for (int i = 0; i < current_new_thread; i++) {
+          pok_thread_status(tids[i], &showattr);
+          float throughput = ((float)showattr.finish_num / showattr.total_num);
+          float goodput = ((float)(showattr.finish_num - showattr.miss_num) / showattr.total_num);
+
+          printf("Thread %d:\tTotal: %d\tFinish: %d\tMiss: %d,\tFinish Rate = %f\tGoodput = %f\n", 
+          tids[i], showattr.total_num, showattr.finish_num, showattr.miss_num, 
+          throughput, goodput);
+        }
       }
-      printf("-----New Task Information-----\n");
+      
     } else if (number == '4') {
-      printf("-----User Print Exit!-----\n");
+      printf("User Print Exit!\n");
       for (int i = 0; i < current_new_thread; i++) {
         pok_thread_suspend_target(tids[i]);
         printf("Stop Thread %d\n", tids[i]);
       }
-      printf("-----Stop All Threads!-----\n");
+      printf("---------------------------\n");
       break;
     }
+    printf("---------------------------\n");
   }
   printf("Exit!\n");
   pok_thread_wait_infinite();
@@ -127,7 +135,7 @@ int main() {
 
   tattr.period = -1;
   tattr.period = 40;
-  tattr.priority = 40;
+  tattr.priority = 20;
   tattr.entry = user_thread;
   pok_thread_create(&tid, &tattr);
 

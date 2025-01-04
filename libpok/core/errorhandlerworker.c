@@ -9,7 +9,7 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2024 POK team
+ *                                      Copyright (c) 2007-2025 POK team
  */
 
 #ifndef POK_USE_GENERATED_ERROR_HANDLER

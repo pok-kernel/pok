@@ -9,7 +9,7 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2024 POK team
+ *                                      Copyright (c) 2007-2025 POK team
  */
 
 void user_hello_part2() { printf("Hello from part2\n"); }

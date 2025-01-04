@@ -9,7 +9,7 @@
  *
  * Please follow the coding guidelines described in doc/CODING_GUIDELINES
  *
- *                                      Copyright (c) 2007-2024 POK team
+ *                                      Copyright (c) 2007-2025 POK team
  */
 
 /* s_asinhf.c -- float version of s_asinh.c.

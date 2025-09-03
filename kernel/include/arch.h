@@ -117,4 +117,8 @@ __attribute__((noreturn)) void pok_division_by_zero_error(void);
 #include <arch/sparc/spinlock.h>
 #endif
 
+#ifdef POK_ARCH_ARM
+/* ARM-specific includes can be added here if needed */
+#endif
+
 #endif /* !__POK_ARCH_H__ */

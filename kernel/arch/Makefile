@@ -6,12 +6,12 @@ include $(TOPDIR)/misc/mk/config.mk
 ifdef ARCH
 SUBDIRS:=$(ARCH)
 else
-SUBDIRS:=ppc sparc x86
+SUBDIRS:=arm ppc sparc x86
 endif
 
 LO_TARGET=	arch.lo
 
-LO_OBJS=		
+LO_OBJS=
 
 LO_DEPS=	$(ARCH)/$(ARCH).lo
 
